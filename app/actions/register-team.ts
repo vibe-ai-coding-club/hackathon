@@ -32,13 +32,11 @@ export type ActionState = {
 };
 
 export async function registerTeam(_prevState: ActionState, formData: FormData): Promise<ActionState> {
-  // Honeypot — 봇이 채우면 차단
   const honeypot = formData.get("website");
   if (honeypot) {
     return { success: false, message: "잘못된 요청입니다." };
   }
 
-  // Rate limit
   const headerStore = await headers();
   const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
@@ -49,7 +47,6 @@ export async function registerTeam(_prevState: ActionState, formData: FormData):
     };
   }
 
-  // 팀 수 상한
   const teamCount = await prisma.team.count();
   if (teamCount >= MAX_TEAMS) {
     return {
