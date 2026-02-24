@@ -35,9 +35,9 @@ hackathon/
 │   ├── layout.tsx          # Root Layout
 │   └── page.tsx            # 홈 페이지
 ├── docs/                   # 프로젝트 문서
-│   ├── YYYYMMDD-*.md       # 설계서/기획서
-│   └── logs/               # 개발 일지
-│       └── YYYYMMDD-*.md   # 일자별 커밋 내용 정리
+│   └── YYYYMMDD-*.md       # 설계서/기획서
+├── logs/                   # 개발 일지
+│   └── YYYYMMDD-*.md       # 일자별 커밋 내용 정리
 ├── generated/prisma/       # Prisma 생성 클라이언트 (gitignored)
 ├── lib/                    # 공유 유틸리티
 │   ├── prisma.ts           # Prisma 싱글톤 클라이언트
