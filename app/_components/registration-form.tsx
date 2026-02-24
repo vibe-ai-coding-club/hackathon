@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
 import { registerTeam, type ActionState } from "@/app/actions/register-team";
 import type { TeamMember } from "@/lib/validations/team";
+import { useActionState, useState } from "react";
 import { MemberFieldset } from "./member-fieldset";
 
 const createMember = (isLeader = false): TeamMember => ({
@@ -18,13 +18,8 @@ const initialState: ActionState = {
 };
 
 export const RegistrationForm = () => {
-  const [state, formAction, isPending] = useActionState(
-    registerTeam,
-    initialState
-  );
-  const [members, setMembers] = useState<TeamMember[]>([
-    createMember(true),
-  ]);
+  const [state, formAction, isPending] = useActionState(registerTeam, initialState);
+  const [members, setMembers] = useState<TeamMember[]>([createMember(true)]);
 
   const updateMember = (index: number, member: TeamMember) => {
     setMembers((prev) => prev.map((m, i) => (i === index ? member : m)));
@@ -42,23 +37,16 @@ export const RegistrationForm = () => {
   return (
     <form action={formAction} className="space-y-6">
       {state.message && !state.success && (
-        <div className="rounded-lg border border-error/30 bg-error/5 p-4 text-sm text-error">
-          {state.message}
-        </div>
+        <div className="rounded-lg border border-error/30 bg-error/5 p-4 text-sm text-error">{state.message}</div>
       )}
 
       {state.success && (
-        <div className="rounded-lg border border-success/30 bg-success/5 p-4 text-sm text-success">
-          {state.message}
-        </div>
+        <div className="rounded-lg border border-success/30 bg-success/5 p-4 text-sm text-success">{state.message}</div>
       )}
 
       <div className="space-y-4">
         <div>
-          <label
-            htmlFor="team-name"
-            className="block text-sm font-medium mb-1"
-          >
+          <label htmlFor="team-name" className="block text-sm font-medium mb-1">
             팀 이름 *
           </label>
           <input
@@ -78,10 +66,7 @@ export const RegistrationForm = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="team-topic"
-            className="block text-sm font-medium mb-1"
-          >
+          <label htmlFor="team-topic" className="block text-sm font-medium mb-1">
             주제 *
           </label>
           <input
@@ -101,12 +86,8 @@ export const RegistrationForm = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="team-description"
-            className="block text-sm font-medium mb-1"
-          >
-            설명{" "}
-            <span className="text-muted-foreground font-normal">(선택)</span>
+          <label htmlFor="team-description" className="block text-sm font-medium mb-1">
+            설명 <span className="text-muted-foreground font-normal">(선택)</span>
           </label>
           <textarea
             id="team-description"
@@ -121,9 +102,7 @@ export const RegistrationForm = () => {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">
-            팀원 ({members.length}/5)
-          </h3>
+          <h3 className="text-sm font-medium">팀원 ({members.length}/5)</h3>
           {members.length < 5 && (
             <button
               type="button"
@@ -155,6 +134,10 @@ export const RegistrationForm = () => {
       </div>
 
       <input type="hidden" name="members" value={JSON.stringify(members)} />
+
+      <div className="absolute opacity-0 -z-10" aria-hidden="true">
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
 
       <button
         type="submit"

@@ -2,6 +2,28 @@
 
 import { prisma } from "@/lib/prisma";
 import { teamRegistrationSchema } from "@/lib/validations/team";
+import { headers } from "next/headers";
+
+const MAX_TEAMS = 100;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1분
+const RATE_LIMIT_MAX = 3; // 1분에 3회
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+const checkRateLimit = (ip: string): boolean => {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+
+  entry.count++;
+  return true;
+};
 
 export type ActionState = {
   success: boolean;
@@ -9,10 +31,33 @@ export type ActionState = {
   errors?: Record<string, string[]>;
 };
 
-export async function registerTeam(
-  _prevState: ActionState,
-  formData: FormData
-): Promise<ActionState> {
+export async function registerTeam(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+  // Honeypot — 봇이 채우면 차단
+  const honeypot = formData.get("website");
+  if (honeypot) {
+    return { success: false, message: "잘못된 요청입니다." };
+  }
+
+  // Rate limit
+  const headerStore = await headers();
+  const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
+  if (!checkRateLimit(ip)) {
+    return {
+      success: false,
+      message: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+    };
+  }
+
+  // 팀 수 상한
+  const teamCount = await prisma.team.count();
+  if (teamCount >= MAX_TEAMS) {
+    return {
+      success: false,
+      message: "모집이 마감되었습니다. 더 이상 팀을 등록할 수 없습니다.",
+    };
+  }
+
   const rawMembers = formData.get("members");
 
   let members: unknown;

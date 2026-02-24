@@ -27,7 +27,7 @@ export default function Home() {
           2026.03.28 — 지구 어딘가
         </p>
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-          <span className="text-accent">AI</span> 잔망이 시작된다!
+          <span className="text-accent">AI</span> 잔망이 시작된다! (임시)
         </h1>
         <p className="max-w-lg text-muted-foreground">
           GPT x Claude x Gemini — 세 가지 AI를 활용하여 혁신적인 프로젝트를 만들어보세요. 8시간 동안의 치열한 대결이
