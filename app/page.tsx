@@ -6,26 +6,15 @@ export default function Home() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
         <nav className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <span className="text-sm font-bold tracking-tight">
-            AI 해커톤 2026
-          </span>
+          <span className="text-sm font-bold tracking-tight">AI 해커톤 2026</span>
           <div className="flex gap-4 text-sm">
-            <a
-              href="#about"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
               소개
             </a>
-            <a
-              href="#schedule"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <a href="#schedule" className="text-muted-foreground hover:text-foreground transition-colors">
               일정
             </a>
-            <a
-              href="#register"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <a href="#register" className="text-muted-foreground hover:text-foreground transition-colors">
               참가 신청
             </a>
           </div>
@@ -35,14 +24,14 @@ export default function Home() {
       {/* Hero */}
       <section className="flex flex-col items-center justify-center gap-6 px-4 py-24 text-center">
         <p className="rounded-full border border-border px-4 py-1 text-xs text-muted-foreground">
-          2026.03.15 — 마음랑외력순 해임
+          2026.03.28 — 지구 어딘가
         </p>
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
           <span className="text-accent">AI</span> 잔망이 시작된다!
         </h1>
         <p className="max-w-lg text-muted-foreground">
-          GPT x Claude x Gemini — 세 가지 AI를 활용하여 혁신적인 프로젝트를
-          만들어보세요. 48시간 동안의 치열한 대결이 시작됩니다.
+          GPT x Claude x Gemini — 세 가지 AI를 활용하여 혁신적인 프로젝트를 만들어보세요. 8시간 동안의 치열한 대결이
+          시작됩니다.
         </p>
         <a
           href="#register"
@@ -61,16 +50,14 @@ export default function Home() {
               <div className="mb-3 text-2xl">🤖</div>
               <h3 className="mb-2 font-semibold">AI 활용</h3>
               <p className="text-sm text-muted-foreground">
-                GPT, Claude, Gemini 등 다양한 AI 도구를 자유롭게 활용하여
-                프로젝트를 완성하세요.
+                GPT, Claude, Gemini 등 다양한 AI 도구를 자유롭게 활용하여 프로젝트를 완성하세요.
               </p>
             </div>
             <div className="rounded-lg border border-border p-6">
               <div className="mb-3 text-2xl">⏱️</div>
-              <h3 className="mb-2 font-semibold">48시간</h3>
+              <h3 className="mb-2 font-semibold">8시간</h3>
               <p className="text-sm text-muted-foreground">
-                제한된 시간 안에 아이디어를 구현하는 도전! 팀워크와 창의력이
-                핵심입니다.
+                10:00부터 18:00까지, 제한된 시간 안에 아이디어를 구현하는 도전! 팀워크와 창의력이 핵심입니다.
               </p>
             </div>
             <div className="rounded-lg border border-border p-6">
@@ -91,33 +78,28 @@ export default function Home() {
           <div className="space-y-4">
             {[
               {
-                date: "03.01 ~ 03.14",
+                date: "03.14 ~ 03.20",
                 title: "참가 신청",
                 desc: "온라인으로 팀 등록",
               },
               {
-                date: "03.15 (토) 10:00",
+                date: "03.28 (토) 10:00",
                 title: "개회식 및 주제 발표",
                 desc: "해커톤 시작",
               },
               {
-                date: "03.15 ~ 03.16",
+                date: "03.28 (토) 10:00 ~ 18:00",
                 title: "해킹 타임",
-                desc: "48시간 개발 진행",
+                desc: "8시간 개발 진행",
               },
               {
-                date: "03.17 (월) 10:00",
+                date: "03.28 (토) 18:00",
                 title: "발표 및 심사",
                 desc: "프로젝트 발표 & 시상식",
               },
             ].map((item) => (
-              <div
-                key={item.title}
-                className="flex gap-4 rounded-lg border border-border p-4"
-              >
-                <div className="w-36 shrink-0 text-sm font-mono text-accent">
-                  {item.date}
-                </div>
+              <div key={item.title} className="flex gap-4 rounded-lg border border-border p-4">
+                <div className="w-36 shrink-0 text-sm font-mono text-accent">{item.date}</div>
                 <div>
                   <p className="font-semibold">{item.title}</p>
                   <p className="text-sm text-muted-foreground">{item.desc}</p>
@@ -133,8 +115,7 @@ export default function Home() {
         <div className="mx-auto max-w-2xl px-4">
           <h2 className="mb-2 text-2xl font-bold">참가 신청</h2>
           <p className="mb-8 text-sm text-muted-foreground">
-            팀 정보와 팀원을 등록해주세요. 팀원은 최소 1명, 최대 5명까지
-            가능합니다.
+            팀 정보와 팀원을 등록해주세요. 팀원은 최소 1명, 최대 5명까지 가능합니다.
           </p>
           <RegistrationForm />
         </div>
