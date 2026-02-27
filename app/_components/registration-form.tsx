@@ -30,7 +30,7 @@ export const RegistrationForm = () => {
   };
 
   const addMember = () => {
-    if (members.length >= 5) return;
+    if (members.length >= 4) return;
     setMembers((prev) => [...prev, createMember()]);
   };
 
@@ -102,8 +102,8 @@ export const RegistrationForm = () => {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">팀원 ({members.length}/5)</h3>
-          {members.length < 5 && (
+          <h3 className="text-sm font-medium">팀원 ({members.length}/4)</h3>
+          {members.length < 4 && (
             <button
               type="button"
               onClick={addMember}

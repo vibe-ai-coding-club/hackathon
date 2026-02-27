@@ -27,7 +27,7 @@ export const teamRegistrationSchema = z
     members: z
       .array(teamMemberSchema)
       .min(1, "최소 1명의 팀원이 필요합니다")
-      .max(5, "팀원은 최대 5명까지 가능합니다"),
+      .max(4, "팀원은 최대 4명까지 가능합니다"),
   })
   .refine((data) => data.members.filter((m) => m.isLeader).length === 1, {
     message: "팀장은 반드시 1명이어야 합니다",
