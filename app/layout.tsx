@@ -13,13 +13,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI 해커톤 2026 - 참가 신청",
+  title: "딸깍톤 2026 - 참가 신청",
   description:
-    "GPT x Claude x Gemini — AI 해커톤 2026 참가 신청 페이지. 48시간 동안 혁신적인 프로젝트를 만들어보세요.",
+    "GPT x Claude x Gemini — 딸깍톤(ttalkkakthon) 2026 참가 신청 페이지. 바이브 코딩으로 혁신적인 프로젝트를 만들어보세요.",
+  keywords: [
+    "딸깍톤",
+    "ttalkkakthon",
+    "AI Hackathon",
+    "AI 해커톤",
+    "바이브 코딩 클럽",
+    "vibe coding club",
+    "바이브 코딩",
+    "vibe coding",
+  ],
   openGraph: {
-    title: "AI 해커톤 2026 - 참가 신청",
+    title: "딸깍톤 2026 - 참가 신청",
     description:
-      "GPT x Claude x Gemini — AI 해커톤 2026 참가 신청 페이지. 48시간 동안 혁신적인 프로젝트를 만들어보세요.",
+      "GPT x Claude x Gemini — 딸깍톤(ttalkkakthon) 2026 참가 신청 페이지. 바이브 코딩으로 혁신적인 프로젝트를 만들어보세요.",
     type: "website",
   },
 };

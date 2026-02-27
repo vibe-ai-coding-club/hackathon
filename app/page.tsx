@@ -6,7 +6,7 @@ export default function Home() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
         <nav className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <span className="text-sm font-bold tracking-tight">AI 해커톤 2026</span>
+          <span className="text-sm font-bold tracking-tight">딸깍톤 2026</span>
           <div className="flex gap-4 text-sm">
             <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
               소개
@@ -27,7 +27,7 @@ export default function Home() {
           2026.03.28 — 지구 어딘가
         </p>
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-          <span className="text-accent">AI</span> 잔망이 시작된다! (임시)
+          <span className="text-accent">딸깍톤</span> 시작된다! (임시)
         </h1>
         <p className="max-w-lg text-muted-foreground">
           GPT x Claude x Gemini — 세 가지 AI를 활용하여 혁신적인 프로젝트를 만들어보세요. 8시간 동안의 치열한 대결이
@@ -44,7 +44,7 @@ export default function Home() {
       {/* About */}
       <section id="about" className="border-t border-border py-20">
         <div className="mx-auto max-w-4xl px-4">
-          <h2 className="mb-8 text-2xl font-bold">해커톤 소개</h2>
+          <h2 className="mb-8 text-2xl font-bold">딸깍톤 소개</h2>
           <div className="grid gap-6 sm:grid-cols-3">
             <div className="rounded-lg border border-border p-6">
               <div className="mb-3 text-2xl">🤖</div>
@@ -85,7 +85,7 @@ export default function Home() {
               {
                 date: "03.28 (토) 10:00",
                 title: "개회식 및 주제 발표",
-                desc: "해커톤 시작",
+                desc: "딸깍톤 시작",
               },
               {
                 date: "03.28 (토) 10:00 ~ 18:00",
@@ -124,7 +124,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border py-8">
         <div className="mx-auto max-w-4xl px-4 text-center text-sm text-muted-foreground">
-          <p>© 2026 AI 해커톤. All rights reserved.</p>
+          <p>© 2026 딸깍톤. All rights reserved.</p>
         </div>
       </footer>
     </div>
