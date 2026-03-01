@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { teamRegistrationSchema } from "@/lib/validations/team";
 import { headers } from "next/headers";
@@ -51,28 +52,34 @@ export async function registerTeam(_prevState: ActionState, formData: FormData):
   if (teamCount >= MAX_TEAMS) {
     return {
       success: false,
-      message: "모집이 마감되었습니다. 더 이상 팀을 등록할 수 없습니다.",
+      message: "모집이 마감되었습니다. 더 이상 등록할 수 없습니다.",
     };
   }
 
   const rawMembers = formData.get("members");
 
   let members: unknown;
-  try {
-    members = JSON.parse(rawMembers as string);
-  } catch {
-    return {
-      success: false,
-      message: "팀원 데이터가 올바르지 않습니다.",
-      errors: { members: ["팀원 데이터를 파싱할 수 없습니다."] },
-    };
+  if (rawMembers) {
+    try {
+      members = JSON.parse(rawMembers as string);
+    } catch {
+      return {
+        success: false,
+        message: "팀원 데이터가 올바르지 않습니다.",
+        errors: { members: ["팀원 데이터를 파싱할 수 없습니다."] },
+      };
+    }
   }
 
   const raw = {
     name: formData.get("name"),
-    topic: formData.get("topic"),
-    description: formData.get("description") || undefined,
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    participationType: formData.get("participationType"),
+    teamName: formData.get("teamName") || undefined,
     members,
+    experienceLevel: formData.get("experienceLevel"),
+    motivation: formData.get("motivation") || undefined,
   };
 
   const result = teamRegistrationSchema.safeParse(raw);
@@ -92,30 +99,34 @@ export async function registerTeam(_prevState: ActionState, formData: FormData):
     };
   }
 
-  const { name, topic, description, members: validMembers } = result.data;
+  const { name, email, phone, participationType, teamName, members: validMembers, experienceLevel, motivation } = result.data;
 
   try {
-    const existing = await prisma.team.findUnique({ where: { name } });
+    const existing = await prisma.team.findUnique({ where: { email } });
     if (existing) {
       return {
         success: false,
-        message: "이미 등록된 팀 이름입니다.",
-        errors: { name: ["이미 등록된 팀 이름입니다."] },
+        message: "이미 등록된 이메일입니다.",
+        errors: { email: ["이미 등록된 이메일입니다."] },
       };
     }
 
     await prisma.team.create({
       data: {
         name,
-        topic,
-        description: description || null,
-        members: validMembers,
+        email,
+        phone,
+        participationType,
+        teamName: teamName || null,
+        members: validMembers ?? Prisma.JsonNull,
+        experienceLevel,
+        motivation: motivation || null,
       },
     });
 
     return {
       success: true,
-      message: "팀 등록이 완료되었습니다!",
+      message: "참가 신청이 완료되었습니다!",
     };
   } catch {
     return {

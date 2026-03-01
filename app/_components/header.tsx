@@ -9,22 +9,25 @@ export const Header = () => {
         </Link>
         <div className="flex items-center gap-5 text-sm">
           <Link href="/#intro" className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors">
-            행사 소개
+            소개
           </Link>
           <Link href="/#schedule" className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors">
-            행사 일정
+            일정
           </Link>
           <Link href="/#rules" className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors">
-            참가 규칙
+            규칙
           </Link>
           <Link href="/#notes" className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors">
-            유의 사항
+            유의사항
+          </Link>
+          <Link href="/register" className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors">
+            신청
           </Link>
           <Link
             href="/register"
             className="rounded-md bg-accent px-4 py-1.5 font-semibold text-white hover:bg-accent-hover transition-colors"
           >
-            참가 신청
+            신청하기
           </Link>
         </div>
       </nav>
