@@ -13,14 +13,50 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ParticipationType {
+  INDIVIDUAL
+  TEAM
+}
+
+enum ExperienceLevel {
+  BEGINNER // 비개발자/입문
+  JUNIOR // 주니어
+  SENIOR // 시니어
+  VIBE_CODER // 바이브코더
+}
+
 model Team {
+  id                String            @id @default(cuid())
+  // 기본 정보 (신청자 = 대표자)
+  name              String // 이름 (대표자)
+  email             String            @unique // 이메일
+  phone             String // 연락처
+  // 참가 유형
+  participationType ParticipationType @default(INDIVIDUAL) @map("participation_type")
+  // 팀 정보 (팀 참여 시)
+  teamName          String?           @map("team_name") // 팀 이름
+  members           Json? // { name: string, email?: string, experienceLevel?: string }[]
+  // 추가 정보
+  experienceLevel   ExperienceLevel   @default(BEGINNER) @map("experience_level")
+  motivation        String? // 참가 동기
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  projects Project[]
+
+  @@map("teams")
+}
+
+model Project {
   id          String   @id @default(cuid())
-  name        String   @unique
-  topic       String
-  description String?
-  members     Json     // { name, email, phone, isLeader }[]
+  teamId      String   @map("team_id")
+  team        Team     @relation(fields: [teamId], references: [id])
+  title       String // 프로젝트 제목
+  description String // 프로젝트 설명
+  imageUrl    String   @map("image_url") // Vercel Blob 이미지 URL
+  linkUrl     String?  @map("link_url") // 프로젝트 링크 (GitHub, 배포 URL 등)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  @@map("teams")
+  @@map("projects")
 }
