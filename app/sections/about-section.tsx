@@ -54,33 +54,33 @@ export const AboutSection = () => {
         {/* 라벨 */}
         <div className="flex items-center gap-3 mb-10">
           <span className="inline-block w-8 h-0.5 bg-accent" />
-          <span className="text-sm font-bold text-accent tracking-widest">ABOUT</span>
+          <span className="typo-subtitle2 text-accent tracking-widest">ABOUT</span>
         </div>
 
         {/* 번호 카드 */}
         <div className="grid gap-5 sm:grid-cols-3 mb-12">
           {descriptions.map((item) => (
             <div key={item.num} className="rounded-2xl bg-muted p-6">
-              <span className="inline-block mb-4 rounded-md bg-accent/10 px-2.5 py-1 text-sm font-bold text-accent">
+              <span className="typo-subtitle2 inline-block mb-4 rounded-md bg-accent/10 px-2.5 py-1 text-accent">
                 {item.num}
               </span>
-              <p className="text-sm leading-relaxed">{item.text}</p>
+              <p className="typo-body3">{item.text}</p>
             </div>
           ))}
         </div>
 
         {/* 행사 정보 카드 */}
         <div className="rounded-2xl bg-muted p-8">
-          <h3 className="mb-6 text-lg font-bold">행사 정보</h3>
+          <h3 className="typo-h7 mb-6">행사 정보</h3>
           <div className="grid gap-6 sm:grid-cols-3">
             {eventInfo.map((info) => (
               <div key={info.label} className="flex gap-3">
                 <div className="mt-0.5 shrink-0">{info.icon}</div>
                 <div>
-                  <p className="text-xs text-muted-foreground">{info.label}</p>
-                  <p className="text-sm font-semibold">{info.value}</p>
+                  <p className="typo-caption1 text-muted-foreground">{info.label}</p>
+                  <p className="typo-subtitle2">{info.value}</p>
                   {info.sub && (
-                    <p className="text-xs text-muted-foreground">{info.sub}</p>
+                    <p className="typo-caption1 text-muted-foreground">{info.sub}</p>
                   )}
                 </div>
               </div>

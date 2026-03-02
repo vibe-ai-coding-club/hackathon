@@ -20,26 +20,26 @@ export const ApplySection = () => {
         {/* 중앙 라벨 */}
         <div className="flex items-center justify-center gap-3 mb-4">
           <span className="inline-block w-8 h-0.5 bg-accent" />
-          <span className="text-sm font-bold text-accent tracking-widest">APPLY</span>
+          <span className="typo-subtitle2 text-accent tracking-widest">APPLY</span>
           <span className="inline-block w-8 h-0.5 bg-accent" />
         </div>
 
-        <h2 className="mb-3 text-3xl font-bold">참가 신청</h2>
-        <p className="mb-10 text-sm text-muted-foreground">
+        <h2 className="typo-h3 mb-3">참가 신청</h2>
+        <p className="typo-body3 mb-10 text-muted-foreground">
           아래 버튼을 통해 신청서를 작성하고 참가를 확정하세요.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-4 text-sm font-semibold text-white hover:bg-accent-hover transition-colors"
+            className="typo-btn3 inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-4 text-white hover:bg-accent-hover transition-colors"
           >
             <DocIcon />
             신청서 작성하기
           </Link>
           <a
             href="#"
-            className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-8 py-4 text-sm font-semibold text-black hover:bg-amber-500 transition-colors"
+            className="typo-btn3 inline-flex items-center gap-2 rounded-xl bg-amber-400 px-8 py-4 text-black hover:bg-amber-500 transition-colors"
           >
             <ExternalIcon />
             배포 링크 제출하기

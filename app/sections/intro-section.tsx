@@ -45,11 +45,11 @@ export const IntroSection = () => {
   return (
     <section id="intro" className="scroll-mt-16 bg-muted py-24 min-h-[85vh] flex flex-col justify-center">
       <div className="mx-auto max-w-5xl px-4 text-center">
-        <h2 className="mb-14 text-3xl font-bold sm:text-4xl">행사 소개</h2>
+        <h2 className="typo-h3 mb-14">행사 소개</h2>
 
-        <div className="mb-16 space-y-6 text-base sm:text-lg">
+        <div className="typo-body1 mb-16 space-y-6">
           <p>AI와 함께 만드는 유쾌한 하루짜리 해커톤이에요</p>
-          <p className="font-semibold">완성도보다 태도, 논리보다 바이브가 더 중요해요</p>
+          <p className="typo-subtitle1">완성도보다 태도, 논리보다 바이브가 더 중요해요</p>
           <p>쓸모없어도 괜찮고 이상해도 괜찮아요</p>
         </div>
 
@@ -60,8 +60,8 @@ export const IntroSection = () => {
               className="rounded-2xl bg-background p-6 text-left"
             >
               <div className="mb-4">{card.icon}</div>
-              <p className="mb-1 text-sm font-bold">{card.label}</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="typo-subtitle2 mb-1">{card.label}</p>
+              <p className="typo-body3 text-muted-foreground">
                 {card.value}
                 {card.sub && (
                   <>

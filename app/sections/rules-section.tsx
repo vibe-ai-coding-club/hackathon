@@ -51,10 +51,10 @@ export const RulesSection = () => {
         {/* 라벨 */}
         <div className="flex items-center gap-3 mb-4">
           <span className="inline-block w-8 h-0.5 bg-accent" />
-          <span className="text-sm font-bold text-accent tracking-widest">RULES</span>
+          <span className="typo-subtitle2 text-accent tracking-widest">RULES</span>
         </div>
 
-        <h2 className="mb-12 text-3xl font-bold">참가 규칙</h2>
+        <h2 className="typo-h3 mb-12">참가 규칙</h2>
 
         <div className="grid gap-5 sm:grid-cols-3">
           {rules.map((rule) => (
@@ -62,8 +62,8 @@ export const RulesSection = () => {
               <div className="mb-4 flex size-10 items-center justify-center rounded-full bg-accent/10 text-accent">
                 {rule.icon}
               </div>
-              <p className="mb-2 font-semibold">{rule.title}</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">{rule.desc}</p>
+              <p className="typo-subtitle1 mb-2">{rule.title}</p>
+              <p className="typo-body3 text-muted-foreground">{rule.desc}</p>
             </div>
           ))}
         </div>

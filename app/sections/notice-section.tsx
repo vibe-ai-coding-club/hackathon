@@ -15,18 +15,18 @@ export const NoticeSection = () => {
         {/* 라벨 */}
         <div className="flex items-center gap-3 mb-4">
           <span className="inline-block w-8 h-0.5 bg-accent" />
-          <span className="text-sm font-bold text-accent tracking-widest">NOTICE</span>
+          <span className="typo-subtitle2 text-accent tracking-widest">NOTICE</span>
         </div>
 
-        <h2 className="mb-10 text-3xl font-bold">유의 사항</h2>
+        <h2 className="typo-h3 mb-10">유의 사항</h2>
 
         <div className="divide-y divide-border">
           {notices.map((item, index) => (
             <div key={index} className="flex gap-4 py-5">
-              <span className="shrink-0 w-6 text-sm text-muted-foreground tabular-nums">
+              <span className="typo-body3 shrink-0 w-6 text-muted-foreground tabular-nums">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <p className="text-sm">{item}</p>
+              <p className="typo-body3">{item}</p>
             </div>
           ))}
         </div>

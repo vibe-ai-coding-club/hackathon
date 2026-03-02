@@ -14,11 +14,11 @@ export const ScheduleSection = () => {
         {/* 라벨 */}
         <div className="flex items-center gap-3 mb-4">
           <span className="inline-block w-8 h-0.5 bg-accent" />
-          <span className="text-sm font-bold text-accent tracking-widest">SCHEDULE</span>
+          <span className="typo-subtitle2 text-accent tracking-widest">SCHEDULE</span>
         </div>
 
-        <h2 className="mb-2 text-3xl font-bold">행사 일정</h2>
-        <p className="mb-12 text-sm text-muted-foreground">
+        <h2 className="typo-h3 mb-2">행사 일정</h2>
+        <p className="typo-body3 mb-12 text-muted-foreground">
           장소 및 참가 인원에 따라 일부 변경될 수 있습니다.
         </p>
 
@@ -26,7 +26,7 @@ export const ScheduleSection = () => {
           {schedule.map((entry) => (
             <div key={entry.startTime} className="flex items-center gap-4">
               {/* 시간 */}
-              <div className="w-14 shrink-0 text-right font-mono text-sm text-muted-foreground">
+              <div className="typo-body3 w-14 shrink-0 text-right font-mono text-muted-foreground">
                 {entry.startTime}
               </div>
 
@@ -45,8 +45,8 @@ export const ScheduleSection = () => {
                   entry.highlight ? "bg-accent/5" : "bg-background"
                 }`}
               >
-                <p className="font-semibold">{entry.title}</p>
-                <p className="text-sm text-muted-foreground">{entry.timeRange}</p>
+                <p className="typo-subtitle1">{entry.title}</p>
+                <p className="typo-body3 text-muted-foreground">{entry.timeRange}</p>
               </div>
             </div>
           ))}

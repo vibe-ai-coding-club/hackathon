@@ -12,18 +12,18 @@ export const ContactSection = () => {
         {/* 중앙 라벨 */}
         <div className="flex items-center justify-center gap-3 mb-4">
           <span className="inline-block w-8 h-0.5 bg-accent" />
-          <span className="text-sm font-bold text-accent tracking-widest">CONTACT</span>
+          <span className="typo-subtitle2 text-accent tracking-widest">CONTACT</span>
           <span className="inline-block w-8 h-0.5 bg-accent" />
         </div>
 
-        <h2 className="mb-3 text-3xl font-bold">문의하기</h2>
-        <p className="mb-10 text-sm text-muted-foreground">
+        <h2 className="typo-h3 mb-3">문의하기</h2>
+        <p className="typo-body3 mb-10 text-muted-foreground">
           궁금한 점이 있으면 아래 이메일로 편하게 연락해 주세요.
         </p>
 
         <a
           href="mailto:vibecodingclub.team@gmail.com"
-          className="mx-auto inline-flex items-center gap-3 rounded-2xl bg-background px-8 py-5 text-sm font-medium hover:shadow-md transition-shadow"
+          className="typo-subtitle4 mx-auto inline-flex items-center gap-3 rounded-2xl bg-background px-8 py-5 hover:shadow-md transition-shadow"
         >
           <MailIcon />
           vibecodingclub.team@gmail.com
