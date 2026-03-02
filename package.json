@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "format:md": "npx prettier --write \"**/*.{md,mdx}\""
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
