@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 type ParticipationType = "INDIVIDUAL" | "TEAM";
 type ExperienceLevel = "BEGINNER" | "JUNIOR" | "SENIOR" | "VIBE_CODER";
 
 const experienceOptions: { value: ExperienceLevel; label: string }[] = [
-  { value: "BEGINNER", label: "비개발자 / 입문" },
+  { value: "BEGINNER", label: "비개발자/입문" },
   { value: "JUNIOR", label: "주니어" },
   { value: "SENIOR", label: "시니어" },
   { value: "VIBE_CODER", label: "바이브코더" },
@@ -15,50 +15,63 @@ const experienceOptions: { value: ExperienceLevel; label: string }[] = [
 type MemberState = {
   name: string;
   email: string;
-  experienceLevel: ExperienceLevel | "";
+  phone: string;
 };
 
 type FormState = {
+  participationType: ParticipationType | "";
   name: string;
   email: string;
   phone: string;
   experienceLevel: ExperienceLevel | "";
   motivation: string;
-  participationType: ParticipationType | "";
-  teamName: string;
   members: MemberState[];
 };
 
-const createEmptyMember = (): MemberState => ({
-  name: "",
-  email: "",
-  experienceLevel: "",
-});
+const createEmptyMember = (): MemberState => ({ name: "", email: "", phone: "" });
 
 const initialForm: FormState = {
+  participationType: "INDIVIDUAL",
   name: "",
   email: "",
   phone: "",
   experienceLevel: "",
   motivation: "",
-  participationType: "",
-  teamName: "",
   members: [createEmptyMember()],
 };
 
-const MAX_MEMBERS = 3; // 대표자 포함 최대 4명
+const MAX_MEMBERS = 5;
+
+const formatPhone = (digits: string): string => {
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+};
+
+const toDigits = (value: string): string => value.replace(/\D/g, "").slice(0, 11);
+
+const RadioDot = ({ checked }: { checked: boolean }) => (
+  <span
+    className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 ${
+      checked ? "border-primary-400" : "border-gray-300"
+    }`}
+  >
+    {checked && <span className="size-2.5 rounded-full bg-primary-400" />}
+  </span>
+);
 
 const inputClass =
-  "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-accent transition-colors";
+  "w-full rounded-lg bg-gray-50 px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40";
 
 export const RegistrationForm = () => {
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, setIsPending] = useState(false);
-  const [result, setResult] = useState<{
+  const [toast, setToast] = useState<{
     success: boolean;
     message: string;
   } | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
   const update = (field: keyof Omit<FormState, "members">, value: string) => {
     setForm((prev) => {
@@ -75,11 +88,7 @@ export const RegistrationForm = () => {
     });
   };
 
-  const updateMember = (
-    index: number,
-    field: keyof MemberState,
-    value: string,
-  ) => {
+  const updateMember = (index: number, field: keyof MemberState, value: string) => {
     setForm((prev) => {
       const members = [...prev.members];
       members[index] = { ...members[index], [field]: value };
@@ -110,94 +119,166 @@ export const RegistrationForm = () => {
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!form.name.trim()) newErrors.name = "이름을 입력해주세요";
-    if (!form.email.trim()) newErrors.email = "이메일을 입력해주세요";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      newErrors.email = "올바른 이메일 주소를 입력해주세요";
-    if (!form.phone.trim()) newErrors.phone = "연락처를 입력해주세요";
-    else if (!/^01[016789]-?\d{3,4}-?\d{4}$/.test(form.phone))
-      newErrors.phone = "올바른 전화번호를 입력해주세요";
-    if (!form.experienceLevel)
-      newErrors.experienceLevel = "개발 경험을 선택해주세요";
-    if (!form.participationType)
-      newErrors.participationType = "참가 유형을 선택해주세요";
+    if (!form.participationType) newErrors.participationType = "참가 유형을 선택해주세요";
+
+    if (form.participationType === "INDIVIDUAL") {
+      if (!form.name.trim()) newErrors.name = "이름을 입력해주세요";
+      if (!form.email.trim()) newErrors.email = "이메일을 입력해주세요";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+        newErrors.email = "올바른 이메일을 입력해주세요";
+      if (!form.phone) newErrors.phone = "연락처를 입력해주세요";
+      else if (!/^01[016789]\d{7,8}$/.test(form.phone))
+        newErrors.phone = "올바른 연락처를 입력해주세요";
+    }
 
     if (form.participationType === "TEAM") {
-      if (!form.teamName.trim())
-        newErrors.teamName = "팀 이름을 입력해주세요";
       form.members.forEach((member, i) => {
-        if (!member.name.trim())
-          newErrors[`members.${i}.name`] = "이름을 입력해주세요";
+        if (!member.name.trim()) newErrors[`members.${i}.name`] = "이름을 입력해주세요";
+        if (i === 0) {
+          if (!member.email.trim()) newErrors[`members.${i}.email`] = "이메일을 입력해주세요";
+          else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email))
+            newErrors[`members.${i}.email`] = "올바른 이메일을 입력해주세요";
+        }
+        if (!member.phone) newErrors[`members.${i}.phone`] = "연락처를 입력해주세요";
+        else if (!/^01[016789]\d{7,8}$/.test(member.phone))
+          newErrors[`members.${i}.phone`] = "올바른 연락처를 입력해주세요";
       });
     }
+
+    if (!form.experienceLevel) newErrors.experienceLevel = "개발 경험을 선택해주세요";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const showToast = (success: boolean, message: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ success, message });
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
+  };
+
+  useEffect(() => () => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+  }, []);
+
+  const isReady = (() => {
+    if (!form.participationType || !form.experienceLevel) return false;
+    if (form.participationType === "INDIVIDUAL") {
+      return (
+        form.name.trim().length > 0 &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) &&
+        /^01[016789]\d{7,8}$/.test(form.phone)
+      );
+    }
+    return form.members.every((m, i) => {
+      const hasName = m.name.trim().length > 0;
+      const hasPhone = /^01[016789]\d{7,8}$/.test(m.phone);
+      if (i === 0) return hasName && hasPhone && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email);
+      return hasName && hasPhone;
+    });
+  })();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsPending(true);
-    setResult(null);
 
     try {
       const formData = new FormData();
-      formData.set("name", form.name);
-      formData.set("email", form.email);
-      formData.set("phone", form.phone);
       formData.set("participationType", form.participationType);
       formData.set("experienceLevel", form.experienceLevel);
       if (form.motivation) formData.set("motivation", form.motivation);
+
+      if (form.participationType === "INDIVIDUAL") {
+        formData.set("name", form.name);
+        formData.set("email", form.email);
+        formData.set("phone", form.phone);
+      }
       if (form.participationType === "TEAM") {
-        formData.set("teamName", form.teamName);
-        const members = form.members.map((m) => ({
-          name: m.name,
-          ...(m.email && { email: m.email }),
-          ...(m.experienceLevel && { experienceLevel: m.experienceLevel }),
-        }));
-        formData.set("members", JSON.stringify(members));
+        formData.set("members", JSON.stringify(form.members));
       }
 
-      // TODO: 서버 액션으로 교체
       const res = await fetch("/api/register", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      setResult(data);
+      showToast(data.success, data.message);
       if (data.success) setForm(initialForm);
     } catch {
-      setResult({
-        success: false,
-        message: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-      });
+      showToast(false, "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsPending(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-10">
-      {result && !result.success && (
-        <div className="rounded-lg border border-error/30 bg-error/5 p-4 text-sm text-error">
-          {result.message}
-        </div>
-      )}
-      {result?.success && (
-        <div className="rounded-lg border border-success/30 bg-success/5 p-4 text-sm text-success">
-          {result.message}
-        </div>
-      )}
+    <>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* 1. 참가 유형 */}
+      <fieldset className="space-y-2">
+        <legend className="typo-subtitle1">
+          참가 유형 <span className="text-error">*</span>
+        </legend>
 
-      {/* 1. 기본 정보 (대표자) */}
-      <fieldset className="space-y-4">
-        <legend className="text-lg font-bold">기본 정보</legend>
+        {/* PC: 가로 2열 / 모바일: 세로 */}
+        <div className="grid gap-2 sm:grid-cols-2">
+          <label
+            className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
+              form.participationType === "INDIVIDUAL"
+                ? "bg-primary-025 ring-2 ring-primary-400"
+                : "bg-gray-50"
+            }`}
+          >
+            <input
+              type="radio"
+              name="participationType"
+              value="INDIVIDUAL"
+              checked={form.participationType === "INDIVIDUAL"}
+              onChange={(e) => update("participationType", e.target.value)}
+              className="sr-only"
+            />
+            <RadioDot checked={form.participationType === "INDIVIDUAL"} />
+            <span>
+              <span className="typo-subtitle2">개인 참여</span>
+              <span className="typo-body3 ml-2 text-gray-500">혼자서 참여해요</span>
+            </span>
+          </label>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+          <label
+            className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
+              form.participationType === "TEAM"
+                ? "bg-primary-025 ring-2 ring-primary-400"
+                : "bg-gray-50"
+            }`}
+          >
+            <input
+              type="radio"
+              name="participationType"
+              value="TEAM"
+              checked={form.participationType === "TEAM"}
+              onChange={(e) => update("participationType", e.target.value)}
+              className="sr-only"
+            />
+            <RadioDot checked={form.participationType === "TEAM"} />
+            <span>
+              <span className="typo-subtitle2">팀 참여</span>
+              <span className="typo-body3 ml-2 text-gray-500">단체로 참여해요</span>
+            </span>
+          </label>
+        </div>
+
+        {errors.participationType && (
+          <p className="typo-caption1 text-error">{errors.participationType}</p>
+        )}
+      </fieldset>
+
+      {/* 2a. 개인 참여: 이름 + 연락처 */}
+      {form.participationType === "INDIVIDUAL" && (
+        <div className="space-y-6">
           <div>
-            <label htmlFor="reg-name" className="block text-sm font-medium mb-1">
+            <label htmlFor="reg-name" className="typo-subtitle1 mb-2 block">
               이름 <span className="text-error">*</span>
             </label>
             <input
@@ -210,11 +291,12 @@ export const RegistrationForm = () => {
               className={inputClass}
             />
             {errors.name && (
-              <p className="mt-1 text-xs text-error">{errors.name}</p>
+              <p className="typo-caption1 mt-1 text-error">{errors.name}</p>
             )}
           </div>
+
           <div>
-            <label htmlFor="reg-email" className="block text-sm font-medium mb-1">
+            <label htmlFor="reg-email" className="typo-subtitle1 mb-2 block">
               이메일 <span className="text-error">*</span>
             </label>
             <input
@@ -222,49 +304,150 @@ export const RegistrationForm = () => {
               type="email"
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
-              placeholder="hello@example.com"
+              placeholder="example@email.com"
               className={inputClass}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-error">{errors.email}</p>
+              <p className="typo-caption1 mt-1 text-error">{errors.email}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="reg-phone" className="typo-subtitle1 mb-2 block">
+              연락처 <span className="text-error">*</span>
+            </label>
+            <input
+              id="reg-phone"
+              type="tel"
+              inputMode="numeric"
+              value={formatPhone(form.phone)}
+              onChange={(e) => update("phone", toDigits(e.target.value))}
+              placeholder="010-1234-5678"
+              className={inputClass}
+            />
+            {errors.phone && (
+              <p className="typo-caption1 mt-1 text-error">{errors.phone}</p>
             )}
           </div>
         </div>
+      )}
 
-        <div>
-          <label htmlFor="reg-phone" className="block text-sm font-medium mb-1">
-            연락처 <span className="text-error">*</span>
-          </label>
-          <input
-            id="reg-phone"
-            type="tel"
-            value={form.phone}
-            onChange={(e) => update("phone", e.target.value)}
-            placeholder="010-0000-0000"
-            className={inputClass}
-          />
-          {errors.phone && (
-            <p className="mt-1 text-xs text-error">{errors.phone}</p>
-          )}
-        </div>
-      </fieldset>
+      {/* 2b. 팀 참여: 팀원 */}
+      {form.participationType === "TEAM" && (
+        <fieldset className="space-y-3">
+          <div className="flex min-h-9 items-center justify-between">
+            <legend className="typo-subtitle1">
+              팀원{" "}
+              <span className="typo-body3 font-normal text-gray-500">
+                ({form.members.length}/{MAX_MEMBERS})
+              </span>
+            </legend>
+            {form.members.length < MAX_MEMBERS && (
+              <button
+                type="button"
+                onClick={addMember}
+                className="typo-caption1 rounded-md bg-gray-100 px-3 py-1.5 text-gray-600 hover:bg-gray-200 cursor-pointer transition-colors"
+              >
+                + 팀원 추가
+              </button>
+            )}
+          </div>
 
-      {/* 2. 추가 정보 (대표자) */}
-      <fieldset className="space-y-4">
-        <legend className="text-lg font-bold">추가 정보</legend>
+          {form.members.map((member, i) => (
+            <div key={i} className="rounded-xl bg-gray-50 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="typo-subtitle2">
+                  {i === 0 ? "팀장" : `팀원 ${i}`}
+                </span>
+                {i > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => removeMember(i)}
+                    className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
+                  >
+                    <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                  </button>
+                )}
+              </div>
 
-        <div>
-          <p className="text-sm font-medium mb-3">
-            개발 경험 <span className="text-error">*</span>
-          </p>
-          <div className="flex flex-wrap gap-2">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="typo-subtitle4 mb-1 block">
+                    이름 <span className="text-error">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={member.name}
+                    onChange={(e) => updateMember(i, "name", e.target.value)}
+                    placeholder="홍길동"
+                    maxLength={50}
+                    className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
+                  />
+                  {errors[`members.${i}.name`] && (
+                    <p className="typo-caption1 mt-1 text-error">
+                      {errors[`members.${i}.name`]}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="typo-subtitle4 mb-1 block">
+                    연락처 <span className="text-error">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    value={formatPhone(member.phone)}
+                    onChange={(e) => updateMember(i, "phone", toDigits(e.target.value))}
+                    placeholder="010-1234-5678"
+                    className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
+                  />
+                  {errors[`members.${i}.phone`] && (
+                    <p className="typo-caption1 mt-1 text-error">
+                      {errors[`members.${i}.phone`]}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {i === 0 && (
+                <div>
+                  <label className="typo-subtitle4 mb-1 block">
+                    이메일 <span className="text-error">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={member.email}
+                    onChange={(e) => updateMember(i, "email", e.target.value)}
+                    placeholder="example@email.com"
+                    className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
+                  />
+                  {errors["members.0.email"] && (
+                    <p className="typo-caption1 mt-1 text-error">
+                      {errors["members.0.email"]}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </fieldset>
+      )}
+
+      {/* 3. 개발 경험 */}
+      {form.participationType && (
+        <fieldset className="space-y-2">
+          <legend className="typo-subtitle1">개발 경험</legend>
+
+          {/* PC: 4열 가로 / 모바일: 세로 */}
+          <div className="grid gap-2 sm:grid-cols-4">
             {experienceOptions.map((opt) => (
               <label
                 key={opt.value}
-                className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm cursor-pointer transition-colors ${
+                className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
                   form.experienceLevel === opt.value
-                    ? "border-accent bg-accent/5 text-accent"
-                    : "border-border hover:border-accent/30"
+                    ? "bg-primary-025 ring-2 ring-primary-400"
+                    : "bg-gray-50"
                 }`}
               >
                 <input
@@ -273,231 +456,36 @@ export const RegistrationForm = () => {
                   value={opt.value}
                   checked={form.experienceLevel === opt.value}
                   onChange={(e) => update("experienceLevel", e.target.value)}
-                  className="accent-accent"
+                  className="sr-only"
                 />
-                {opt.label}
+                <RadioDot checked={form.experienceLevel === opt.value} />
+                <span className="typo-subtitle4">{opt.label}</span>
               </label>
             ))}
           </div>
-          {errors.experienceLevel && (
-            <p className="mt-1 text-xs text-error">{errors.experienceLevel}</p>
-          )}
-        </div>
 
+          {errors.experienceLevel && (
+            <p className="typo-caption1 text-error">{errors.experienceLevel}</p>
+          )}
+        </fieldset>
+      )}
+
+      {/* 4. 참여 동기 및 문의 사항 */}
+      {form.participationType && (
         <div>
-          <label htmlFor="reg-motivation" className="block text-sm font-medium mb-1">
-            참가 동기 또는 하고 싶은 말
+          <label htmlFor="reg-motivation" className="typo-subtitle1 mb-2 block">
+            참여 동기 및 문의 사항
           </label>
           <textarea
             id="reg-motivation"
             value={form.motivation}
             onChange={(e) => update("motivation", e.target.value)}
-            placeholder="자유롭게 작성해 주세요. 진지함은 빼고!"
+            placeholder="자유롭게 작성해 주세요"
             maxLength={500}
-            rows={4}
+            rows={6}
             className={`${inputClass} resize-y`}
           />
         </div>
-      </fieldset>
-
-      {/* 3. 참가 유형 */}
-      <fieldset className="space-y-3">
-        <legend className="text-lg font-bold">
-          참가 유형 <span className="text-error">*</span>
-        </legend>
-
-        <label
-          className={`flex items-center gap-3 rounded-lg border p-4 cursor-pointer transition-colors ${
-            form.participationType === "INDIVIDUAL"
-              ? "border-accent bg-accent/5"
-              : "border-border hover:border-accent/30"
-          }`}
-        >
-          <input
-            type="radio"
-            name="participationType"
-            value="INDIVIDUAL"
-            checked={form.participationType === "INDIVIDUAL"}
-            onChange={(e) => update("participationType", e.target.value)}
-            className="accent-accent"
-          />
-          <div>
-            <span className="font-medium">개인 참여</span>
-            <span className="ml-2 text-sm text-muted-foreground">
-              혼자서 참가합니다
-            </span>
-          </div>
-        </label>
-
-        <label
-          className={`flex items-center gap-3 rounded-lg border p-4 cursor-pointer transition-colors ${
-            form.participationType === "TEAM"
-              ? "border-accent bg-accent/5"
-              : "border-border hover:border-accent/30"
-          }`}
-        >
-          <input
-            type="radio"
-            name="participationType"
-            value="TEAM"
-            checked={form.participationType === "TEAM"}
-            onChange={(e) => update("participationType", e.target.value)}
-            className="accent-accent"
-          />
-          <div>
-            <span className="font-medium">팀 참여</span>
-            <span className="ml-2 text-sm text-muted-foreground">
-              팀으로 참가합니다
-            </span>
-          </div>
-        </label>
-
-        {errors.participationType && (
-          <p className="text-xs text-error">{errors.participationType}</p>
-        )}
-      </fieldset>
-
-      {/* 4. 팀 정보 + 팀원 입력 (팀 참여 시) */}
-      {form.participationType === "TEAM" && (
-        <fieldset className="space-y-6">
-          <legend className="text-lg font-bold">팀 정보</legend>
-
-          <div>
-            <label htmlFor="reg-team-name" className="block text-sm font-medium mb-1">
-              팀 이름 <span className="text-error">*</span>
-            </label>
-            <input
-              id="reg-team-name"
-              type="text"
-              value={form.teamName}
-              onChange={(e) => update("teamName", e.target.value)}
-              placeholder="예: 바이브코더즈"
-              maxLength={50}
-              className={inputClass}
-            />
-            {errors.teamName && (
-              <p className="mt-1 text-xs text-error">{errors.teamName}</p>
-            )}
-          </div>
-
-          {/* 팀원 목록 */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">
-                팀원{" "}
-                <span className="text-muted-foreground font-normal">
-                  (대표자 제외, 최대 {MAX_MEMBERS}명)
-                </span>
-              </p>
-              <span className="text-xs text-muted-foreground">
-                {form.members?.length ?? 0}/{MAX_MEMBERS}명
-              </span>
-            </div>
-
-            {(form.members ?? []).map((member, index) => (
-              <div
-                key={index}
-                className="rounded-lg border border-border p-4 space-y-3"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">
-                    팀원 {index + 1}
-                  </span>
-                  {form.members.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeMember(index)}
-                      className="text-sm text-error hover:text-error/80 cursor-pointer"
-                    >
-                      삭제
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-1">
-                      이름 <span className="text-error">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={member.name}
-                      onChange={(e) =>
-                        updateMember(index, "name", e.target.value)
-                      }
-                      placeholder="홍길동"
-                      maxLength={50}
-                      className={inputClass}
-                    />
-                    {errors[`members.${index}.name`] && (
-                      <p className="mt-1 text-xs text-error">
-                        {errors[`members.${index}.name`]}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-1">
-                      이메일
-                    </label>
-                    <input
-                      type="email"
-                      value={member.email}
-                      onChange={(e) =>
-                        updateMember(index, "email", e.target.value)
-                      }
-                      placeholder="hong@example.com"
-                      className={inputClass}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    개발 경험
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {experienceOptions.map((opt) => (
-                      <label
-                        key={opt.value}
-                        className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs cursor-pointer transition-colors ${
-                          member.experienceLevel === opt.value
-                            ? "border-accent bg-accent/5 text-accent"
-                            : "border-border hover:border-accent/30"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name={`member-exp-${index}`}
-                          value={opt.value}
-                          checked={member.experienceLevel === opt.value}
-                          onChange={(e) =>
-                            updateMember(
-                              index,
-                              "experienceLevel",
-                              e.target.value,
-                            )
-                          }
-                          className="accent-accent sr-only"
-                        />
-                        {opt.label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {(form.members?.length ?? 0) < MAX_MEMBERS && (
-              <button
-                type="button"
-                onClick={addMember}
-                className="w-full rounded-lg border border-dashed border-border py-3 text-sm text-muted-foreground hover:border-accent hover:text-accent cursor-pointer transition-colors"
-              >
-                + 팀원 추가
-              </button>
-            )}
-          </div>
-        </fieldset>
       )}
 
       {/* 허니팟 */}
@@ -506,17 +494,47 @@ export const RegistrationForm = () => {
       </div>
 
       {/* 제출 */}
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full rounded-lg bg-accent py-4 text-base font-bold text-white hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
-      >
-        {isPending ? "등록 중..." : "참가 신청 완료하기"}
-      </button>
-
-      <p className="text-center text-xs text-muted-foreground">
-        제출된 정보는 행사 운영 목적으로만 사용됩니다.
-      </p>
+      <div className="text-center pt-4">
+        <button
+          type="submit"
+          disabled={isPending}
+          className={`typo-btn2 rounded-xl px-12 py-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors ${
+            isReady
+              ? "bg-primary-400 text-white hover:bg-primary-500"
+              : "bg-gray-100 text-foreground hover:bg-gray-200"
+          }`}
+        >
+          {isPending ? "등록 중..." : "딸깍톤 신청하기"}
+        </button>
+        <p className="typo-caption1 mt-3 text-gray-500">
+          제출된 정보는 행사 운영 목적으로만 사용돼요
+        </p>
+      </div>
     </form>
+
+    {/* 토스트 */}
+    <div
+      className={`fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl px-6 py-3.5 shadow-lg transition-all duration-300 ${
+        toast
+          ? "translate-y-0 opacity-100"
+          : "translate-y-4 opacity-0 pointer-events-none"
+      } ${
+        toast?.success
+          ? "bg-success text-white"
+          : "bg-error text-white"
+      }`}
+    >
+      <span className="typo-subtitle4">{toast?.message}</span>
+      <button
+        type="button"
+        onClick={() => setToast(null)}
+        className="ml-1 shrink-0 opacity-70 hover:opacity-100 cursor-pointer transition-opacity"
+      >
+        <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+        </svg>
+      </button>
+    </div>
+    </>
   );
 };
