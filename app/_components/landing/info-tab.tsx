@@ -25,14 +25,14 @@ export const InfoTab = ({ tabs }: InfoTabProps) => {
               key={tab.label}
               type="button"
               className={cn(
-                "relative px-2 py-2 typo-subtitle2 md:typo-h6",
+                "relative cursor-pointer px-2 py-2 typo-subtitle2 hover:cursor-pointer md:typo-h6",
                 isActive ? "text-gray-900" : "text-gray-800",
               )}
               onClick={() => setActiveIndex(index)}
             >
               {tab.label}
               {isActive ? (
-                <span className="absolute inset-x-1 bottom-0 h-0.5 rounded-full bg-primary-400" />
+                <span className="absolute inset-x-1 bottom-0 h-0.5 rounded-full bg-current" />
               ) : null}
             </button>
           );
