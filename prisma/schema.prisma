@@ -51,10 +51,12 @@ model Project {
   id          String   @id @default(cuid())
   teamId      String   @map("team_id")
   team        Team     @relation(fields: [teamId], references: [id])
-  title       String // 프로젝트 제목
-  description String // 프로젝트 설명
-  imageUrl    String   @map("image_url") // Vercel Blob 이미지 URL
-  linkUrl     String?  @map("link_url") // 프로젝트 링크 (GitHub, 배포 URL 등)
+  title       String
+  description String
+  githubUrl   String   @map("github_url")
+  demoUrl     String?  @map("demo_url")
+  imageUrl    String?  @map("image_url")
+  linkUrl     String?  @map("link_url")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 

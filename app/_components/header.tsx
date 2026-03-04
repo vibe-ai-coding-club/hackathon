@@ -32,6 +32,9 @@ export const Header = () => {
           <Link href="/#gallery" className="font-bold text-foreground hover:text-primary-400 transition-colors">
             갤러리
           </Link>
+          <Link href="/projects/submit" className="font-bold text-foreground hover:text-primary-400 transition-colors">
+            프로젝트 등록
+          </Link>
           <Link
             href="/register"
             className="typo-btn3 hidden rounded-lg bg-primary-400 px-6 py-2 text-white hover:bg-primary-500 transition-colors sm:block"
