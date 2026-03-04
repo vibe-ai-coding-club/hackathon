@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { AdminNav } from "./_components/admin-nav";
 import { LogoutButton } from "./_components/logout-button";
 import { StatsCards } from "./_components/stats-cards";
 import { TeamTable } from "./_components/team-table";
@@ -50,6 +51,8 @@ const AdminPage = async () => {
       </div>
 
       <div className="space-y-8">
+        <AdminNav />
+
         <StatsCards
           totalTeams={totalTeams}
           byParticipationType={statsByParticipationType}
