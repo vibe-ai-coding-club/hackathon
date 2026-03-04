@@ -7,6 +7,18 @@ const experienceLevelEnum = z.enum(["BEGINNER", "JUNIOR", "SENIOR", "VIBE_CODER"
 const teamMemberSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요").max(50, "이름은 50자 이하로 입력해주세요"),
   email: z.string().email("올바른 이메일 주소를 입력해주세요").optional().or(z.literal("")),
+  contact: z
+    .string()
+    .min(1, "연락처를 입력해주세요")
+    .refine(
+      (val) => {
+        if (/^\d+$/.test(val)) return PHONE_REGEX.test(val);
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      },
+      { message: "올바른 연락처를 입력해주세요 (전화번호 또는 이메일)" },
+    )
+    .optional()
+    .or(z.literal("")),
   experienceLevel: experienceLevelEnum.optional(),
 });
 

@@ -29,7 +29,13 @@ const PHONE_REGEX = /^01[016789]-?\d{3,4}-?\d{4}$/;
 const memberSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요").max(50),
   email: z.string().optional().or(z.literal("")),
-  phone: z.string().regex(PHONE_REGEX, "올바른 연락처를 입력해주세요"),
+  contact: z.string().min(1, "연락처를 입력해주세요").refine(
+    (val) => {
+      if (/^\d+$/.test(val)) return PHONE_REGEX.test(val);
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    },
+    { message: "올바른 연락처를 입력해주세요 (전화번호 또는 이메일)" },
+  ),
 });
 
 const individualSchema = z.object({
@@ -44,6 +50,7 @@ const individualSchema = z.object({
 const teamSchema = z
   .object({
     participationType: z.literal("TEAM"),
+    teamName: z.string().min(1, "팀 이름을 입력해주세요").max(50, "팀 이름은 50자 이하로 입력해주세요"),
     members: z.array(memberSchema).min(1, "최소 1명의 팀원이 필요합니다").max(5),
     experienceLevel: z.enum(["BEGINNER", "JUNIOR", "SENIOR", "VIBE_CODER"]),
     motivation: z.string().max(500).optional().or(z.literal("")),
@@ -133,6 +140,7 @@ export async function POST(request: NextRequest) {
       }
       raw = {
         participationType,
+        teamName: formData.get("teamName") as string,
         members,
         experienceLevel,
         motivation,
@@ -170,7 +178,7 @@ export async function POST(request: NextRequest) {
     } else {
       name = data.members[0].name;
       email = data.members[0].email!;
-      phone = data.members[0].phone;
+      phone = data.members[0].contact;
       members = data.members as Prisma.InputJsonValue;
     }
 
@@ -190,6 +198,7 @@ export async function POST(request: NextRequest) {
         email,
         phone,
         participationType: data.participationType,
+        teamName: data.participationType === "TEAM" ? data.teamName : null,
         members,
         experienceLevel: data.experienceLevel,
         motivation: data.motivation || null,

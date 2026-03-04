@@ -15,7 +15,7 @@ const experienceOptions: { value: ExperienceLevel; label: string }[] = [
 type MemberState = {
   name: string;
   email: string;
-  phone: string;
+  contact: string;
 };
 
 type FormState = {
@@ -23,18 +23,44 @@ type FormState = {
   name: string;
   email: string;
   phone: string;
+  teamName: string;
   experienceLevel: ExperienceLevel | "";
   motivation: string;
   members: MemberState[];
 };
 
-const createEmptyMember = (): MemberState => ({ name: "", email: "", phone: "" });
+const createEmptyMember = (): MemberState => ({ name: "", email: "", contact: "" });
+
+const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);
+
+const displayContact = (value: string): string => {
+  if (!value) return "";
+  if (isDigitsOnly(value)) return formatPhone(value);
+  return value;
+};
+
+const validateContact = (value: string): string | null => {
+  if (!value.trim()) return "연락처를 입력해주세요";
+  if (isDigitsOnly(value)) {
+    if (!/^01[016789]\d{7,8}$/.test(value)) return "올바른 전화번호를 입력해주세요";
+  } else {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "올바른 이메일을 입력해주세요";
+  }
+  return null;
+};
+
+const isValidContact = (value: string): boolean => {
+  if (!value.trim()) return false;
+  if (isDigitsOnly(value)) return /^01[016789]\d{7,8}$/.test(value);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+};
 
 const initialForm: FormState = {
   participationType: "INDIVIDUAL",
   name: "",
   email: "",
   phone: "",
+  teamName: "",
   experienceLevel: "",
   motivation: "",
   members: [createEmptyMember()],
@@ -132,6 +158,7 @@ export const RegistrationForm = () => {
     }
 
     if (form.participationType === "TEAM") {
+      if (!form.teamName.trim()) newErrors.teamName = "팀 이름을 입력해주세요";
       form.members.forEach((member, i) => {
         if (!member.name.trim()) newErrors[`members.${i}.name`] = "이름을 입력해주세요";
         if (i === 0) {
@@ -139,9 +166,8 @@ export const RegistrationForm = () => {
           else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email))
             newErrors[`members.${i}.email`] = "올바른 이메일을 입력해주세요";
         }
-        if (!member.phone) newErrors[`members.${i}.phone`] = "연락처를 입력해주세요";
-        else if (!/^01[016789]\d{7,8}$/.test(member.phone))
-          newErrors[`members.${i}.phone`] = "올바른 연락처를 입력해주세요";
+        const contactError = validateContact(member.contact);
+        if (contactError) newErrors[`members.${i}.contact`] = contactError;
       });
     }
 
@@ -170,11 +196,11 @@ export const RegistrationForm = () => {
         /^01[016789]\d{7,8}$/.test(form.phone)
       );
     }
-    return form.members.every((m, i) => {
+    return form.teamName.trim().length > 0 && form.members.every((m, i) => {
       const hasName = m.name.trim().length > 0;
-      const hasPhone = /^01[016789]\d{7,8}$/.test(m.phone);
-      if (i === 0) return hasName && hasPhone && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email);
-      return hasName && hasPhone;
+      const hasContact = isValidContact(m.contact);
+      if (i === 0) return hasName && hasContact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email);
+      return hasName && hasContact;
     });
   })();
 
@@ -196,6 +222,7 @@ export const RegistrationForm = () => {
         formData.set("phone", form.phone);
       }
       if (form.participationType === "TEAM") {
+        formData.set("teamName", form.teamName);
         formData.set("members", JSON.stringify(form.members));
       }
 
@@ -332,7 +359,30 @@ export const RegistrationForm = () => {
         </div>
       )}
 
-      {/* 2b. 팀 참여: 팀원 */}
+      {/* 2b. 팀 참여: 팀명 + 팀원 */}
+      {form.participationType === "TEAM" && (
+        <div className="space-y-6">
+          <div>
+            <label htmlFor="reg-teamName" className="typo-subtitle1 mb-2 block">
+              팀 이름 <span className="text-error">*</span>
+            </label>
+            <input
+              id="reg-teamName"
+              type="text"
+              value={form.teamName}
+              onChange={(e) => update("teamName", e.target.value)}
+              placeholder="팀 이름을 입력해주세요"
+              maxLength={50}
+              className={inputClass}
+            />
+            {errors.teamName && (
+              <p className="typo-caption1 mt-1 text-error">{errors.teamName}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 2c. 팀 참여: 팀원 */}
       {form.participationType === "TEAM" && (
         <fieldset className="space-y-3">
           <div className="flex min-h-9 items-center justify-between">
@@ -396,16 +446,23 @@ export const RegistrationForm = () => {
                     연락처 <span className="text-error">*</span>
                   </label>
                   <input
-                    type="tel"
-                    inputMode="numeric"
-                    value={formatPhone(member.phone)}
-                    onChange={(e) => updateMember(i, "phone", toDigits(e.target.value))}
-                    placeholder="010-1234-5678"
+                    type={isDigitsOnly(member.contact) || !member.contact ? "tel" : "email"}
+                    inputMode={isDigitsOnly(member.contact) || !member.contact ? "numeric" : "email"}
+                    value={displayContact(member.contact)}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/-/g, "");
+                      if (/^\d*$/.test(raw)) {
+                        updateMember(i, "contact", raw.slice(0, 11));
+                      } else {
+                        updateMember(i, "contact", e.target.value);
+                      }
+                    }}
+                    placeholder="전화번호 또는 이메일"
                     className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
                   />
-                  {errors[`members.${i}.phone`] && (
+                  {errors[`members.${i}.contact`] && (
                     <p className="typo-caption1 mt-1 text-error">
-                      {errors[`members.${i}.phone`]}
+                      {errors[`members.${i}.contact`]}
                     </p>
                   )}
                 </div>
