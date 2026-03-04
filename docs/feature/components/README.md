@@ -10,6 +10,8 @@
 - `chip.md`
 - `section-title.md`
 - `header.md`
+- `navigation.md`
+- `logo.md`
 - `footer.md`
 - `runaway-button.md`
 - `registration-form.md`
