@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { projectSubmitSchema } from "@/lib/validations/project";
+import { NextRequest, NextResponse } from "next/server";
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 3;
@@ -29,16 +29,11 @@ export async function POST(request: NextRequest) {
     // 허니팟 체크
     const honeypot = formData.get("website");
     if (honeypot) {
-      return NextResponse.json(
-        { success: false, message: "잘못된 요청입니다." },
-        { status: 400 },
-      );
+      return NextResponse.json({ success: false, message: "잘못된 요청입니다." }, { status: 400 });
     }
 
     // 레이트 리밋
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      "unknown";
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         {
@@ -67,10 +62,7 @@ export async function POST(request: NextRequest) {
         if (!errors[field]) errors[field] = [];
         errors[field].push(issue.message);
       });
-      return NextResponse.json(
-        { success: false, message: "입력값을 확인해주세요.", errors },
-        { status: 400 },
-      );
+      return NextResponse.json({ success: false, message: "입력값을 확인해주세요.", errors }, { status: 400 });
     }
 
     const data = result.data;
@@ -84,8 +76,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "등록된 참가 신청 정보를 찾을 수 없습니다. 대표자 이메일을 확인해주세요.",
+          message: "등록된 참가 신청 정보를 찾을 수 없습니다. 대표자 이메일을 확인해주세요.",
         },
         { status: 400 },
       );

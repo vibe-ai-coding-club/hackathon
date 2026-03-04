@@ -1,13 +1,13 @@
 "use server";
 
 import { adminLoginSchema } from "@/lib/validations/admin";
+import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 
 type ActionState = {
   success: boolean;
   message: string;
 };
-import { createHmac, timingSafeEqual } from "crypto";
 
 const COOKIE_NAME = "admin_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 24시간
@@ -42,10 +42,7 @@ export const verifyAdminSession = async (): Promise<boolean> => {
   }
 };
 
-export const adminLogin = async (
-  _prevState: ActionState,
-  formData: FormData,
-): Promise<ActionState> => {
+export const adminLogin = async (_prevState: ActionState, formData: FormData): Promise<ActionState> => {
   const raw = { password: formData.get("password") };
   const result = adminLoginSchema.safeParse(raw);
 
@@ -62,9 +59,7 @@ export const adminLogin = async (
   const inputBuffer = Buffer.from(password);
   const expectedBuffer = Buffer.from(adminPassword);
 
-  const isValid =
-    inputBuffer.length === expectedBuffer.length &&
-    timingSafeEqual(inputBuffer, expectedBuffer);
+  const isValid = inputBuffer.length === expectedBuffer.length && timingSafeEqual(inputBuffer, expectedBuffer);
 
   if (!isValid) {
     return {

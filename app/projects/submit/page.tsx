@@ -10,9 +10,7 @@ export default function ProjectSubmitPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 pt-24 pb-20">
       <h1 className="typo-h3 mb-1">프로젝트 등록</h1>
-      <p className="typo-body3 mb-10 text-gray-600">
-        해커톤에서 만든 프로젝트를 등록해주세요
-      </p>
+      <p className="typo-body3 mb-10 text-gray-600">해커톤에서 만든 프로젝트를 등록해주세요</p>
       <ProjectSubmitForm />
     </div>
   );

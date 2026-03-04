@@ -8,25 +8,24 @@ const AdminPage = async () => {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  const [teams, totalTeams, byParticipationType, byExperienceLevel, recentWeekCount] =
-    await Promise.all([
-      prisma.team.findMany({
-        include: { members: true },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.team.count(),
-      prisma.team.groupBy({
-        by: ["participationType"],
-        _count: true,
-      }),
-      prisma.team.groupBy({
-        by: ["experienceLevel"],
-        _count: true,
-      }),
-      prisma.team.count({
-        where: { createdAt: { gte: sevenDaysAgo } },
-      }),
-    ]);
+  const [teams, totalTeams, byParticipationType, byExperienceLevel, recentWeekCount] = await Promise.all([
+    prisma.team.findMany({
+      include: { members: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.team.count(),
+    prisma.team.groupBy({
+      by: ["participationType"],
+      _count: true,
+    }),
+    prisma.team.groupBy({
+      by: ["experienceLevel"],
+      _count: true,
+    }),
+    prisma.team.count({
+      where: { createdAt: { gte: sevenDaysAgo } },
+    }),
+  ]);
 
   const serializedTeams = teams.map((team) => ({
     ...team,

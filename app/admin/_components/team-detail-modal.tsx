@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import type { SerializedTeam, SerializedMember } from "./team-table";
+import type { SerializedMember, SerializedTeam } from "./team-table";
 
 type TeamDetailModalProps = {
   team: SerializedTeam;
@@ -25,14 +25,10 @@ const MemberCard = ({ member }: { member: SerializedMember }) => (
     <div className="flex items-center gap-2">
       <p className="font-medium">{member.name}</p>
       {member.isLeader && (
-        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-          대표
-        </span>
+        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">대표</span>
       )}
     </div>
-    {!member.isLeader && (
-      <p className="text-muted-foreground">연락처: {member.contact}</p>
-    )}
+    {!member.isLeader && <p className="text-muted-foreground">연락처: {member.contact}</p>}
   </div>
 );
 

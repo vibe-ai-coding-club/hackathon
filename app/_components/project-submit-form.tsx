@@ -44,25 +44,19 @@ export const ProjectSubmitForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (!form.email.trim()) newErrors.email = "이메일을 입력해주세요";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      newErrors.email = "올바른 이메일을 입력해주세요";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = "올바른 이메일을 입력해주세요";
 
     if (!form.title.trim()) newErrors.title = "프로젝트 이름을 입력해주세요";
-    else if (form.title.length > 100)
-      newErrors.title = "프로젝트 이름은 100자 이하로 입력해주세요";
+    else if (form.title.length > 100) newErrors.title = "프로젝트 이름은 100자 이하로 입력해주세요";
 
-    if (!form.description.trim())
-      newErrors.description = "프로젝트 설명을 입력해주세요";
-    else if (form.description.length > 2000)
-      newErrors.description = "프로젝트 설명은 2000자 이하로 입력해주세요";
+    if (!form.description.trim()) newErrors.description = "프로젝트 설명을 입력해주세요";
+    else if (form.description.length > 2000) newErrors.description = "프로젝트 설명은 2000자 이하로 입력해주세요";
 
-    if (!form.githubUrl.trim())
-      newErrors.githubUrl = "GitHub 링크를 입력해주세요";
+    if (!form.githubUrl.trim()) newErrors.githubUrl = "GitHub 링크를 입력해주세요";
     else {
       try {
         const url = new URL(form.githubUrl);
-        if (!url.hostname.endsWith("github.com"))
-          newErrors.githubUrl = "GitHub 링크를 입력해주세요";
+        if (!url.hostname.endsWith("github.com")) newErrors.githubUrl = "GitHub 링크를 입력해주세요";
       } catch {
         newErrors.githubUrl = "올바른 URL을 입력해주세요";
       }
@@ -142,9 +136,7 @@ export const ProjectSubmitForm = () => {
           <label htmlFor="proj-email" className="typo-subtitle1 mb-2 block">
             대표자 이메일 <span className="text-error">*</span>
           </label>
-          <p className="typo-caption1 mb-2 text-gray-500">
-            참가 신청 시 사용한 대표자 이메일을 입력해주세요
-          </p>
+          <p className="typo-caption1 mb-2 text-gray-500">참가 신청 시 사용한 대표자 이메일을 입력해주세요</p>
           <input
             id="proj-email"
             type="email"
@@ -153,9 +145,7 @@ export const ProjectSubmitForm = () => {
             placeholder="example@email.com"
             className={inputClass}
           />
-          {errors.email && (
-            <p className="typo-caption1 mt-1 text-error">{errors.email}</p>
-          )}
+          {errors.email && <p className="typo-caption1 mt-1 text-error">{errors.email}</p>}
         </div>
 
         {/* 프로젝트 이름 */}
@@ -172,17 +162,12 @@ export const ProjectSubmitForm = () => {
             maxLength={100}
             className={inputClass}
           />
-          {errors.title && (
-            <p className="typo-caption1 mt-1 text-error">{errors.title}</p>
-          )}
+          {errors.title && <p className="typo-caption1 mt-1 text-error">{errors.title}</p>}
         </div>
 
         {/* 프로젝트 설명 */}
         <div>
-          <label
-            htmlFor="proj-description"
-            className="typo-subtitle1 mb-2 block"
-          >
+          <label htmlFor="proj-description" className="typo-subtitle1 mb-2 block">
             프로젝트 설명 <span className="text-error">*</span>
           </label>
           <textarea
@@ -194,11 +179,7 @@ export const ProjectSubmitForm = () => {
             rows={6}
             className={`${inputClass} resize-y`}
           />
-          {errors.description && (
-            <p className="typo-caption1 mt-1 text-error">
-              {errors.description}
-            </p>
-          )}
+          {errors.description && <p className="typo-caption1 mt-1 text-error">{errors.description}</p>}
         </div>
 
         {/* GitHub 링크 */}
@@ -214,9 +195,7 @@ export const ProjectSubmitForm = () => {
             placeholder="https://github.com/username/repository"
             className={inputClass}
           />
-          {errors.githubUrl && (
-            <p className="typo-caption1 mt-1 text-error">{errors.githubUrl}</p>
-          )}
+          {errors.githubUrl && <p className="typo-caption1 mt-1 text-error">{errors.githubUrl}</p>}
         </div>
 
         {/* 데모 링크 */}
@@ -232,9 +211,7 @@ export const ProjectSubmitForm = () => {
             placeholder="https://example.com"
             className={inputClass}
           />
-          {errors.demoUrl && (
-            <p className="typo-caption1 mt-1 text-error">{errors.demoUrl}</p>
-          )}
+          {errors.demoUrl && <p className="typo-caption1 mt-1 text-error">{errors.demoUrl}</p>}
         </div>
 
         {/* 허니팟 */}
@@ -255,18 +232,14 @@ export const ProjectSubmitForm = () => {
           >
             {isPending ? "등록 중..." : "프로젝트 등록하기"}
           </button>
-          <p className="typo-caption1 mt-3 text-gray-500">
-            등록된 프로젝트는 갤러리에 공개돼요
-          </p>
+          <p className="typo-caption1 mt-3 text-gray-500">등록된 프로젝트는 갤러리에 공개돼요</p>
         </div>
       </form>
 
       {/* 토스트 */}
       <div
         className={`fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl px-6 py-3.5 shadow-lg transition-all duration-300 ${
-          toast
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-4 opacity-0"
+          toast ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
         } ${toast?.success ? "bg-success text-white" : "bg-error text-white"}`}
       >
         <span className="typo-subtitle4">{toast?.message}</span>

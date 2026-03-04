@@ -16,9 +16,7 @@ export const Header = () => {
   return (
     <header
       className={`fixed top-0 right-0 left-0 z-50 backdrop-blur-sm transition-[border-color,background-color] duration-300 ${
-        scrolled
-          ? "border-b border-border bg-background/80"
-          : "border-b border-transparent bg-transparent"
+        scrolled ? "border-b border-border bg-background/80" : "border-b border-transparent bg-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">

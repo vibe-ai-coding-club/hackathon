@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ProjectDetailModal } from "./project-detail-modal";
 
 export type SerializedProject = {
@@ -95,14 +95,10 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
                   onClick={() => setSelectedProject(project)}
                   className="border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors"
                 >
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {page * PAGE_SIZE + i + 1}
-                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{page * PAGE_SIZE + i + 1}</td>
                   <td className="px-4 py-3 font-medium">{project.title}</td>
                   <td className="px-4 py-3 text-muted-foreground">{project.team.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {project.team.teamName ?? "-"}
-                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{project.team.teamName ?? "-"}</td>
                   <td className="px-4 py-3">
                     <a
                       href={project.githubUrl}
@@ -163,12 +159,7 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
       )}
 
       {/* 상세 모달 */}
-      {selectedProject && (
-        <ProjectDetailModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-      )}
+      {selectedProject && <ProjectDetailModal project={selectedProject} onClose={() => setSelectedProject(null)} />}
     </div>
   );
 };

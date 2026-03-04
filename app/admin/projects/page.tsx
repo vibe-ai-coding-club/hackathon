@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { LogoutButton } from "../_components/logout-button";
 import { AdminNav } from "../_components/admin-nav";
+import { LogoutButton } from "../_components/logout-button";
 import { ProjectTable } from "../_components/project-table";
 
 const AdminProjectsPage = async () => {
