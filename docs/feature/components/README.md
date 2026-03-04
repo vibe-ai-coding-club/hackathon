@@ -7,6 +7,7 @@
 
 ## 인덱스
 - `button.md`
+- `chip.md`
 - `header.md`
 - `footer.md`
 - `runaway-button.md`
