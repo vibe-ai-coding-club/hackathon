@@ -13,17 +13,11 @@ export async function POST(request: NextRequest) {
   }
 
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return NextResponse.json(
-      { error: "JPG, PNG, WebP 형식만 업로드할 수 있습니다." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "JPG, PNG, WebP 형식만 업로드할 수 있습니다." }, { status: 400 });
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return NextResponse.json(
-      { error: "파일 크기는 1MB 이하여야 합니다." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "파일 크기는 1MB 이하여야 합니다." }, { status: 400 });
   }
 
   const blob = await put(`projects/${Date.now()}-${file.name}`, file, {

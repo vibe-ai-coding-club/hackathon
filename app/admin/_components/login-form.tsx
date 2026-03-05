@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
 import { adminLogin } from "@/app/actions/admin-auth";
+import { useActionState } from "react";
 
 const inputClass =
   "w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-accent transition-colors";
@@ -15,9 +15,7 @@ export const LoginForm = () => {
   return (
     <form action={formAction} className="space-y-4">
       {state.message && !state.success && (
-        <div className="rounded-lg border border-error/30 bg-error/5 p-3 text-sm text-error">
-          {state.message}
-        </div>
+        <div className="rounded-lg border border-error/30 bg-error/5 p-3 text-sm text-error">{state.message}</div>
       )}
 
       <div>

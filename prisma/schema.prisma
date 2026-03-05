@@ -29,34 +29,77 @@ model Team {
   id                String            @id @default(cuid())
   // 기본 정보 (신청자 = 대표자)
   name              String // 이름 (대표자)
-  email             String            @unique // 이메일
-  phone             String // 연락처
+  email             String            @unique // 이메일 (프로젝트 등록 매칭용)
+  phone             String? // 연락처 (선택)
   // 참가 유형
   participationType ParticipationType @default(INDIVIDUAL) @map("participation_type")
   // 팀 정보 (팀 참여 시)
   teamName          String?           @map("team_name") // 팀 이름
-  members           Json? // { name: string, email?: string, experienceLevel?: string }[]
   // 추가 정보
   experienceLevel   ExperienceLevel   @default(BEGINNER) @map("experience_level")
   motivation        String? // 참가 동기
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
 
+  members  Member[]
   projects Project[]
 
   @@map("teams")
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  teamId    String   @map("team_id")
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  name      String
+  contact   String   @unique // 투표용 (전화번호 또는 이메일)
+  isLeader  Boolean  @default(false) @map("is_leader")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  votes Vote[]
+
+  @@map("members")
 }
 
 model Project {
   id          String   @id @default(cuid())
   teamId      String   @map("team_id")
   team        Team     @relation(fields: [teamId], references: [id])
-  title       String // 프로젝트 제목
-  description String // 프로젝트 설명
-  imageUrl    String   @map("image_url") // Vercel Blob 이미지 URL
-  linkUrl     String?  @map("link_url") // 프로젝트 링크 (GitHub, 배포 URL 등)
+  title       String
+  description String
+  githubUrl   String   @map("github_url")
+  demoUrl     String?  @map("demo_url")
+  imageUrl    String?  @map("image_url")
+  linkUrl     String?  @map("link_url")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  votes Vote[]
+
   @@map("projects")
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  memberId  String   @map("member_id")
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  projectId String   @map("project_id")
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([memberId, projectId])
+  @@map("votes")
+}
+
+model VoteSession {
+  id        String    @id @default(cuid())
+  isActive  Boolean   @default(false) @map("is_active")
+  maxVotes  Int       @default(5) @map("max_votes")
+  startedAt DateTime? @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("vote_sessions")
 }

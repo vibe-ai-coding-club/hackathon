@@ -1,16 +1,25 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { TeamDetailModal } from "./team-detail-modal";
+
+export type SerializedMember = {
+  id: string;
+  name: string;
+  contact: string;
+  isLeader: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type SerializedTeam = {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   participationType: string;
   teamName: string | null;
-  members: unknown;
+  members: SerializedMember[];
   experienceLevel: string;
   motivation: string | null;
   createdAt: string;
@@ -46,11 +55,7 @@ export const TeamTable = ({ teams }: TeamTableProps) => {
   const filtered = useMemo(() => {
     if (!search.trim()) return teams;
     const q = search.toLowerCase();
-    return teams.filter(
-      (t) =>
-        t.name.toLowerCase().includes(q) ||
-        t.email.toLowerCase().includes(q),
-    );
+    return teams.filter((t) => t.name.toLowerCase().includes(q) || t.email.toLowerCase().includes(q));
   }, [teams, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -84,13 +89,14 @@ export const TeamTable = ({ teams }: TeamTableProps) => {
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">참가유형</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">경험수준</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">팀명</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">멤버</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">신청일</th>
             </tr>
           </thead>
           <tbody>
             {paged.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
                   {search ? "검색 결과가 없습니다." : "신청 데이터가 없습니다."}
                 </td>
               </tr>
@@ -101,9 +107,7 @@ export const TeamTable = ({ teams }: TeamTableProps) => {
                   onClick={() => setSelectedTeam(team)}
                   className="border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors"
                 >
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {page * PAGE_SIZE + i + 1}
-                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{page * PAGE_SIZE + i + 1}</td>
                   <td className="px-4 py-3 font-medium">{team.name}</td>
                   <td className="px-4 py-3 text-muted-foreground">{team.email}</td>
                   <td className="px-4 py-3">
@@ -117,11 +121,10 @@ export const TeamTable = ({ teams }: TeamTableProps) => {
                       {participationTypeLabel[team.participationType] ?? team.participationType}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    {experienceLevelLabel[team.experienceLevel] ?? team.experienceLevel}
-                  </td>
+                  <td className="px-4 py-3">{experienceLevelLabel[team.experienceLevel] ?? team.experienceLevel}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{team.teamName ?? "-"}</td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {team.teamName ?? "-"}
+                    {team.participationType === "TEAM" ? `${team.members.filter((m) => !m.isLeader).length}명` : "-"}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                     {new Date(team.createdAt).toLocaleDateString("ko-KR")}
@@ -157,12 +160,7 @@ export const TeamTable = ({ teams }: TeamTableProps) => {
       )}
 
       {/* 상세 모달 */}
-      {selectedTeam && (
-        <TeamDetailModal
-          team={selectedTeam}
-          onClose={() => setSelectedTeam(null)}
-        />
-      )}
+      {selectedTeam && <TeamDetailModal team={selectedTeam} onClose={() => setSelectedTeam(null)} />}
     </div>
   );
 };

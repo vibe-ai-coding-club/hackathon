@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 import { Button } from "@/app/_components/button";
 
@@ -14,35 +14,57 @@ const experienceOptions: { value: ExperienceLevel; label: string }[] = [
   { value: "VIBE_CODER", label: "바이브코더" },
 ];
 
-type MemberState = {
-  name: string;
-  email: string;
-  phone: string;
-};
+type MemberState = { name: string; contact: string };
 
 type FormState = {
   participationType: ParticipationType | "";
-  name: string;
   email: string;
+  name: string;
   phone: string;
+  teamName: string;
+  members: MemberState[];
   experienceLevel: ExperienceLevel | "";
   motivation: string;
-  members: MemberState[];
 };
 
-const createEmptyMember = (): MemberState => ({ name: "", email: "", phone: "" });
+const createEmptyMember = (): MemberState => ({ name: "", contact: "" });
+
+const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);
+
+const displayContact = (value: string): string => {
+  if (!value) return "";
+  if (isDigitsOnly(value)) return formatPhone(value);
+  return value;
+};
+
+const validateContact = (value: string): string | null => {
+  if (!value.trim()) return "연락처를 입력해주세요";
+  if (isDigitsOnly(value)) {
+    if (!/^01[016789]\d{7,8}$/.test(value)) return "올바른 전화번호를 입력해주세요";
+  } else {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "올바른 이메일을 입력해주세요";
+  }
+  return null;
+};
+
+const isValidContact = (value: string): boolean => {
+  if (!value.trim()) return false;
+  if (isDigitsOnly(value)) return /^01[016789]\d{7,8}$/.test(value);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+};
 
 const initialForm: FormState = {
   participationType: "INDIVIDUAL",
-  name: "",
   email: "",
+  name: "",
   phone: "",
+  teamName: "",
+  members: [createEmptyMember()],
   experienceLevel: "",
   motivation: "",
-  members: [createEmptyMember()],
 };
 
-const MAX_MEMBERS = 5;
+const MAX_MEMBERS = 4;
 
 const formatPhone = (digits: string): string => {
   if (digits.length <= 3) return digits;
@@ -65,9 +87,26 @@ const RadioDot = ({ checked }: { checked: boolean }) => (
 const inputClass =
   "w-full rounded-lg bg-gray-50 px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40";
 
+const checkDuplicate = async (field: "email" | "contact", value: string): Promise<boolean> => {
+  try {
+    const res = await fetch("/api/check-duplicate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ field, value }),
+    });
+    const data = await res.json();
+    return data.duplicate === true;
+  } catch {
+    return false;
+  }
+};
+
+type DuplicateStatus = "idle" | "checking" | "available" | "duplicate";
+
 export const RegistrationForm = () => {
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [dupStatus, setDupStatus] = useState<Record<string, DuplicateStatus>>({});
   const [isPending, setIsPending] = useState(false);
   const [toast, setToast] = useState<{
     success: boolean;
@@ -88,6 +127,9 @@ export const RegistrationForm = () => {
       delete next[field];
       return next;
     });
+    if (field === "email") {
+      setDupStatus((prev) => ({ ...prev, email: "idle" }));
+    }
   };
 
   const updateMember = (index: number, field: keyof MemberState, value: string) => {
@@ -101,6 +143,9 @@ export const RegistrationForm = () => {
       delete next[`members.${index}.${field}`];
       return next;
     });
+    if (field === "contact") {
+      setDupStatus((prev) => ({ ...prev, [`members.${index}.contact`]: "idle" }));
+    }
   };
 
   const addMember = () => {
@@ -118,32 +163,67 @@ export const RegistrationForm = () => {
     }));
   };
 
+  const checkEmailDuplicate = useCallback(async () => {
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return;
+    setDupStatus((prev) => ({ ...prev, email: "checking" }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.email;
+      return next;
+    });
+    const isDupEmail = await checkDuplicate("email", form.email);
+    const isDupContact = await checkDuplicate("contact", form.email);
+    if (isDupEmail || isDupContact) {
+      setDupStatus((prev) => ({ ...prev, email: "duplicate" }));
+      setErrors((prev) => ({
+        ...prev,
+        email: "이미 등록된 이메일입니다",
+      }));
+    } else {
+      setDupStatus((prev) => ({ ...prev, email: "available" }));
+    }
+  }, [form.email]);
+
+  const checkContactDuplicate = useCallback(async (field: string, value: string) => {
+    if (!isValidContact(value)) return;
+    setDupStatus((prev) => ({ ...prev, [field]: "checking" }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    const isDup = await checkDuplicate("contact", value);
+    if (isDup) {
+      setDupStatus((prev) => ({ ...prev, [field]: "duplicate" }));
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "이미 등록된 연락처입니다",
+      }));
+    } else {
+      setDupStatus((prev) => ({ ...prev, [field]: "available" }));
+    }
+  }, []);
+
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!form.participationType) newErrors.participationType = "참가 유형을 선택해주세요";
 
-    if (form.participationType === "INDIVIDUAL") {
-      if (!form.name.trim()) newErrors.name = "이름을 입력해주세요";
-      if (!form.email.trim()) newErrors.email = "이메일을 입력해주세요";
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-        newErrors.email = "올바른 이메일을 입력해주세요";
-      if (!form.phone) newErrors.phone = "연락처를 입력해주세요";
-      else if (!/^01[016789]\d{7,8}$/.test(form.phone))
-        newErrors.phone = "올바른 연락처를 입력해주세요";
-    }
+    // 공통 필드
+    if (!form.email.trim()) newErrors.email = "이메일을 입력해주세요";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = "올바른 이메일을 입력해주세요";
 
+    if (!form.name.trim()) newErrors.name = "이름을 입력해주세요";
+
+    if (form.phone && !/^01[016789]\d{7,8}$/.test(form.phone)) newErrors.phone = "올바른 전화번호를 입력해주세요";
+
+    // 팀 전용
     if (form.participationType === "TEAM") {
+      if (!form.teamName.trim()) newErrors.teamName = "팀 이름을 입력해주세요";
       form.members.forEach((member, i) => {
         if (!member.name.trim()) newErrors[`members.${i}.name`] = "이름을 입력해주세요";
-        if (i === 0) {
-          if (!member.email.trim()) newErrors[`members.${i}.email`] = "이메일을 입력해주세요";
-          else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email))
-            newErrors[`members.${i}.email`] = "올바른 이메일을 입력해주세요";
-        }
-        if (!member.phone) newErrors[`members.${i}.phone`] = "연락처를 입력해주세요";
-        else if (!/^01[016789]\d{7,8}$/.test(member.phone))
-          newErrors[`members.${i}.phone`] = "올바른 연락처를 입력해주세요";
+        const memberContactErr = validateContact(member.contact);
+        if (memberContactErr) newErrors[`members.${i}.contact`] = memberContactErr;
       });
     }
 
@@ -159,25 +239,26 @@ export const RegistrationForm = () => {
     toastTimer.current = setTimeout(() => setToast(null), 4000);
   };
 
-  useEffect(() => () => {
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    },
+    [],
+  );
 
   const isReady = (() => {
     if (!form.participationType || !form.experienceLevel) return false;
-    if (form.participationType === "INDIVIDUAL") {
+    const hasBasic = form.name.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+
+    if (!hasBasic) return false;
+
+    if (form.participationType === "TEAM") {
       return (
-        form.name.trim().length > 0 &&
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) &&
-        /^01[016789]\d{7,8}$/.test(form.phone)
+        form.teamName.trim().length > 0 &&
+        form.members.every((m) => m.name.trim().length > 0 && isValidContact(m.contact))
       );
     }
-    return form.members.every((m, i) => {
-      const hasName = m.name.trim().length > 0;
-      const hasPhone = /^01[016789]\d{7,8}$/.test(m.phone);
-      if (i === 0) return hasName && hasPhone && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email);
-      return hasName && hasPhone;
-    });
+    return true;
   })();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -187,23 +268,22 @@ export const RegistrationForm = () => {
     setIsPending(true);
 
     try {
-      const formData = new FormData();
-      formData.set("participationType", form.participationType);
-      formData.set("experienceLevel", form.experienceLevel);
-      if (form.motivation) formData.set("motivation", form.motivation);
-
-      if (form.participationType === "INDIVIDUAL") {
-        formData.set("name", form.name);
-        formData.set("email", form.email);
-        formData.set("phone", form.phone);
-      }
-      if (form.participationType === "TEAM") {
-        formData.set("members", JSON.stringify(form.members));
-      }
+      const payload = {
+        participationType: form.participationType,
+        email: form.email,
+        name: form.name,
+        phone: form.phone || undefined,
+        contact: form.email, // 대표/개인은 이메일을 투표용 연락처로 사용
+        teamName: form.participationType === "TEAM" ? form.teamName : undefined,
+        members: form.participationType === "TEAM" ? form.members : undefined,
+        experienceLevel: form.experienceLevel,
+        motivation: form.motivation || undefined,
+      };
 
       const res = await fetch("/api/register", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       showToast(data.success, data.message);
@@ -217,325 +297,335 @@ export const RegistrationForm = () => {
 
   return (
     <>
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {/* 1. 참가 유형 */}
-      <fieldset className="space-y-2">
-        <legend className="typo-subtitle1">
-          참가 유형 <span className="text-error">*</span>
-        </legend>
-
-        {/* PC: 가로 2열 / 모바일: 세로 */}
-        <div className="grid gap-2 sm:grid-cols-2">
-          <label
-            className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
-              form.participationType === "INDIVIDUAL"
-                ? "bg-primary-025 ring-2 ring-primary-400"
-                : "bg-gray-50"
-            }`}
-          >
-            <input
-              type="radio"
-              name="participationType"
-              value="INDIVIDUAL"
-              checked={form.participationType === "INDIVIDUAL"}
-              onChange={(e) => update("participationType", e.target.value)}
-              className="sr-only"
-            />
-            <RadioDot checked={form.participationType === "INDIVIDUAL"} />
-            <span>
-              <span className="typo-subtitle2">개인 참여</span>
-              <span className="typo-body3 ml-2 text-gray-500">혼자서 참여해요</span>
-            </span>
-          </label>
-
-          <label
-            className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
-              form.participationType === "TEAM"
-                ? "bg-primary-025 ring-2 ring-primary-400"
-                : "bg-gray-50"
-            }`}
-          >
-            <input
-              type="radio"
-              name="participationType"
-              value="TEAM"
-              checked={form.participationType === "TEAM"}
-              onChange={(e) => update("participationType", e.target.value)}
-              className="sr-only"
-            />
-            <RadioDot checked={form.participationType === "TEAM"} />
-            <span>
-              <span className="typo-subtitle2">팀 참여</span>
-              <span className="typo-body3 ml-2 text-gray-500">단체로 참여해요</span>
-            </span>
-          </label>
-        </div>
-
-        {errors.participationType && (
-          <p className="typo-caption1 text-error">{errors.participationType}</p>
-        )}
-      </fieldset>
-
-      {/* 2a. 개인 참여: 이름 + 연락처 */}
-      {form.participationType === "INDIVIDUAL" && (
-        <div className="space-y-6">
-          <div>
-            <label htmlFor="reg-name" className="typo-subtitle1 mb-2 block">
-              이름 <span className="text-error">*</span>
-            </label>
-            <input
-              id="reg-name"
-              type="text"
-              value={form.name}
-              onChange={(e) => update("name", e.target.value)}
-              placeholder="홍길동"
-              maxLength={50}
-              className={inputClass}
-            />
-            {errors.name && (
-              <p className="typo-caption1 mt-1 text-error">{errors.name}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="reg-email" className="typo-subtitle1 mb-2 block">
-              이메일 <span className="text-error">*</span>
-            </label>
-            <input
-              id="reg-email"
-              type="email"
-              value={form.email}
-              onChange={(e) => update("email", e.target.value)}
-              placeholder="example@email.com"
-              className={inputClass}
-            />
-            {errors.email && (
-              <p className="typo-caption1 mt-1 text-error">{errors.email}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="reg-phone" className="typo-subtitle1 mb-2 block">
-              연락처 <span className="text-error">*</span>
-            </label>
-            <input
-              id="reg-phone"
-              type="tel"
-              inputMode="numeric"
-              value={formatPhone(form.phone)}
-              onChange={(e) => update("phone", toDigits(e.target.value))}
-              placeholder="010-1234-5678"
-              className={inputClass}
-            />
-            {errors.phone && (
-              <p className="typo-caption1 mt-1 text-error">{errors.phone}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* 2b. 팀 참여: 팀원 */}
-      {form.participationType === "TEAM" && (
-        <fieldset className="space-y-3">
-          <div className="flex min-h-9 items-center justify-between">
-            <legend className="typo-subtitle1">
-              팀원{" "}
-              <span className="typo-body3 font-normal text-gray-500">
-                ({form.members.length}/{MAX_MEMBERS})
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* 1. 참가 유형 */}
+        <fieldset className="space-y-2">
+          <legend className="typo-subtitle1">
+            참가 유형 <span className="text-error">*</span>
+          </legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label
+              className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
+                form.participationType === "INDIVIDUAL" ? "bg-primary-025 ring-2 ring-primary-400" : "bg-gray-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="participationType"
+                value="INDIVIDUAL"
+                checked={form.participationType === "INDIVIDUAL"}
+                onChange={(e) => update("participationType", e.target.value)}
+                className="sr-only"
+              />
+              <RadioDot checked={form.participationType === "INDIVIDUAL"} />
+              <span>
+                <span className="typo-subtitle2">개인 참여</span>
+                <span className="typo-body3 ml-2 text-gray-500">혼자서 참여해요</span>
               </span>
-            </legend>
-            {form.members.length < MAX_MEMBERS && (
-              <button
-                type="button"
-                onClick={addMember}
-                className="typo-caption1 rounded-md bg-gray-100 px-3 py-1.5 text-gray-600 hover:bg-gray-200 cursor-pointer transition-colors"
-              >
-                + 팀원 추가
-              </button>
-            )}
+            </label>
+
+            <label
+              className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
+                form.participationType === "TEAM" ? "bg-primary-025 ring-2 ring-primary-400" : "bg-gray-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="participationType"
+                value="TEAM"
+                checked={form.participationType === "TEAM"}
+                onChange={(e) => update("participationType", e.target.value)}
+                className="sr-only"
+              />
+              <RadioDot checked={form.participationType === "TEAM"} />
+              <span>
+                <span className="typo-subtitle2">팀 참여</span>
+                <span className="typo-body3 ml-2 text-gray-500">단체로 참여해요</span>
+              </span>
+            </label>
           </div>
+          {errors.participationType && <p className="typo-caption1 text-error">{errors.participationType}</p>}
+        </fieldset>
 
-          {form.members.map((member, i) => (
-            <div key={i} className="rounded-xl bg-gray-50 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="typo-subtitle2">
-                  {i === 0 ? "팀장" : `팀원 ${i}`}
-                </span>
-                {i > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => removeMember(i)}
-                    className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
-                  >
-                    <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                    </svg>
-                  </button>
-                )}
+        {/* 2. 대표자 정보 */}
+        {form.participationType && (
+          <div className="space-y-6">
+            {/* 대표 이메일 */}
+            <div>
+              <label htmlFor="reg-email" className="typo-subtitle1 mb-1 block">
+                대표 이메일 <span className="text-error">*</span>
+              </label>
+              <p className="typo-caption1 mb-2 text-gray-500">프로젝트 등록 시 팀 식별에 사용됩니다</p>
+              <div className="flex gap-2">
+                <input
+                  id="reg-email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => update("email", e.target.value)}
+                  onBlur={checkEmailDuplicate}
+                  placeholder="example@email.com"
+                  className={`${inputClass} flex-1`}
+                />
+                <button
+                  type="button"
+                  onClick={checkEmailDuplicate}
+                  disabled={
+                    !form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) || dupStatus.email === "checking"
+                  }
+                  className="shrink-0 rounded-lg bg-gray-100 px-4 py-3 typo-body3 font-medium text-gray-600 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                >
+                  {dupStatus.email === "checking" ? "확인 중..." : "중복확인"}
+                </button>
               </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="typo-subtitle4 mb-1 block">
-                    이름 <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={member.name}
-                    onChange={(e) => updateMember(i, "name", e.target.value)}
-                    placeholder="홍길동"
-                    maxLength={50}
-                    className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
-                  />
-                  {errors[`members.${i}.name`] && (
-                    <p className="typo-caption1 mt-1 text-error">
-                      {errors[`members.${i}.name`]}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="typo-subtitle4 mb-1 block">
-                    연락처 <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    value={formatPhone(member.phone)}
-                    onChange={(e) => updateMember(i, "phone", toDigits(e.target.value))}
-                    placeholder="010-1234-5678"
-                    className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
-                  />
-                  {errors[`members.${i}.phone`] && (
-                    <p className="typo-caption1 mt-1 text-error">
-                      {errors[`members.${i}.phone`]}
-                    </p>
-                  )}
-                </div>
-              </div>
-              {i === 0 && (
-                <div>
-                  <label className="typo-subtitle4 mb-1 block">
-                    이메일 <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={member.email}
-                    onChange={(e) => updateMember(i, "email", e.target.value)}
-                    placeholder="example@email.com"
-                    className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
-                  />
-                  {errors["members.0.email"] && (
-                    <p className="typo-caption1 mt-1 text-error">
-                      {errors["members.0.email"]}
-                    </p>
-                  )}
-                </div>
+              {errors.email && <p className="typo-caption1 mt-1 text-error">{errors.email}</p>}
+              {dupStatus.email === "available" && !errors.email && (
+                <p className="typo-caption1 mt-1 text-success">사용 가능한 이메일입니다</p>
               )}
             </div>
-          ))}
-        </fieldset>
-      )}
 
-      {/* 3. 개발 경험 */}
-      {form.participationType && (
-        <fieldset className="space-y-2">
-          <legend className="typo-subtitle1">개발 경험</legend>
-
-          {/* PC: 4열 가로 / 모바일: 세로 */}
-          <div className="grid gap-2 sm:grid-cols-4">
-            {experienceOptions.map((opt) => (
-              <label
-                key={opt.value}
-                className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                  form.experienceLevel === opt.value
-                    ? "bg-primary-025 ring-2 ring-primary-400"
-                    : "bg-gray-50"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="experienceLevel"
-                  value={opt.value}
-                  checked={form.experienceLevel === opt.value}
-                  onChange={(e) => update("experienceLevel", e.target.value)}
-                  className="sr-only"
-                />
-                <RadioDot checked={form.experienceLevel === opt.value} />
-                <span className="typo-subtitle4">{opt.label}</span>
+            {/* 이름 */}
+            <div>
+              <label htmlFor="reg-name" className="typo-subtitle1 mb-2 block">
+                이름 <span className="text-error">*</span>
               </label>
-            ))}
+              <input
+                id="reg-name"
+                type="text"
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
+                placeholder="홍길동"
+                maxLength={50}
+                className={inputClass}
+              />
+              {errors.name && <p className="typo-caption1 mt-1 text-error">{errors.name}</p>}
+            </div>
+
+            {/* 전화번호 (선택) */}
+            <div>
+              <label htmlFor="reg-phone" className="typo-subtitle1 mb-2 block">
+                전화번호 <span className="typo-body3 font-normal text-gray-500">(선택)</span>
+              </label>
+              <input
+                id="reg-phone"
+                type="tel"
+                inputMode="numeric"
+                value={formatPhone(form.phone)}
+                onChange={(e) => update("phone", toDigits(e.target.value))}
+                placeholder="010-1234-5678"
+                className={inputClass}
+              />
+              {errors.phone && <p className="typo-caption1 mt-1 text-error">{errors.phone}</p>}
+            </div>
           </div>
+        )}
 
-          {errors.experienceLevel && (
-            <p className="typo-caption1 text-error">{errors.experienceLevel}</p>
-          )}
-        </fieldset>
-      )}
+        {/* 3. 팀 정보 */}
+        {form.participationType === "TEAM" && (
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="reg-teamName" className="typo-subtitle1 mb-2 block">
+                팀 이름 <span className="text-error">*</span>
+              </label>
+              <input
+                id="reg-teamName"
+                type="text"
+                value={form.teamName}
+                onChange={(e) => update("teamName", e.target.value)}
+                placeholder="팀 이름을 입력해주세요"
+                maxLength={50}
+                className={inputClass}
+              />
+              {errors.teamName && <p className="typo-caption1 mt-1 text-error">{errors.teamName}</p>}
+            </div>
+          </div>
+        )}
 
-      {/* 4. 참여 동기 및 문의 사항 */}
-      {form.participationType && (
-        <div>
-          <label htmlFor="reg-motivation" className="typo-subtitle1 mb-2 block">
-            참여 동기 및 문의 사항
-          </label>
-          <textarea
-            id="reg-motivation"
-            value={form.motivation}
-            onChange={(e) => update("motivation", e.target.value)}
-            placeholder="자유롭게 작성해 주세요"
-            maxLength={500}
-            rows={6}
-            className={`${inputClass} resize-y`}
-          />
+        {/* 4. 팀원 */}
+        {form.participationType === "TEAM" && (
+          <fieldset className="space-y-3">
+            <div className="flex min-h-9 items-center justify-between">
+              <legend className="typo-subtitle1">
+                팀원{" "}
+                <span className="typo-body3 font-normal text-gray-500">
+                  ({form.members.length}/{MAX_MEMBERS})
+                </span>
+              </legend>
+              {form.members.length < MAX_MEMBERS && (
+                <button
+                  type="button"
+                  onClick={addMember}
+                  className="typo-caption1 cursor-pointer rounded-md bg-gray-100 px-3 py-1.5 text-gray-600 transition-colors hover:bg-gray-200"
+                >
+                  + 팀원 추가
+                </button>
+              )}
+            </div>
+            <p className="typo-caption1 text-gray-400">팀장을 제외하고 입력해주세요</p>
+
+            {form.members.map((member, i) => (
+              <div key={i} className="space-y-3 rounded-xl bg-gray-50 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="typo-subtitle2">팀원 {i + 1}</span>
+                  {form.members.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeMember(i)}
+                      className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
+                    >
+                      <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="typo-subtitle4 mb-1 block">
+                      이름 <span className="text-error">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={member.name}
+                      onChange={(e) => updateMember(i, "name", e.target.value)}
+                      placeholder="홍길동"
+                      maxLength={50}
+                      className="w-full rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
+                    />
+                    {errors[`members.${i}.name`] && (
+                      <p className="typo-caption1 mt-1 text-error">{errors[`members.${i}.name`]}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="typo-subtitle4 mb-1 block">
+                      연락처 <span className="text-error">*</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type={isDigitsOnly(member.contact) || !member.contact ? "tel" : "email"}
+                        inputMode={isDigitsOnly(member.contact) || !member.contact ? "numeric" : "email"}
+                        value={displayContact(member.contact)}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/-/g, "");
+                          if (/^\d*$/.test(raw)) {
+                            updateMember(i, "contact", raw.slice(0, 11));
+                          } else {
+                            updateMember(i, "contact", e.target.value);
+                          }
+                        }}
+                        onBlur={() => checkContactDuplicate(`members.${i}.contact`, member.contact)}
+                        placeholder="전화번호 또는 이메일"
+                        className="w-full flex-1 rounded-lg bg-white px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => checkContactDuplicate(`members.${i}.contact`, member.contact)}
+                        disabled={!isValidContact(member.contact) || dupStatus[`members.${i}.contact`] === "checking"}
+                        className="shrink-0 rounded-lg bg-white px-3 py-2 typo-caption1 font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                      >
+                        {dupStatus[`members.${i}.contact`] === "checking" ? "확인 중..." : "중복확인"}
+                      </button>
+                    </div>
+                    {errors[`members.${i}.contact`] ? (
+                      <p className="typo-caption1 mt-1 text-error">{errors[`members.${i}.contact`]}</p>
+                    ) : dupStatus[`members.${i}.contact`] === "available" ? (
+                      <p className="typo-caption1 mt-1 text-success">사용 가능한 연락처입니다</p>
+                    ) : (
+                      <p className="typo-caption1 mt-1 text-gray-400">투표 시 사용됩니다</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </fieldset>
+        )}
+
+        {/* 5. 개발 경험 */}
+        {form.participationType && (
+          <fieldset className="space-y-2">
+            <legend className="typo-subtitle1">개발 경험</legend>
+            <div className="grid gap-2 sm:grid-cols-4">
+              {experienceOptions.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
+                    form.experienceLevel === opt.value ? "bg-primary-025 ring-2 ring-primary-400" : "bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="experienceLevel"
+                    value={opt.value}
+                    checked={form.experienceLevel === opt.value}
+                    onChange={(e) => update("experienceLevel", e.target.value)}
+                    className="sr-only"
+                  />
+                  <RadioDot checked={form.experienceLevel === opt.value} />
+                  <span className="typo-subtitle4">{opt.label}</span>
+                </label>
+              ))}
+            </div>
+            {errors.experienceLevel && <p className="typo-caption1 text-error">{errors.experienceLevel}</p>}
+          </fieldset>
+        )}
+
+        {/* 6. 참여 동기 */}
+        {form.participationType && (
+          <div>
+            <label htmlFor="reg-motivation" className="typo-subtitle1 mb-2 block">
+              참여 동기 및 문의 사항
+            </label>
+            <textarea
+              id="reg-motivation"
+              value={form.motivation}
+              onChange={(e) => update("motivation", e.target.value)}
+              placeholder="자유롭게 작성해 주세요"
+              maxLength={500}
+              rows={6}
+              className={`${inputClass} resize-y`}
+            />
+          </div>
+        )}
+
+        {/* 허니팟 */}
+        <div className="absolute -z-10 opacity-0" aria-hidden="true">
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" />
         </div>
-      )}
 
-      {/* 허니팟 */}
-      <div className="absolute opacity-0 -z-10" aria-hidden="true">
-        <input type="text" name="website" tabIndex={-1} autoComplete="off" />
-      </div>
-
-      {/* 제출 */}
-      <div className="text-center pt-4">
-        <Button
-          type="submit"
-          color={isReady ? "primary" : "gray"}
-          size="medium"
-          state="default"
-          disabled={isPending}
-          className="w-full sm:w-auto sm:min-w-56"
-        >
-          {isPending ? "등록 중..." : "딸깍톤 신청하기"}
-        </Button>
-        <p className="typo-caption1 mt-3 text-gray-500">
-          제출된 정보는 행사 운영 목적으로만 사용돼요
-        </p>
-      </div>
-    </form>
-
-    {/* 토스트 */}
-    <div
-      className={`fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl px-6 py-3.5 shadow-lg transition-all duration-300 ${
-        toast
-          ? "translate-y-0 opacity-100"
-          : "translate-y-4 opacity-0 pointer-events-none"
-      } ${
-        toast?.success
-          ? "bg-success text-white"
-          : "bg-error text-white"
-      }`}
-    >
-      <span className="typo-subtitle4">{toast?.message}</span>
-      <button
-        type="button"
-        onClick={() => setToast(null)}
-        className="ml-1 shrink-0 opacity-70 hover:opacity-100 cursor-pointer transition-opacity"
+        {/* 제출 */}
+        <div className="pt-4 text-center">
+          <button
+            type="submit"
+            disabled={isPending}
+            className={`typo-btn2 cursor-pointer rounded-xl px-12 py-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+              isReady
+                ? "bg-primary-400 text-white hover:bg-primary-500"
+                : "bg-gray-100 text-foreground hover:bg-gray-200"
+            }`}
+          >
+            {isPending ? "등록 중..." : "딸깍톤 신청하기"}
+          </button>
+          <p className="typo-caption1 mt-3 text-gray-500">제출된 정보는 행사 운영 목적으로만 사용돼요</p>
+        </div>
+      </form>
+      
+      {/* 토스트 */}
+      <div
+        className={`fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl px-6 py-3.5 shadow-lg transition-all duration-300 ${
+          toast ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
+        } ${toast?.success ? "bg-success text-white" : "bg-error text-white"}`}
       >
-        <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-        </svg>
-      </button>
-    </div>
+        <span className="typo-subtitle4">{toast?.message}</span>
+        <button
+          type="button"
+          onClick={() => setToast(null)}
+          className="ml-1 shrink-0 cursor-pointer opacity-70 transition-opacity hover:opacity-100"
+        >
+          <svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+          </svg>
+        </button>
+      </div>
     </>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import type { SerializedTeam } from "./team-table";
+import type { SerializedMember, SerializedTeam } from "./team-table";
 
 type TeamDetailModalProps = {
   team: SerializedTeam;
@@ -20,24 +20,17 @@ const experienceLevelLabel: Record<string, string> = {
   VIBE_CODER: "바이브코더",
 };
 
-type Member = {
-  name: string;
-  email?: string;
-  experienceLevel?: string;
-};
-
-const parseMembers = (members: unknown): Member[] => {
-  if (!members) return [];
-  if (Array.isArray(members)) return members as Member[];
-  if (typeof members === "string") {
-    try {
-      return JSON.parse(members) as Member[];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-};
+const MemberCard = ({ member }: { member: SerializedMember }) => (
+  <div className="rounded-md border border-border p-3 text-sm space-y-1">
+    <div className="flex items-center gap-2">
+      <p className="font-medium">{member.name}</p>
+      {member.isLeader && (
+        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">대표</span>
+      )}
+    </div>
+    {!member.isLeader && <p className="text-muted-foreground">연락처: {member.contact}</p>}
+  </div>
+);
 
 export const TeamDetailModal = ({ team, onClose }: TeamDetailModalProps) => {
   useEffect(() => {
@@ -47,8 +40,6 @@ export const TeamDetailModal = ({ team, onClose }: TeamDetailModalProps) => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
-
-  const members = parseMembers(team.members);
 
   return (
     <div
@@ -77,8 +68,12 @@ export const TeamDetailModal = ({ team, onClose }: TeamDetailModalProps) => {
             <dd>{team.name}</dd>
             <dt className="text-muted-foreground">이메일</dt>
             <dd>{team.email}</dd>
-            <dt className="text-muted-foreground">연락처</dt>
-            <dd>{team.phone}</dd>
+            {team.phone && (
+              <>
+                <dt className="text-muted-foreground">전화번호</dt>
+                <dd>{team.phone}</dd>
+              </>
+            )}
           </dl>
         </section>
 
@@ -99,29 +94,18 @@ export const TeamDetailModal = ({ team, onClose }: TeamDetailModalProps) => {
           </dl>
         </section>
 
-        {/* 팀원 목록 */}
-        {members.length > 0 && (
+        {/* 팀원 목록 (팀 참여만 표시) */}
+        {team.participationType === "TEAM" && team.members.length > 0 && (
           <section className="space-y-3">
             <h3 className="typo-subtitle2 text-muted-foreground">
-              팀원 ({members.length}명)
+              팀원 ({team.members.filter((m) => !m.isLeader).length}명)
             </h3>
             <div className="space-y-2">
-              {members.map((member, i) => (
-                <div
-                  key={i}
-                  className="rounded-md border border-border p-3 text-sm space-y-1"
-                >
-                  <p className="font-medium">{member.name}</p>
-                  {member.email && (
-                    <p className="text-muted-foreground">{member.email}</p>
-                  )}
-                  {member.experienceLevel && (
-                    <p className="text-muted-foreground">
-                      {experienceLevelLabel[member.experienceLevel] ?? member.experienceLevel}
-                    </p>
-                  )}
-                </div>
-              ))}
+              {team.members
+                .filter((m) => !m.isLeader)
+                .map((member) => (
+                  <MemberCard key={member.id} member={member} />
+                ))}
             </div>
           </section>
         )}
