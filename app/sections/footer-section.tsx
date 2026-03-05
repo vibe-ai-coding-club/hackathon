@@ -18,7 +18,7 @@ export const FooterSection = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] leading-[18px] tracking-[-0.2px] md:text-[14px] md:leading-[24px] md:tracking-[-0.4px]">
+        <div className="flex flex-col items-start gap-1 text-[10px] leading-[18px] tracking-[-0.2px] md:flex-row md:items-center md:justify-between md:gap-2 md:text-[14px] md:leading-[24px] md:tracking-[-0.4px]">
           <p>Talkkakthon 2026 by Vibe Coding Club</p>
           <p>문의: vibecodingclub.team@gmail.com</p>
         </div>
