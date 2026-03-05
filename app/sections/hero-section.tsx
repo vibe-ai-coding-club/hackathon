@@ -2,7 +2,10 @@ import Link from "next/link";
 
 export const HeroSection = () => {
   return (
-    <section id="hero" className="relative overflow-hidden pt-[180px] pb-[100px] md:pt-[380px] md:pb-[300px]">
+    <section
+      id="hero"
+      className="relative h-[100svh] min-h-[640px] overflow-hidden pt-[180px] pb-[100px] md:min-h-[900px] md:pt-[380px] md:pb-[300px]"
+    >
       {/* TODO: 배경 이미지 확정 후 교체 */}
       <div className="absolute inset-0 bg-[linear-gradient(135deg,#7b8794_0%,#9aa5b1_50%,#6c7983_100%)]" />
       <div className="absolute inset-0 bg-black/20" />
