@@ -7,9 +7,14 @@ export const AboutSection = () => {
       <div className="mx-auto max-w-[1280px]">
         <SectionTitle chipLabel="About" title="언제, 어디에서, 누가 참여할 수 있나요?" />
 
-        <div className="mt-9 grid gap-8 md:mt-[52px] md:grid-cols-3 md:gap-7">
-          {ABOUT_CARDS.map((card) => (
-            <article key={card.title} className="overflow-hidden rounded-xl md:rounded-[14px]">
+        <div className="mt-9 grid gap-8 md:mt-[52px] md:grid-cols-2 md:gap-7 lg:grid-cols-3">
+          {ABOUT_CARDS.map((card, index) => (
+            <article
+              key={card.title}
+              className={`overflow-hidden rounded-xl md:rounded-[14px] ${
+                index === 2 ? "md:col-span-2 lg:col-span-1" : ""
+              }`}
+            >
               <div className="aspect-[3/2] rounded-xl bg-gray-300 md:rounded-[14px]" />
               <div className="mt-0 flex h-[114px] flex-col justify-center rounded-xl bg-gray-50 px-5 md:rounded-[14px] md:px-7">
                 <h3 className="typo-subtitle1 text-gray-850 md:typo-h6">{card.title}</h3>
