@@ -42,7 +42,8 @@
 
 ### 5) Culture
 - Culture 카드 배열을 무한 롤링으로 노출.
-- `swiper` 기반 구현.
+- CSS keyframes 기반 커스텀 롤러로 구현(카드 목록 2세트를 이어붙여 무한 이동).
+- 롤링은 `linear` 타이밍으로 카드 경계 구간에서도 동일 속도 유지.
 - PC: hover 동안 롤링 정지.
 - Mobile: press(touch hold) 동안 롤링 정지.
 

@@ -68,6 +68,44 @@ html {
   scroll-behavior: smooth;
 }
 
+.culture-card-roller-track {
+  display: flex;
+  width: max-content;
+  animation-name: culture-card-roller-scroll;
+  animation-duration: var(--culture-roll-duration, 24s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.culture-card-roller-track-paused {
+  animation-play-state: paused;
+}
+
+.culture-card-roller-row {
+  display: flex;
+  flex-shrink: 0;
+  gap: 24px;
+  padding-right: 24px;
+}
+
+@media (min-width: 768px) {
+  .culture-card-roller-row {
+    gap: 28px;
+    padding-right: 28px;
+  }
+}
+
+@keyframes culture-card-roller-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 /* ===== Typography Tokens ===== */
 /* @utility로 정의하여 sm:typo-h1 등 반응형 변형 지원 */
 

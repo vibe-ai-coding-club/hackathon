@@ -1,9 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import { Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import type { Swiper as SwiperInstance } from "swiper/types";
+import { useMemo, useState } from "react";
 
 import type { CultureItem } from "@/app/sections/landing-data";
 import { CultureCard } from "./culture-card";
@@ -13,52 +10,47 @@ type CultureCardRollerProps = {
 };
 
 export const CultureCardRoller = ({ items }: CultureCardRollerProps) => {
-  const swiperRef = useRef<SwiperInstance | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const stopAutoplay = () => {
-    swiperRef.current?.autoplay?.stop();
-  };
+  const durationSeconds = useMemo(() => {
+    return Math.max(20, items.length * 4);
+  }, [items.length]);
 
-  const startAutoplay = () => {
-    swiperRef.current?.autoplay?.start();
-  };
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <div
-      className="w-full"
-      onMouseEnter={stopAutoplay}
-      onMouseLeave={startAutoplay}
-      onTouchStart={stopAutoplay}
-      onTouchEnd={startAutoplay}
-      onTouchCancel={startAutoplay}
+      className="culture-card-roller w-full overflow-hidden"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+      onTouchCancel={() => setIsPaused(false)}
     >
-      <Swiper
-        modules={[Autoplay]}
-        loop
-        speed={5000}
-        allowTouchMove
-        grabCursor
-        autoplay={{
-          delay: 0,
-          disableOnInteraction: false,
-        }}
-        spaceBetween={24}
-        slidesPerView="auto"
-        onSwiper={(swiper) => {
-          swiperRef.current = swiper;
-        }}
-        breakpoints={{
-          768: {
-            spaceBetween: 28,
-          },
+      <div
+        className={`culture-card-roller-track ${isPaused ? "culture-card-roller-track-paused" : ""}`}
+        style={{
+          ["--culture-roll-duration" as string]: `${durationSeconds}s`,
         }}
       >
-        {items.map((item) => (
-          <SwiperSlide key={item.title} className="!w-auto">
-            <CultureCard item={item} />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+        <div className="culture-card-roller-row" aria-label="Culture cards">
+          {items.map((item, index) => (
+            <div key={`${item.title}-primary-${index}`} className="shrink-0">
+              <CultureCard item={item} />
+            </div>
+          ))}
+        </div>
+
+        <div className="culture-card-roller-row" aria-hidden="true">
+          {items.map((item, index) => (
+            <div key={`${item.title}-duplicate-${index}`} className="shrink-0">
+              <CultureCard item={item} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

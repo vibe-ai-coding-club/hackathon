@@ -7,6 +7,7 @@ CultureCard 목록을 무한 롤링 인터랙션으로 제공.
 - `items: CultureItem[]`
 
 ## 동작/UI
-- `swiper` 기반 `loop + autoplay(delay=0)`로 연속 이동.
-- PC: `hover` 동안 autoplay stop.
-- Mobile: `touch start` 동안 stop, `touch end/cancel` 시 재시작.
+- CSS keyframes 기반 무한 롤링으로 연속 이동(중복 렌더링된 카드 행 2개를 선형 이동).
+- `animation-timing-function: linear`로 구간별 감속/가속 없이 동일 속도로 이동.
+- PC: `hover` 동안 애니메이션 일시정지.
+- Mobile: `touch start` 동안 일시정지, `touch end/cancel` 시 재시작.
