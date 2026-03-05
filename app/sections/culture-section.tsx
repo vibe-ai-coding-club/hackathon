@@ -16,8 +16,10 @@ export const CultureSection = () => {
           title="딸깍톤만의 특별한 해커톤 문화"
           titleClassName="text-white"
         />
+      </div>
 
-        <div className="mt-9 md:mt-[52px]">
+      <div className="relative left-1/2 mt-9 w-screen -translate-x-1/2 md:mt-[52px]">
+        <div className="w-full">
           <CultureCardRoller items={CULTURE_ITEMS} />
         </div>
       </div>
