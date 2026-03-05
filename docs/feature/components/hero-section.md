@@ -18,7 +18,7 @@
   - `미션 성공` 상태에서 `canvas-confetti` 기반의 `fireworks + side cannon` 빵빠레를 재생한 뒤 2초 후 `/register`로 이동.
 - Desktop(`>=768px`)
   - idle 상태에서 CTA hover 시 게임 시작.
-  - 도망 버튼은 Hero 내부 지정 영역으로 랜덤 슬라이딩하며 회피.
+  - 도망 버튼은 Hero 전체 영역(상하좌우 최소 여백 제외) 내에서 랜덤 슬라이딩하며 회피.
   - 시작 후 5초까지 회피 속도가 점점 느려지며, 이후에는 잡기 쉬운 상태(회피 중단/저빈도)로 전환.
   - placeholder 문구는 개행 없이 한 줄로 표시.
 - Mobile(`<=767px`)

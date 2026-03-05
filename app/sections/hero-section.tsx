@@ -114,19 +114,17 @@ export const HeroSection = () => {
   }, []);
 
   const getBounds = useCallback(
-    (sectionRect: DOMRect, startY: number) => {
+    (sectionRect: DOMRect) => {
       const runawayWidth = runawaySizeRef.current.width;
       const runawayHeight = runawaySizeRef.current.height;
-      const paddingX = isMobile ? 16 : 24;
-      const paddingTop = isMobile ? 24 : 36;
-      const playableMinY = clamp(startY - (isMobile ? 120 : 220), paddingTop, sectionRect.height - runawayHeight - paddingTop);
-      const playableMaxY = sectionRect.height - runawayHeight - paddingTop;
+      const paddingX = isMobile ? 8 : 12;
+      const paddingY = isMobile ? 8 : 12;
 
       return {
         minX: paddingX,
         maxX: Math.max(paddingX, sectionRect.width - runawayWidth - paddingX),
-        minY: playableMinY,
-        maxY: Math.max(playableMinY, playableMaxY),
+        minY: paddingY,
+        maxY: Math.max(paddingY, sectionRect.height - runawayHeight - paddingY),
       };
     },
     [isMobile]
@@ -144,7 +142,7 @@ export const HeroSection = () => {
     const { sectionRect } = rects;
     const elapsed = gameStartedAtRef.current ? performance.now() - gameStartedAtRef.current : 0;
     const progress = clamp(elapsed / CATCHABLE_AFTER_MS, 0, 1);
-    const bounds = getBounds(sectionRect, startPositionRef.current.y);
+    const bounds = getBounds(sectionRect);
     const nextX = bounds.minX + Math.random() * Math.max(1, bounds.maxX - bounds.minX);
     const nextY = bounds.minY + Math.random() * Math.max(1, bounds.maxY - bounds.minY);
     const moveDuration = isMobile ? 120 : Math.round(lerp(170, 720, progress));
@@ -303,7 +301,7 @@ export const HeroSection = () => {
         return;
       }
 
-      const bounds = getBounds(sectionRect, startPositionRef.current.y);
+      const bounds = getBounds(sectionRect);
       const nextX = clamp(event.clientX - sectionRect.left - dragOffsetRef.current.x, bounds.minX, bounds.maxX);
       const nextY = clamp(event.clientY - sectionRect.top - dragOffsetRef.current.y, bounds.minY, bounds.maxY);
       const nextPosition = { x: nextX, y: nextY };
