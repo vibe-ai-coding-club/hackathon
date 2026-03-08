@@ -8,14 +8,14 @@ type VoterVerifyModalProps = {
 };
 
 export const VoterVerifyModal = ({ onVerified, onClose }: VoterVerifyModalProps) => {
-  const [contact, setContact] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contact.trim()) {
-      setError("연락처를 입력해주세요.");
+    if (!email.trim()) {
+      setError("이메일을 입력해주세요.");
       return;
     }
 
@@ -26,7 +26,7 @@ export const VoterVerifyModal = ({ onVerified, onClose }: VoterVerifyModalProps)
       const res = await fetch("/api/vote/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contact: contact.trim() }),
+        body: JSON.stringify({ email: email.trim() }),
       });
 
       const json = await res.json();
@@ -49,16 +49,16 @@ export const VoterVerifyModal = ({ onVerified, onClose }: VoterVerifyModalProps)
       <div className="mx-4 w-full max-w-md rounded-2xl bg-background p-6 shadow-xl">
         <h2 className="typo-h6 mb-2">투표자 확인</h2>
         <p className="typo-body3 text-muted-foreground mb-6">
-          참가 신청 시 등록한 연락처를 입력해주세요.
+          참가 신청 시 등록한 이메일을 입력해주세요.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <input
-              type="text"
-              value={contact}
-              onChange={(e) => setContact(e.target.value)}
-              placeholder="전화번호 또는 이메일"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
               className="w-full rounded-lg border border-border bg-background px-4 py-3 typo-body3 placeholder:text-muted-foreground focus:border-primary-400 focus:outline-none transition-colors"
               autoFocus
             />
