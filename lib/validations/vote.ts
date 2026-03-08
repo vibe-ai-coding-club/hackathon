@@ -1,17 +1,10 @@
 import * as z from "zod";
 
-/** 투표자 인증: 연락처 (전화번호 또는 이메일) */
+/** 투표자 인증: 이메일 기준 */
 export const verifyVoterSchema = z.object({
-  contact: z
+  email: z
     .string()
-    .min(1, "연락처를 입력해주세요")
-    .refine(
-      (val) => {
-        if (/^\d+$/.test(val)) return /^01[016789]-?\d{3,4}-?\d{4}$/.test(val);
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-      },
-      { message: "올바른 연락처를 입력해주세요 (전화번호 또는 이메일)" },
-    ),
+    .email("올바른 이메일을 입력해주세요"),
 });
 
 /** 투표 제출 */
