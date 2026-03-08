@@ -63,6 +63,9 @@ export const teamRegistrationSchema = z
       .string()
       .min(1, "예금주를 입력해주세요"),
     hasDeposited: z.boolean(),
+    privacyConsent: z
+      .boolean()
+      .refine((val) => val === true, "개인정보 수집·이용에 동의해주세요"),
   })
   .refine(
     (data) => {

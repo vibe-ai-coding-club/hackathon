@@ -134,6 +134,8 @@ export async function POST(request: NextRequest) {
         refundAccount: data.refundAccount,
         refundAccountHolder: data.refundAccountHolder,
         hasDeposited: data.hasDeposited,
+        privacyConsent: data.privacyConsent,
+        consentedAt: data.privacyConsent ? new Date() : null,
         members: {
           create: memberCreateData,
         },
