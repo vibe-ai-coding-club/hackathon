@@ -27,6 +27,7 @@ type FormState = {
   refundAccount: string;
   refundAccountHolder: string;
   hasDeposited: boolean;
+  privacyConsent: boolean;
 };
 
 const createEmptyMember = (): MemberState => ({ name: "", email: "", phone: "" });
@@ -54,6 +55,7 @@ const initialForm: FormState = {
   refundAccount: "",
   refundAccountHolder: "",
   hasDeposited: false,
+  privacyConsent: false,
 };
 
 const MAX_MEMBERS = 3;
@@ -92,6 +94,7 @@ export const RegistrationForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [dupStatus, setDupStatus] = useState<Record<string, DuplicateStatus>>({});
   const [isPending, setIsPending] = useState(false);
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   const [toast, setToast] = useState<{
     success: boolean;
     message: string;
@@ -212,6 +215,9 @@ export const RegistrationForm = () => {
 
     if (!form.experienceLevel) newErrors.experienceLevel = "개발 경험을 선택해주세요";
 
+    // 개인정보 동의
+    if (!form.privacyConsent) newErrors.privacyConsent = "개인정보 수집·이용에 동의해주세요";
+
     // 환불 계좌
     if (!form.refundBank.trim()) newErrors.refundBank = "은행명을 입력해주세요";
     if (!form.refundAccount.trim()) newErrors.refundAccount = "계좌번호를 입력해주세요";
@@ -245,7 +251,7 @@ export const RegistrationForm = () => {
       form.refundAccount.trim().length > 0 &&
       form.refundAccountHolder.trim().length > 0;
 
-    if (!hasBasic || !hasRefund || !form.hasDeposited) return false;
+    if (!hasBasic || !hasRefund || !form.hasDeposited || !form.privacyConsent) return false;
 
     if (form.participationType === "TEAM") {
       return (
@@ -281,6 +287,7 @@ export const RegistrationForm = () => {
         refundAccount: form.refundAccount,
         refundAccountHolder: form.refundAccountHolder,
         hasDeposited: form.hasDeposited,
+        privacyConsent: form.privacyConsent,
       };
 
       const res = await fetch("/api/register", {
@@ -722,6 +729,35 @@ export const RegistrationForm = () => {
           </div>
         )}
 
+        {/* 8. 개인정보 수집·이용 동의 */}
+        {form.participationType && (
+          <div className="space-y-2">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={form.privacyConsent}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, privacyConsent: e.target.checked }))
+                }
+                className="mt-0.5 size-5 shrink-0 accent-primary-400 cursor-pointer"
+              />
+              <span className="typo-body3">
+                <span className="text-error">[필수]</span> 개인정보 수집·이용에 동의합니다.{" "}
+                <button
+                  type="button"
+                  onClick={() => setPrivacyModalOpen(true)}
+                  className="cursor-pointer text-primary-400 underline underline-offset-2 hover:text-primary-500"
+                >
+                  내용 보기
+                </button>
+              </span>
+            </label>
+            {errors.privacyConsent && (
+              <p className="typo-caption1 text-error">{errors.privacyConsent}</p>
+            )}
+          </div>
+        )}
+
         {/* 허니팟 */}
         <div className="absolute -z-10 opacity-0" aria-hidden="true">
           <input type="text" name="website" tabIndex={-1} autoComplete="off" />
@@ -740,9 +776,97 @@ export const RegistrationForm = () => {
           >
             {isPending ? "등록 중..." : "딸깍톤 신청하기"}
           </button>
-          <p className="typo-caption1 mt-3 text-gray-500">제출된 정보는 행사 운영 목적으로만 사용돼요</p>
         </div>
       </form>
+
+      {/* 개인정보 수집·이용 동의 모달 */}
+      {privacyModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setPrivacyModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="typo-subtitle1 text-lg">개인정보 수집·이용 동의</h2>
+              <button
+                type="button"
+                onClick={() => setPrivacyModalOpen(false)}
+                className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
+              >
+                <svg className="size-6" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="max-h-[60vh] space-y-4 overflow-y-auto typo-body3 text-gray-700">
+              <div>
+                <p className="typo-subtitle2 mb-1">1. 수집 목적</p>
+                <p>딸깍톤 해커톤 참가 신청 접수, 본인 확인, 행사 안내 및 운영, 참가비 환불 처리</p>
+              </div>
+
+              <div>
+                <p className="typo-subtitle2 mb-1">2. 수집 항목</p>
+                <ul className="list-inside list-disc space-y-0.5">
+                  <li><span className="font-medium">필수:</span> 이름, 이메일, 연락처(전화번호)</li>
+                  <li><span className="font-medium">필수:</span> 환불 계좌 정보(은행명, 계좌번호, 예금주)</li>
+                  <li><span className="font-medium">팀 참가 시:</span> 팀원 이름, 이메일, 연락처</li>
+                  <li><span className="font-medium">선택:</span> 참여 동기 및 문의 사항</li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="typo-subtitle2 mb-1">3. 보유 및 이용 기간</p>
+                <p>
+                  수집된 개인정보는 <span className="font-semibold">대회 종료 후 즉시 파기</span>합니다.
+                  단, 환불 처리가 완료되지 않은 경우 환불 완료 시까지 보유합니다.
+                </p>
+              </div>
+
+              <div>
+                <p className="typo-subtitle2 mb-1">4. 동의 거부권 및 불이익</p>
+                <p>
+                  개인정보 수집·이용에 대한 동의를 거부할 권리가 있습니다.
+                  다만, 필수 항목에 대한 동의를 거부할 경우 참가 신청이 불가합니다.
+                </p>
+              </div>
+
+              <div>
+                <p className="typo-subtitle2 mb-1">5. 파기 방법</p>
+                <p>전자적 파일 형태의 정보는 복구할 수 없는 방법으로 영구 삭제합니다.</p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setForm((prev) => ({ ...prev, privacyConsent: true }));
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.privacyConsent;
+                    return next;
+                  });
+                  setPrivacyModalOpen(false);
+                }}
+                className="cursor-pointer rounded-lg bg-primary-400 px-5 py-2.5 typo-subtitle4 text-white transition-colors hover:bg-primary-500"
+              >
+                동의하기
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrivacyModalOpen(false)}
+                className="cursor-pointer rounded-lg bg-gray-100 px-5 py-2.5 typo-subtitle4 text-gray-600 transition-colors hover:bg-gray-200"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 토스트 */}
       <div
