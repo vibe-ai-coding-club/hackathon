@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     const data = result.data;
 
-    // 이메일 중복 확인
+    // 이메일 중복 확인 (팀 대표 이메일)
     const existingTeam = await prisma.team.findUnique({
       where: { email: data.email },
     });
@@ -72,36 +72,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "이미 등록된 이메일입니다." }, { status: 400 });
     }
 
-    // 모든 contact 중복 일괄 체크
-    const allContacts = [data.contact];
+    // 모든 이메일 중복 일괄 체크 (멤버 테이블)
+    const allEmails = [data.email];
     if (data.participationType === "TEAM" && data.members) {
-      allContacts.push(...data.members.map((m) => m.contact));
+      allEmails.push(...data.members.map((m) => m.email));
     }
 
     const existingMembers = await prisma.member.findMany({
-      where: { contact: { in: allContacts } },
-      select: { contact: true },
+      where: { email: { in: allEmails } },
+      select: { email: true },
     });
 
     if (existingMembers.length > 0) {
-      const duplicates = existingMembers.map((m) => m.contact);
+      const duplicates = existingMembers.map((m) => m.email);
       return NextResponse.json(
         {
           success: false,
-          message: "이미 등록된 연락처가 있습니다.",
-          duplicateContacts: duplicates,
+          message: "이미 등록된 이메일이 있습니다.",
+          duplicateEmails: duplicates,
         },
         { status: 400 },
       );
     }
 
-    // 팀원 내 contact 중복 체크
-    const uniqueContacts = new Set(allContacts);
-    if (uniqueContacts.size !== allContacts.length) {
+    // 팀원 내 이메일 중복 체크
+    const uniqueEmails = new Set(allEmails);
+    if (uniqueEmails.size !== allEmails.length) {
       return NextResponse.json(
         {
           success: false,
-          message: "팀원 간 연락처가 중복됩니다.",
+          message: "팀원 간 이메일이 중복됩니다.",
         },
         { status: 400 },
       );
@@ -109,11 +109,12 @@ export async function POST(request: NextRequest) {
 
     // Member 데이터 구성
     const memberCreateData = [
-      { name: data.name, contact: data.contact, isLeader: true },
+      { name: data.name, email: data.email, phone: data.phone, isLeader: true },
       ...(data.participationType === "TEAM" && data.members
         ? data.members.map((m) => ({
             name: m.name,
-            contact: m.contact,
+            email: m.email,
+            phone: m.phone,
             isLeader: false,
           }))
         : []),
@@ -124,11 +125,15 @@ export async function POST(request: NextRequest) {
       data: {
         name: data.name,
         email: data.email,
-        phone: data.phone || null,
+        phone: data.phone,
         participationType: data.participationType,
         teamName: data.participationType === "TEAM" ? data.teamName : null,
         experienceLevel: data.experienceLevel,
         motivation: data.motivation || null,
+        refundBank: data.refundBank,
+        refundAccount: data.refundAccount,
+        refundAccountHolder: data.refundAccountHolder,
+        hasDeposited: data.hasDeposited,
         members: {
           create: memberCreateData,
         },

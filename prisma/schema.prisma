@@ -30,7 +30,7 @@ model Team {
   // 기본 정보 (신청자 = 대표자)
   name              String // 이름 (대표자)
   email             String            @unique // 이메일 (프로젝트 등록 매칭용)
-  phone             String? // 연락처 (선택)
+  phone             String // 연락처 (필수)
   // 참가 유형
   participationType ParticipationType @default(INDIVIDUAL) @map("participation_type")
   // 팀 정보 (팀 참여 시)
@@ -38,6 +38,12 @@ model Team {
   // 추가 정보
   experienceLevel   ExperienceLevel   @default(BEGINNER) @map("experience_level")
   motivation        String? // 참가 동기
+  // 환불 계좌 정보
+  refundBank          String            @map("refund_bank") // 은행명
+  refundAccount       String            @map("refund_account") // 계좌번호
+  refundAccountHolder String            @map("refund_account_holder") // 예금주
+  hasDeposited        Boolean           @default(false) @map("has_deposited") // 신청자 자가 입금 여부
+  depositConfirmed    Boolean           @default(false) @map("deposit_confirmed") // 관리자 입금 확인
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
 
@@ -52,7 +58,8 @@ model Member {
   teamId    String   @map("team_id")
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   name      String
-  contact   String   @unique // 투표용 (전화번호 또는 이메일)
+  email     String   @unique // 투표 인증용
+  phone     String // 연락처
   isLeader  Boolean  @default(false) @map("is_leader")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

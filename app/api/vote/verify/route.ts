@@ -9,13 +9,13 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { success: false, message: "올바른 연락처를 입력해주세요." },
+        { success: false, message: "올바른 이메일을 입력해주세요." },
         { status: 400 },
       );
     }
 
     const member = await prisma.member.findUnique({
-      where: { contact: result.data.contact },
+      where: { email: result.data.email },
       select: {
         id: true,
         name: true,
