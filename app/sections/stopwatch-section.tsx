@@ -52,7 +52,7 @@ export const StopwatchSection = () => {
   return (
     <section
       id="stopwatch-section"
-      className="bg-[linear-gradient(178deg,#1AB0FF_44%,#7AD2FF_99%)] px-4 py-9 backdrop-blur-[10px] md:px-8 md:py-[60px]"
+      className="bg-[linear-gradient(178deg,#FE3E8C_44%,#FE90BC_99%)] px-4 py-9 backdrop-blur-[10px] md:px-8 md:py-[60px]"
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="flex items-center justify-center gap-2.5 md:gap-3.5">

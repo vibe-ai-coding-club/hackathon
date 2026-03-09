@@ -476,31 +476,16 @@ export const HeroSection = () => {
     <section
       id="hero"
       ref={sectionRef}
-      className="relative flex h-[100svh] min-h-[640px] items-center overflow-hidden px-4 pt-[120px] pb-[80px] md:min-h-[900px] md:px-8 md:pt-[170px] md:pb-[130px]"
+      className="relative flex h-[1112px] max-h-[100svh] flex-col items-center justify-center gap-10 overflow-hidden bg-[#FE2A80] px-4 pt-[120px] pb-[80px] md:gap-14 md:px-8 md:pt-[170px] md:pb-[130px]"
     >
-      {/* TODO: 배경 이미지 확정 후 교체 */}
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,#7b8794_0%,#9aa5b1_50%,#6c7983_100%)]" />
-      <div className="absolute inset-0 bg-black/20" />
+      <img
+        src="/images/hero.png"
+        alt="딸깍톤 히어로"
+        className="w-[120%] max-w-[941px] object-contain xl:w-[50%]"
+      />
 
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-col items-center text-center">
-        <h1 className="max-w-full text-[56px] leading-[1.06] font-bold tracking-[-0.4px] text-white break-all md:text-[100px] md:leading-[0.95] md:break-normal">
-          <span className="md:hidden">
-            TTALKKAK
-            <br />
-            THON
-          </span>
-          <span className="hidden md:inline">TTALKKAKTHON</span>
-        </h1>
-        <p className="mt-4 text-[20px] leading-[30px] font-bold tracking-[-0.4px] text-white md:mt-6 md:text-[34px] md:leading-[52px]">
-          <span className="md:hidden">
-            엉뚱한 상상이
-            <br />
-            딸깍하고 현실이 되는 곳
-          </span>
-          <span className="hidden md:inline">엉뚱한 상상이 딸깍하고 현실이 되는 곳</span>
-        </p>
-
-        <div ref={ctaSlotRef} className="relative mt-10 inline-flex md:mt-15">
+        <div ref={ctaSlotRef} className="relative inline-flex">
           <button
             type="button"
             className={`inline-flex h-[50px] min-w-[160px] items-center justify-center rounded-xl bg-primary-400 px-5 text-[18px] leading-[26px] font-semibold tracking-[-0.4px] text-white whitespace-nowrap transition-[opacity,colors] duration-300 ease-out hover:bg-primary-500 md:h-[66px] md:min-w-[420px] md:rounded-2xl md:px-8 md:text-[24px] md:leading-[34px] md:font-bold ${
@@ -527,7 +512,7 @@ export const HeroSection = () => {
       {phase !== "idle" && (
         <button
           type="button"
-          className={`absolute z-30 inline-flex h-[50px] min-w-[160px] touch-none select-none items-center justify-center rounded-xl bg-primary-400 px-5 text-[18px] leading-[26px] font-semibold tracking-[-0.4px] text-white whitespace-nowrap transition-[transform,opacity] md:h-[66px] md:min-w-[420px] md:rounded-2xl md:px-8 md:text-[24px] md:leading-[34px] md:font-bold ${
+          className={`absolute z-30 inline-flex h-[50px] min-w-[160px] touch-none select-none items-center justify-center rounded-xl bg-[#EFF2F5] px-5 text-[18px] leading-[26px] font-semibold tracking-[-0.4px] text-black whitespace-nowrap transition-[transform,opacity] md:h-[66px] md:min-w-[420px] md:rounded-2xl md:px-8 md:text-[24px] md:leading-[34px] md:font-bold ${
             phase === "active" ? "pointer-events-auto" : "pointer-events-none"
           }`}
           style={{
