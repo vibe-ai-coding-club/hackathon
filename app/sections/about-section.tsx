@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { SectionTitle } from "@/app/_components/section-title";
 import { ABOUT_CARDS } from "./landing-data";
 
@@ -15,7 +17,15 @@ export const AboutSection = () => {
                 index === 2 ? "md:col-span-2 lg:col-span-1" : ""
               }`}
             >
-              <div className="aspect-[3/2] rounded-xl bg-gray-300 md:rounded-[14px]" />
+              <div className="relative aspect-[3/2] overflow-hidden rounded-xl md:rounded-[14px] border-2 border-[#FFE342]">
+                <Image
+                  src={card.image}
+                  alt={card.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+              </div>
               <div className="mt-0 flex h-[114px] flex-col justify-center rounded-xl bg-gray-50 px-5 md:rounded-[14px] md:px-7">
                 <h3 className="typo-subtitle1 text-gray-850 md:typo-h6">{card.title}</h3>
                 <p className="typo-body2 mt-0.5 text-gray-700 md:mt-1">{card.description}</p>
