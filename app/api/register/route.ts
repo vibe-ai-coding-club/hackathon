@@ -44,6 +44,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 강제 마감 확인
+    const registrationSetting = await prisma.registrationSetting.findFirst({
+      orderBy: { createdAt: "desc" },
+    });
+    if (registrationSetting?.isClosed) {
+      return NextResponse.json({ success: false, message: "신청이 마감되었습니다." }, { status: 403 });
+    }
+
     // 팀 정원 확인
     const teamCount = await prisma.team.count();
     if (teamCount >= MAX_TEAMS) {

@@ -115,6 +115,17 @@ model Vote {
   @@map("votes")
 }
 
+model RegistrationSetting {
+  id       String  @id @default(cuid())
+  isClosed Boolean @default(false) @map("is_closed")
+
+  closedAt  DateTime? @map("closed_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("registration_settings")
+}
+
 model VoteSession {
   id       String  @id @default(cuid())
   isActive Boolean @default(false) @map("is_active")
