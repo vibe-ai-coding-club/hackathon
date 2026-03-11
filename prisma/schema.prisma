@@ -90,6 +90,11 @@ model Member {
   phone    String // 연락처
   isLeader Boolean @default(false) @map("is_leader")
 
+  // 환불 계좌 정보 (멤버 개인)
+  refundBank          String? @map("refund_bank")
+  refundAccount       String? @map("refund_account")
+  refundAccountHolder String? @map("refund_account_holder")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

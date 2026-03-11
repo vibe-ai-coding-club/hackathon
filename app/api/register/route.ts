@@ -117,7 +117,15 @@ export async function POST(request: NextRequest) {
 
     // Member 데이터 구성
     const memberCreateData = [
-      { name: data.name, email: data.email, phone: data.phone, isLeader: true },
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        isLeader: true,
+        refundBank: data.refundBank,
+        refundAccount: data.refundAccount,
+        refundAccountHolder: data.refundAccountHolder,
+      },
       ...(data.participationType === "TEAM" && data.members
         ? data.members.map((m) => ({
             name: m.name,

@@ -660,5 +660,57 @@ export type SerializedTeam = {
 ### 미정/후속 작업
 
 - **메일 발송**: 상태 변경 시 자동 메일 발송 (외부 메일 서비스 연동 필요 — Resend, SendGrid 등)
-- **팀 합류 신청**: 게시판에서 직접 팀 가입 신청 기능 (스펙 미확정)
 - **구글 시트 Fallback**: 위 기능으로 커버 불가능 시 `googleapis` 연동
+
+---
+
+## 구현 완료 사항 (Phase 1~6 이후 추가)
+
+### 멤버 환불계좌 분리
+
+**배경**: 팀 환불계좌는 Team 모델에만 존재했으나, 멤버가 다른 팀으로 이동하면 환불계좌 정보가 유실됨.
+
+**변경 내용**:
+
+1. **Member 모델에 환불계좌 칼럼 추가** (옵셔널)
+   ```prisma
+   model Member {
+     // ...기존 필드
+     refundBank          String? @map("refund_bank")
+     refundAccount       String? @map("refund_account")
+     refundAccountHolder String? @map("refund_account_holder")
+   }
+   ```
+
+2. **신청 시 리더 멤버에 팀 환불계좌 복제**
+   - `POST /api/register` — 팀 생성 시 리더 멤버의 `refundBank`, `refundAccount`, `refundAccountHolder`에 동일 값 저장
+   - 일반 팀원은 `null` (별도 환불계좌 미보유)
+
+3. **어드민 테이블에서 멤버별 환불계좌 표시**
+   - 리더 행: 멤버의 환불계좌 표시 (Team이 아닌 Member 기준)
+   - 멤버 행: 환불계좌가 있으면 표시, 없으면 `-`
+
+4. **기존 데이터 마이그레이션**: 기존 리더 멤버에 팀 환불계좌를 백필
+
+### 신청자 팀 이동 (셀프)
+
+**배경**: 팀 모집 게시판에서 신청자가 직접 다른 팀으로 이동할 수 있어야 함.
+
+**구현 내용**:
+
+1. **`POST /api/team-building/transfer`** — 신청자가 직접 팀 이동
+   - NextAuth 세션 인증 (memberId 기반)
+   - 대상 팀이 RECRUITING 상태이고 4명 미만인지 검증
+   - 팀장 이동 시 남은 멤버 중 첫 번째를 팀장으로 승격, 팀 대표 정보 갱신
+   - `participationType` 자동 변경: 1명 → INDIVIDUAL, 2명+ → TEAM
+   - **1인 팀 이동 시 빈 팀 자동 삭제**
+
+2. **팀 빌딩 게시판 UI** (`team-building-board.tsx`)
+   - 내 팀 항상 표시 (모집중: 강조, 비모집: 흐리게 + 상태 표기)
+   - 다른 팀 카드 클릭 → 컨펌 모달 → 이동
+   - 모집중이 아니거나 꽉 찬 팀은 클릭 불가 (opacity-50, "마감" 배지)
+   - 상단에 유저 이름 + 로그아웃 버튼
+
+3. **JWT 세션 갱신** (`lib/auth.ts`)
+   - JWT callback에서 매 요청마다 DB에서 최신 `teamId` 조회
+   - 팀 이동 후 새로고침 시 즉시 반영
