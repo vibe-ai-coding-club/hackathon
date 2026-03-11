@@ -215,15 +215,15 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const allEmails = useMemo(() => {
-    return teams.flatMap((t) => t.members.map((m) => m.email)).join(", ");
-  }, [teams]);
+    return filtered.flatMap((t) => t.members.map((m) => m.email)).join(", ");
+  }, [filtered]);
 
   const leaderEmails = useMemo(() => {
-    return teams.map((t) => {
+    return filtered.map((t) => {
       const leader = t.members.find((m) => m.isLeader) ?? t.members[0];
       return leader?.email ?? t.email;
     }).join(", ");
-  }, [teams]);
+  }, [filtered]);
 
   const toggleDeposit = async (teamId: string, current: boolean) => {
     setTogglingId(teamId);
