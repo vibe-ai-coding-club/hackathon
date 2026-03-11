@@ -77,7 +77,7 @@ export const adminLogin = async (_prevState: ActionState, formData: FormData): P
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: COOKIE_MAX_AGE,
-    path: "/admin",
+    path: "/",
   });
 
   return {

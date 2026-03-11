@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState, useEffect } from "react";
+import { Fragment, useMemo, useState, useCallback } from "react";
 import { toggleDepositConfirmed } from "@/app/actions/admin-actions";
+import { ConfirmModal } from "./confirm-modal";
 
 export type SerializedMember = {
   id: string;
@@ -9,6 +10,9 @@ export type SerializedMember = {
   email: string;
   phone: string;
   isLeader: boolean;
+  refundBank: string | null;
+  refundAccount: string | null;
+  refundAccountHolder: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -84,9 +88,6 @@ const formatDate = (iso: string) => {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 };
 
-const inputClass =
-  "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent transition-colors";
-
 const CopyButton = ({ text, label }: { text: string; label?: string }) => {
   const [copied, setCopied] = useState(false);
   const handleCopy = async (e: React.MouseEvent) => {
@@ -99,7 +100,7 @@ const CopyButton = ({ text, label }: { text: string; label?: string }) => {
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex items-center gap-1 rounded px-1 py-0.5 text-xs text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
+      className="inline-flex items-center gap-0.5 rounded px-0.5 py-px text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
       title={`${label ?? text} 복사`}
     >
       {copied ? (
@@ -116,83 +117,47 @@ const CopyButton = ({ text, label }: { text: string; label?: string }) => {
   );
 };
 
-// 멤버 이동 팝오버
-const TransferPopover = ({
-  memberId,
-  currentTeamId,
-  allTeams,
-  onTransfer,
-  onClose,
-}: {
-  memberId: string;
-  currentTeamId: string;
-  allTeams: SerializedTeam[];
-  onTransfer: (memberId: string, targetTeamId: string) => Promise<void>;
-  onClose: () => void;
-}) => {
-  const [teamSearch, setTeamSearch] = useState("");
-  const [transferring, setTransferring] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
-
-  const filteredTeams = allTeams.filter((t) => {
-    if (t.id === currentTeamId) return false;
-    if (!teamSearch.trim()) return true;
-    const q = teamSearch.toLowerCase();
-    return (t.teamName?.toLowerCase().includes(q) || t.name.toLowerCase().includes(q));
-  });
-
-  const handleSelect = async (targetTeamId: string) => {
-    setTransferring(true);
-    await onTransfer(memberId, targetTeamId);
-    setTransferring(false);
-    onClose();
+// 일괄 복사 버튼 (라벨 포함)
+const BulkCopyButton = ({ text, label }: { text: string; label: string }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
-
   return (
-    <div ref={ref} className="absolute z-50 mt-1 w-64 rounded-lg border border-border bg-background shadow-lg">
-      <div className="p-2">
-        <input
-          type="text"
-          value={teamSearch}
-          onChange={(e) => setTeamSearch(e.target.value)}
-          placeholder="팀 검색..."
-          className={`${inputClass} text-xs`}
-          autoFocus
-        />
-      </div>
-      <div className="max-h-48 overflow-y-auto">
-        {filteredTeams.length === 0 ? (
-          <p className="px-3 py-2 text-xs text-muted-foreground">결과 없음</p>
-        ) : (
-          filteredTeams.map((t) => {
-            const isFull = t.members.length >= 4;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                disabled={isFull || transferring}
-                onClick={() => handleSelect(t.id)}
-                className="w-full px-3 py-2 text-left text-xs hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
-              >
-                <span className="font-medium">{t.teamName || t.name}</span>
-                <span className="ml-1 text-muted-foreground">({t.members.length}/4)</span>
-                {isFull && <span className="ml-1 text-red-500">가득 참</span>}
-              </button>
-            );
-          })
-        )}
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={handleCopy}
+      className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 typo-caption2 cursor-pointer transition-colors ${
+        copied
+          ? "border-success/30 bg-success/5 text-success"
+          : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+      }`}
+    >
+      {copied ? (
+        <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+        </svg>
+      ) : (
+        <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M7 3.5A1.5 1.5 0 018.5 2h3.879a1.5 1.5 0 011.06.44l3.122 3.12A1.5 1.5 0 0117 6.622V12.5a1.5 1.5 0 01-1.5 1.5h-1v-3.379a3 3 0 00-.879-2.121L10.5 5.379A3 3 0 008.379 4.5H7v-1z" />
+          <path d="M4.5 6A1.5 1.5 0 003 7.5v9A1.5 1.5 0 004.5 18h7a1.5 1.5 0 001.5-1.5v-5.879a1.5 1.5 0 00-.44-1.06L9.44 6.439A1.5 1.5 0 008.378 6H4.5z" />
+        </svg>
+      )}
+      {copied ? "복사됨" : label}
+    </button>
   );
 };
+
+// 드래그 핸들 아이콘
+const DragHandle = () => (
+  <svg className="size-3.5 text-muted-foreground/50 shrink-0 cursor-grab active:cursor-grabbing" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 5A.75.75 0 012.75 9h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.75zm0 5a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+  </svg>
+);
+
+type DragData = { memberId: string; sourceTeamId: string; memberName: string };
 
 type Filters = {
   status: string;
@@ -213,7 +178,19 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   });
   const [page, setPage] = useState(0);
   const [togglingId, setTogglingId] = useState<string | null>(null);
-  const [transferPopover, setTransferPopover] = useState<{ memberId: string; teamId: string } | null>(null);
+
+  // 드래그 앤 드롭
+  const [dragData, setDragData] = useState<DragData | null>(null);
+  const [dropTargetTeamId, setDropTargetTeamId] = useState<string | null>(null);
+
+  // 컨펌 모달 (빈 팀 삭제)
+  const [pendingTransfer, setPendingTransfer] = useState<{
+    memberId: string;
+    sourceTeamId: string;
+    targetTeamId: string;
+    memberName: string;
+    sourceTeamName: string;
+  } | null>(null);
 
   const updateFilter = (key: keyof Filters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -239,6 +216,13 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
 
   const allEmails = useMemo(() => {
     return teams.flatMap((t) => t.members.map((m) => m.email)).join(", ");
+  }, [teams]);
+
+  const leaderEmails = useMemo(() => {
+    return teams.map((t) => {
+      const leader = t.members.find((m) => m.isLeader) ?? t.members[0];
+      return leader?.email ?? t.email;
+    }).join(", ");
   }, [teams]);
 
   const toggleDeposit = async (teamId: string, current: boolean) => {
@@ -289,35 +273,105 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     }
   };
 
-  const transferMember = async (memberId: string, targetTeamId: string) => {
+  // 실제 이동 실행
+  const executeTransfer = useCallback(async (memberId: string, targetTeamId: string, deleteSourceTeam?: string) => {
     try {
       const res = await fetch(`/api/admin/members/${memberId}/transfer`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetTeamId }),
       });
-      if (res.ok) {
-        // 페이지 새로고침으로 데이터 동기화 (멤버 이동은 복잡한 상태 변경)
-        window.location.reload();
+      if (!res.ok) return;
+
+      // 빈 팀 삭제
+      if (deleteSourceTeam) {
+        await fetch(`/api/admin/teams/${deleteSourceTeam}`, { method: "DELETE" });
       }
+
+      window.location.reload();
     } catch (error) {
-      console.error("transferMember error:", error);
+      console.error("transfer error:", error);
     }
+  }, []);
+
+  // 드래그 시작
+  const handleDragStart = (e: React.DragEvent, memberId: string, sourceTeamId: string, memberName: string) => {
+    setDragData({ memberId, sourceTeamId, memberName });
+    e.dataTransfer.effectAllowed = "move";
   };
 
-  const thClass = "px-3 py-2 text-left text-xs font-medium text-muted-foreground whitespace-nowrap";
-  const tdClass = "px-3 py-2 text-xs";
+  // 드래그 끝 (취소 포함)
+  const handleDragEnd = () => {
+    setDragData(null);
+    setDropTargetTeamId(null);
+  };
+
+  // 드롭 영역 진입
+  const handleDragOver = (e: React.DragEvent, teamId: string) => {
+    if (!dragData || dragData.sourceTeamId === teamId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDropTargetTeamId(teamId);
+  };
+
+  const handleDragLeave = () => {
+    setDropTargetTeamId(null);
+  };
+
+  // 드롭 실행
+  const handleDrop = (e: React.DragEvent, targetTeamId: string) => {
+    e.preventDefault();
+    setDropTargetTeamId(null);
+    if (!dragData || dragData.sourceTeamId === targetTeamId) return;
+
+    const sourceTeam = teams.find((t) => t.id === dragData.sourceTeamId);
+    if (!sourceTeam) return;
+
+    const targetTeam = teams.find((t) => t.id === targetTeamId);
+    if (targetTeam && targetTeam.members.length >= 4) return;
+
+    // 이동 후 원래 팀이 비게 되는 경우 → 컨펌 모달
+    if (sourceTeam.members.length === 1) {
+      setPendingTransfer({
+        memberId: dragData.memberId,
+        sourceTeamId: dragData.sourceTeamId,
+        targetTeamId,
+        memberName: dragData.memberName,
+        sourceTeamName: sourceTeam.teamName || sourceTeam.name,
+      });
+      setDragData(null);
+      return;
+    }
+
+    executeTransfer(dragData.memberId, targetTeamId);
+    setDragData(null);
+  };
+
+  // 컨펌 모달: 삭제 확인 → 이동 + 팀 삭제
+  const handleConfirmDelete = () => {
+    if (!pendingTransfer) return;
+    executeTransfer(pendingTransfer.memberId, pendingTransfer.targetTeamId, pendingTransfer.sourceTeamId);
+    setPendingTransfer(null);
+  };
+
+  // 컨펌 모달: 취소 → 이동 취소
+  const handleCancelDelete = () => {
+    setPendingTransfer(null);
+  };
+
+  const thClass = "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
+  const tdClass = "px-2.5 py-1.5 typo-caption1";
 
   return (
     <div className="space-y-4">
       {/* 필터 바 */}
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="typo-h6 shrink-0 mr-2">신청 목록</h2>
+        <h2 className="typo-subtitle2 shrink-0 mr-2">신청 목록</h2>
 
         <select
           value={filters.status}
           onChange={(e) => updateFilter("status", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1.5 text-xs cursor-pointer"
+          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
         >
           <option value="ALL">상태: 전체</option>
           {Object.entries(statusLabel).map(([k, v]) => (
@@ -328,7 +382,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         <select
           value={filters.recruitmentStatus}
           onChange={(e) => updateFilter("recruitmentStatus", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1.5 text-xs cursor-pointer"
+          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
         >
           <option value="ALL">모집: 전체</option>
           {Object.entries(recruitmentLabel).map(([k, v]) => (
@@ -339,7 +393,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         <select
           value={filters.experienceLevel}
           onChange={(e) => updateFilter("experienceLevel", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1.5 text-xs cursor-pointer"
+          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
         >
           <option value="ALL">경험: 전체</option>
           {Object.entries(experienceLevelLabel).map(([k, v]) => (
@@ -350,7 +404,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         <select
           value={filters.participationType}
           onChange={(e) => updateFilter("participationType", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1.5 text-xs cursor-pointer"
+          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
         >
           <option value="ALL">유형: 전체</option>
           {Object.entries(participationTypeLabel).map(([k, v]) => (
@@ -358,185 +412,218 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
           ))}
         </select>
 
-        <div className="ml-auto flex items-center gap-2">
-          <CopyButton text={allEmails} label="전체 이메일" />
-          <span className="text-xs text-muted-foreground">전체 이메일 복사</span>
+        <div className="ml-auto flex items-center gap-1.5">
+          {filtered.length !== teams.length && (
+            <span className="typo-caption2 text-muted-foreground mr-1">{filtered.length}/{teams.length}건</span>
+          )}
+          <BulkCopyButton text={leaderEmails} label="대표 이메일" />
+          <BulkCopyButton text={allEmails} label="전체 이메일" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
             placeholder="이름/이메일/팀명 검색"
-            className={`w-48 ${inputClass} text-xs`}
+            className="w-44 rounded-md border border-border bg-background px-2.5 py-1 typo-caption1 outline-none focus:border-accent transition-colors ml-1"
           />
         </div>
       </div>
 
-      <div className="text-xs text-muted-foreground">
-        총 {filtered.length}건 {filters.search || Object.values(filters).some((v) => v !== "ALL" && v !== "") ? `(전체 ${teams.length}건)` : ""}
-      </div>
-
       {/* 스프레드시트형 테이블 */}
       <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
+        <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-muted">
               <th className={thClass}>#</th>
               <th className={thClass}>상태</th>
+              <th className={thClass}>유형</th>
+              <th className={thClass}>팀이름</th>
               <th className={thClass}>이름</th>
               <th className={thClass}>이메일</th>
               <th className={thClass}>연락처</th>
-              <th className={thClass}>유형</th>
-              <th className={thClass}>팀이름</th>
-              <th className={thClass}>멤버</th>
+              <th className={thClass}>계좌정보</th>
               <th className={thClass}>경험</th>
+              <th className={thClass}>입금</th>
+              <th className={thClass}>모집</th>
               <th className={thClass}>신청일</th>
             </tr>
           </thead>
           <tbody>
             {paged.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-muted-foreground text-sm">
+                <td colSpan={12} className="px-4 py-6 text-center text-muted-foreground typo-caption1">
                   {filters.search ? "검색 결과가 없습니다." : "신청 데이터가 없습니다."}
                 </td>
               </tr>
             ) : (
-              paged.map((team, i) => (
-                <>
-                  {/* 1행: 주요 정보 */}
-                  <tr key={team.id} className="border-b border-border/50 bg-background">
-                    <td className={`${tdClass} text-muted-foreground`} rowSpan={2}>
-                      {page * PAGE_SIZE + i + 1}
-                    </td>
-                    <td className={tdClass}>
-                      <select
-                        value={team.status}
-                        onChange={(e) => updateTeamStatus(team.id, e.target.value)}
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer border-none outline-none ${statusStyle[team.status] ?? ""}`}
-                      >
-                        {Object.entries(statusLabel).map(([k, v]) => (
-                          <option key={k} value={k}>{v}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className={`${tdClass} font-medium whitespace-nowrap`}>{team.name}</td>
-                    <td className={tdClass}>
-                      <div className="flex items-center gap-0.5">
-                        <span className="text-muted-foreground">{team.email}</span>
-                        <CopyButton text={team.email} label="이메일" />
-                      </div>
-                    </td>
-                    <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>{team.phone}</td>
-                    <td className={tdClass}>
-                      <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                        team.participationType === "TEAM" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"
-                      }`}>
-                        {participationTypeLabel[team.participationType] ?? team.participationType}
-                      </span>
-                    </td>
-                    <td className={`${tdClass} whitespace-nowrap`}>
-                      {team.teamName || <span className="text-muted-foreground">-</span>}
-                    </td>
-                    <td className={tdClass}>
-                      <div className="flex flex-wrap items-center gap-1">
-                        {team.members.map((m) => (
-                          <span key={m.id} className="relative inline-flex items-center gap-0.5">
-                            <span className={`text-xs ${m.isLeader ? "font-semibold" : ""}`}>
-                              {m.name}{m.isLeader && "(L)"}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setTransferPopover({ memberId: m.id, teamId: team.id })}
-                              className="text-muted-foreground hover:text-accent cursor-pointer transition-colors"
-                              title="팀 이동"
-                            >
-                              <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-                            {transferPopover?.memberId === m.id && (
-                              <TransferPopover
-                                memberId={m.id}
-                                currentTeamId={team.id}
-                                allTeams={teams}
-                                onTransfer={transferMember}
-                                onClose={() => setTransferPopover(null)}
-                              />
-                            )}
-                            {i < team.members.length - 1 || m.id !== team.members[team.members.length - 1].id ? (
-                              <span className="text-muted-foreground mx-0.5">&middot;</span>
-                            ) : null}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className={`${tdClass} whitespace-nowrap`}>
-                      {experienceLevelLabel[team.experienceLevel] ?? team.experienceLevel}
-                    </td>
-                    <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>
-                      {formatDate(team.createdAt)}
-                    </td>
-                  </tr>
+              paged.map((team, i) => {
+                const leader = team.members.find((m) => m.isLeader) ?? team.members[0];
+                const otherMembers = team.members.filter((m) => m.id !== leader?.id);
+                const hasEmptySlot = team.members.length < 4;
+                const totalRows = 1 + otherMembers.length + (hasEmptySlot ? 1 : 0);
+                const isDropTarget = dropTargetTeamId === team.id;
 
-                  {/* 2행: 부가 정보 */}
-                  <tr key={`${team.id}-sub`} className="border-b border-border bg-muted/30">
-                    {/* # 컬럼은 rowSpan으로 병합됨 */}
-                    <td className={tdClass}>
-                      <select
-                        value={team.recruitmentStatus}
-                        onChange={(e) => updateRecruitmentStatus(team.id, e.target.value)}
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer border-none outline-none ${recruitmentStyle[team.recruitmentStatus] ?? ""}`}
-                      >
-                        {Object.entries(recruitmentLabel).map(([k, v]) => (
-                          <option key={k} value={k}>{v}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className={tdClass}>
-                      <button
-                        type="button"
-                        onClick={() => toggleDeposit(team.id, team.depositConfirmed)}
-                        disabled={togglingId === team.id}
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer transition-colors disabled:opacity-50 ${
-                          team.depositConfirmed
-                            ? "bg-green-100 text-green-700 hover:bg-green-200"
-                            : "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                return (
+                  <Fragment key={team.id}>
+                    {/* 리더 행 */}
+                    <tr className="border-b border-border/50 bg-background">
+                      <td className={`${tdClass} text-muted-foreground`} rowSpan={totalRows}>
+                        {page * PAGE_SIZE + i + 1}
+                      </td>
+                      <td className={tdClass} rowSpan={totalRows}>
+                        <select
+                          value={team.status}
+                          onChange={(e) => updateTeamStatus(team.id, e.target.value)}
+                          className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer border-none outline-none ${statusStyle[team.status] ?? ""}`}
+                        >
+                          {Object.entries(statusLabel).map(([k, v]) => (
+                            <option key={k} value={k}>{v}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className={tdClass} rowSpan={totalRows}>
+                        <span className={`inline-block rounded-full px-2 py-px typo-caption1 font-medium ${
+                          team.participationType === "TEAM" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"
+                        }`}>
+                          {participationTypeLabel[team.participationType] ?? team.participationType}
+                        </span>
+                      </td>
+                      <td className={`${tdClass} whitespace-nowrap`} rowSpan={totalRows} title={team.recruitmentNote ?? undefined}>
+                        {team.teamName || <span className="text-muted-foreground">-</span>}
+                      </td>
+                      <td className={`${tdClass} font-medium whitespace-nowrap`}>
+                        <div
+                          className="flex items-center gap-1"
+                          draggable
+                          onDragStart={(e) => leader && handleDragStart(e, leader.id, team.id, leader.name)}
+                          onDragEnd={handleDragEnd}
+                        >
+                          <DragHandle />
+                          <span>{leader?.name ?? team.name}</span>
+                          <span className="typo-caption2 text-accent">(L)</span>
+                        </div>
+                      </td>
+                      <td className={tdClass}>
+                        <div className="flex items-center gap-0.5">
+                          <span className="text-muted-foreground">{leader?.email ?? team.email}</span>
+                          <CopyButton text={leader?.email ?? team.email} label="이메일" />
+                        </div>
+                      </td>
+                      <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>{leader?.phone ?? team.phone}</td>
+                      <td className={tdClass}>
+                        {leader?.refundBank ? (
+                          <div className="flex items-center gap-0.5 text-muted-foreground">
+                            <span className="truncate max-w-[180px]">
+                              {leader.refundBank} {leader.refundAccount} ({leader.refundAccountHolder})
+                            </span>
+                            <CopyButton
+                              text={`${leader.refundBank} ${leader.refundAccount} (${leader.refundAccountHolder})`}
+                              label="환불계좌"
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground/40">-</span>
+                        )}
+                      </td>
+                      <td className={`${tdClass} whitespace-nowrap`}>
+                        {experienceLevelLabel[team.experienceLevel] ?? team.experienceLevel}
+                      </td>
+                      <td className={tdClass}>
+                        <button
+                          type="button"
+                          onClick={() => toggleDeposit(team.id, team.depositConfirmed)}
+                          disabled={togglingId === team.id}
+                          className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer transition-colors disabled:opacity-50 ${
+                            team.depositConfirmed
+                              ? "bg-green-100 text-green-700 hover:bg-green-200"
+                              : "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                          }`}
+                        >
+                          {team.depositConfirmed ? "입금확인" : "미확인"}
+                        </button>
+                      </td>
+                      <td className={tdClass}>
+                        <select
+                          value={team.recruitmentStatus}
+                          onChange={(e) => updateRecruitmentStatus(team.id, e.target.value)}
+                          className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer border-none outline-none ${recruitmentStyle[team.recruitmentStatus] ?? ""}`}
+                        >
+                          {Object.entries(recruitmentLabel).map(([k, v]) => (
+                            <option key={k} value={k}>{v}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>
+                        {formatDate(team.createdAt)}
+                      </td>
+                    </tr>
+
+                    {/* 멤버 행 */}
+                    {otherMembers.map((m) => (
+                      <tr key={m.id} className="border-b border-border/30 bg-muted/20">
+                        <td className={`${tdClass} whitespace-nowrap`}>
+                          <div
+                            className="flex items-center gap-1"
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, m.id, team.id, m.name)}
+                            onDragEnd={handleDragEnd}
+                          >
+                            <DragHandle />
+                            <span>{m.name}</span>
+                          </div>
+                        </td>
+                        <td className={tdClass}>
+                          <div className="flex items-center gap-0.5">
+                            <span className="text-muted-foreground">{m.email}</span>
+                            <CopyButton text={m.email} label="이메일" />
+                          </div>
+                        </td>
+                        <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>{m.phone}</td>
+                        <td className={tdClass}>
+                          {m.refundBank ? (
+                            <div className="flex items-center gap-0.5 text-muted-foreground">
+                              <span className="truncate max-w-[180px]">
+                                {m.refundBank} {m.refundAccount} ({m.refundAccountHolder})
+                              </span>
+                              <CopyButton
+                                text={`${m.refundBank} ${m.refundAccount} (${m.refundAccountHolder})`}
+                                label="환불계좌"
+                              />
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground/40">-</span>
+                          )}
+                        </td>
+                        <td className={tdClass} />
+                        <td className={tdClass} />
+                        <td className={tdClass} />
+                        <td className={tdClass} />
+                      </tr>
+                    ))}
+
+                    {/* 빈 슬롯 행 (드롭 영역) */}
+                    {hasEmptySlot && (
+                      <tr
+                        className={`border-b border-border/30 transition-colors ${
+                          isDropTarget
+                            ? "bg-accent/10 border-accent/30"
+                            : "bg-muted/10"
                         }`}
+                        onDragOver={(e) => handleDragOver(e, team.id)}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, team.id)}
                       >
-                        {team.depositConfirmed ? "입금확인" : "미확인"}
-                      </button>
-                    </td>
-                    <td className={tdClass} colSpan={2}>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <span className="truncate max-w-[200px]">
-                          {team.refundBank} {team.refundAccount} ({team.refundAccountHolder})
-                        </span>
-                        <CopyButton
-                          text={`${team.refundBank} ${team.refundAccount} (${team.refundAccountHolder})`}
-                          label="환불계좌"
-                        />
-                      </div>
-                    </td>
-                    <td className={tdClass} colSpan={2}>
-                      {team.recruitmentNote ? (
-                        <span className="text-muted-foreground truncate block max-w-[180px]" title={team.recruitmentNote}>
-                          {team.recruitmentNote}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground/50">-</span>
-                      )}
-                    </td>
-                    <td className={tdClass} colSpan={3}>
-                      {team.motivation ? (
-                        <span className="text-muted-foreground truncate block max-w-[300px]" title={team.motivation}>
-                          {team.motivation}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground/50">-</span>
-                      )}
-                    </td>
-                  </tr>
-                </>
-              ))
+                        <td className={`${tdClass} typo-caption2 text-muted-foreground/40`} colSpan={8}>
+                          {isDropTarget ? (
+                            <span className="text-accent font-medium">여기에 놓기</span>
+                          ) : (
+                            `+${4 - team.members.length}명 추가 가능`
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -548,21 +635,34 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
           >
             이전
           </button>
-          <span className="text-sm text-muted-foreground">
+          <span className="typo-caption1 text-muted-foreground">
             {page + 1} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
           >
             다음
           </button>
         </div>
+      )}
+
+      {/* 팀 삭제 컨펌 모달 */}
+      {pendingTransfer && (
+        <ConfirmModal
+          title="팀 삭제 확인"
+          message={`"${pendingTransfer.memberName}"을(를) 이동하면 "${pendingTransfer.sourceTeamName}" 팀에 멤버가 없어집니다.\n해당 팀을 삭제하시겠습니까?`}
+          confirmLabel="이동 및 팀 삭제"
+          cancelLabel="취소"
+          variant="danger"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
       )}
     </div>
   );
