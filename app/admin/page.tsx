@@ -35,6 +35,7 @@ const AdminPage = async () => {
       createdAt: m.createdAt.toISOString(),
       updatedAt: m.updatedAt.toISOString(),
     })),
+    consentedAt: team.consentedAt?.toISOString() ?? null,
     createdAt: team.createdAt.toISOString(),
     updatedAt: team.updatedAt.toISOString(),
   }));
