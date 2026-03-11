@@ -28,8 +28,8 @@ type ProjectTableProps = {
 
 const PAGE_SIZE = 20;
 
-const inputClass =
-  "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent transition-colors";
+const thClass = "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
+const tdClass = "px-2.5 py-1.5 typo-caption1";
 
 export const ProjectTable = ({ projects }: ProjectTableProps) => {
   const [search, setSearch] = useState("");
@@ -58,33 +58,33 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="typo-h6 shrink-0">프로젝트 목록</h2>
+        <h2 className="typo-subtitle2 shrink-0">프로젝트 목록</h2>
         <input
           type="text"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="프로젝트명, 이름 또는 이메일 검색"
-          className={`max-w-xs ${inputClass}`}
+          className="max-w-xs w-full rounded-md border border-border bg-background px-2.5 py-1 typo-caption1 outline-none focus:border-accent transition-colors"
         />
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
+        <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-muted">
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">#</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">프로젝트명</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">대표자</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">팀명</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">GitHub</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">데모</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">등록일</th>
+              <th className={thClass}>#</th>
+              <th className={thClass}>프로젝트명</th>
+              <th className={thClass}>대표자</th>
+              <th className={thClass}>팀명</th>
+              <th className={thClass}>GitHub</th>
+              <th className={thClass}>데모</th>
+              <th className={thClass}>등록일</th>
             </tr>
           </thead>
           <tbody>
             {paged.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground typo-caption1">
                   {search ? "검색 결과가 없습니다." : "등록된 프로젝트가 없습니다."}
                 </td>
               </tr>
@@ -95,11 +95,11 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
                   onClick={() => setSelectedProject(project)}
                   className="border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors"
                 >
-                  <td className="px-4 py-3 text-muted-foreground">{page * PAGE_SIZE + i + 1}</td>
-                  <td className="px-4 py-3 font-medium">{project.title}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{project.team.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{project.team.teamName ?? "-"}</td>
-                  <td className="px-4 py-3">
+                  <td className={`${tdClass} text-muted-foreground`}>{page * PAGE_SIZE + i + 1}</td>
+                  <td className={`${tdClass} font-medium`}>{project.title}</td>
+                  <td className={`${tdClass} text-muted-foreground`}>{project.team.name}</td>
+                  <td className={`${tdClass} text-muted-foreground`}>{project.team.teamName ?? "-"}</td>
+                  <td className={tdClass}>
                     <a
                       href={project.githubUrl}
                       target="_blank"
@@ -110,7 +110,7 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
                       링크
                     </a>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className={tdClass}>
                     {project.demoUrl ? (
                       <a
                         href={project.demoUrl}
@@ -125,7 +125,7 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
                       <span className="text-muted-foreground">-</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                  <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>
                     {new Date(project.createdAt).toLocaleDateString("ko-KR")}
                   </td>
                 </tr>
@@ -141,17 +141,17 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
           >
             이전
           </button>
-          <span className="text-sm text-muted-foreground">
+          <span className="typo-caption1 text-muted-foreground">
             {page + 1} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
           >
             다음
           </button>

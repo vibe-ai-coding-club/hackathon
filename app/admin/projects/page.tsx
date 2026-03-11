@@ -29,21 +29,18 @@ const AdminProjectsPage = async () => {
   }));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="typo-h5">딸깍톤 Admin</h1>
+    <div className="mx-auto max-w-7xl px-4 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-4">
+          <h1 className="typo-h6">딸깍톤 Admin</h1>
+          <AdminNav />
+        </div>
         <LogoutButton />
       </div>
 
-      <div className="space-y-8">
-        <AdminNav />
-
-        {/* 프로젝트 통계 */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-border p-6">
-            <p className="text-sm text-muted-foreground">총 프로젝트 수</p>
-            <p className="mt-1 typo-h4">{totalProjects}</p>
-          </div>
+      <div className="space-y-3">
+        <div className="typo-caption1 text-muted-foreground">
+          총 <strong className="text-foreground">{totalProjects}</strong>개 프로젝트
         </div>
 
         <ProjectTable projects={serializedProjects} />

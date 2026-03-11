@@ -58,44 +58,36 @@ export const RegistrationSettingControl = () => {
 
   if (fetching) {
     return (
-      <div className="rounded-lg border border-border p-6">
-        <h2 className="typo-subtitle1 mb-4">신청 마감 관리</h2>
-        <p className="typo-body3 text-muted-foreground">로딩 중...</p>
+      <div className="flex items-center gap-2 typo-caption1 text-muted-foreground">
+        신청 상태 확인 중...
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-border p-6">
-      <h2 className="typo-subtitle1 mb-4">신청 마감 관리</h2>
-
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <span
-            className={`h-3 w-3 rounded-full ${isClosed ? "bg-error" : "bg-success animate-pulse"}`}
-          />
-          <span className="typo-body3">
-            {isClosed ? "신청 마감됨" : "신청 접수 중"}
-          </span>
-          {isClosed && closedAt && (
-            <span className="typo-caption1 text-muted-foreground">
-              마감: {new Date(closedAt).toLocaleString("ko-KR")}
-            </span>
-          )}
-        </div>
-
-        <button
-          onClick={handleToggle}
-          disabled={loading}
-          className={`rounded-lg px-6 py-2.5 typo-btn3 text-white transition-colors disabled:opacity-50 ${
-            isClosed
-              ? "bg-success hover:opacity-90"
-              : "bg-error hover:opacity-90"
-          }`}
-        >
-          {loading ? "처리 중..." : isClosed ? "신청 오픈" : "신청 마감"}
-        </button>
-      </div>
+    <div className="flex items-center gap-3">
+      <span
+        className={`h-2 w-2 rounded-full shrink-0 ${isClosed ? "bg-error" : "bg-success animate-pulse"}`}
+      />
+      <span className="typo-caption1">
+        {isClosed ? "신청 마감됨" : "신청 접수 중"}
+      </span>
+      {isClosed && closedAt && (
+        <span className="typo-caption2 text-muted-foreground">
+          {new Date(closedAt).toLocaleString("ko-KR")}
+        </span>
+      )}
+      <button
+        onClick={handleToggle}
+        disabled={loading}
+        className={`rounded-md px-3 py-1 typo-btn4 text-white transition-colors disabled:opacity-50 cursor-pointer ${
+          isClosed
+            ? "bg-success hover:opacity-90"
+            : "bg-error hover:opacity-90"
+        }`}
+      >
+        {loading ? "처리 중..." : isClosed ? "신청 오픈" : "신청 마감"}
+      </button>
     </div>
   );
 };

@@ -47,27 +47,26 @@ const AdminVotesPage = () => {
     fetchData();
   }, [fetchData]);
 
-  // 세션 활성 중이면 자동 새로고침
   useEffect(() => {
     if (!session?.isActive) return;
-
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, [session?.isActive, fetchData]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="typo-h5">딸깍톤 Admin</h1>
+    <div className="mx-auto max-w-7xl px-4 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-4">
+          <h1 className="typo-h6">딸깍톤 Admin</h1>
+          <AdminNav />
+        </div>
         <LogoutButton />
       </div>
 
-      <div className="space-y-8">
-        <AdminNav />
-
+      <div className="space-y-3">
         {loading ? (
-          <div className="py-20 text-center">
-            <p className="typo-body1 text-muted-foreground">로딩 중...</p>
+          <div className="py-8 text-center">
+            <p className="typo-caption1 text-muted-foreground">로딩 중...</p>
           </div>
         ) : (
           <>

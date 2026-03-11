@@ -42,33 +42,33 @@ export const VoteSessionControl = ({ session, onRefresh }: VoteSessionControlPro
   const isActive = session?.isActive ?? false;
 
   return (
-    <div className="rounded-lg border border-border p-6">
-      <h2 className="typo-subtitle1 mb-4">투표 세션 관리</h2>
+    <div className="rounded-lg border border-border p-4">
+      <h2 className="typo-subtitle2 mb-3">투표 세션 관리</h2>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* 현재 상태 */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <span
-            className={`h-3 w-3 rounded-full ${isActive ? "bg-success animate-pulse" : "bg-gray-300"}`}
+            className={`h-2.5 w-2.5 rounded-full ${isActive ? "bg-success animate-pulse" : "bg-gray-300"}`}
           />
-          <span className="typo-body3">
+          <span className="typo-caption1">
             {isActive ? "투표 진행 중" : "투표 비활성"}
           </span>
           {session?.startedAt && (
-            <span className="typo-caption1 text-muted-foreground">
+            <span className="typo-caption2 text-muted-foreground">
               시작: {new Date(session.startedAt).toLocaleString("ko-KR")}
             </span>
           )}
           {session?.endedAt && !isActive && (
-            <span className="typo-caption1 text-muted-foreground">
+            <span className="typo-caption2 text-muted-foreground">
               종료: {new Date(session.endedAt).toLocaleString("ko-KR")}
             </span>
           )}
         </div>
 
         {/* 최대 투표 수 설정 */}
-        <div className="flex items-center gap-3">
-          <label className="typo-body3 text-muted-foreground">1인당 최대 투표 수:</label>
+        <div className="flex items-center gap-2">
+          <label className="typo-caption1 text-muted-foreground">1인당 최대 투표 수:</label>
           <input
             type="number"
             value={maxVotes}
@@ -76,17 +76,17 @@ export const VoteSessionControl = ({ session, onRefresh }: VoteSessionControlPro
             min={1}
             max={20}
             disabled={isActive}
-            className="w-20 rounded-lg border border-border bg-background px-3 py-2 typo-body3 text-center disabled:opacity-50"
+            className="w-16 rounded-md border border-border bg-background px-2 py-1 typo-caption1 text-center disabled:opacity-50"
           />
         </div>
 
         {/* 액션 버튼 */}
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {!isActive ? (
             <button
               onClick={() => handleAction("start")}
               disabled={loading}
-              className="rounded-lg bg-success px-6 py-2.5 typo-btn3 text-white hover:opacity-90 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-success px-4 py-1.5 typo-btn4 text-white hover:opacity-90 disabled:opacity-50 cursor-pointer transition-colors"
             >
               {loading ? "처리 중..." : "투표 시작"}
             </button>
@@ -94,7 +94,7 @@ export const VoteSessionControl = ({ session, onRefresh }: VoteSessionControlPro
             <button
               onClick={() => handleAction("stop")}
               disabled={loading}
-              className="rounded-lg bg-error px-6 py-2.5 typo-btn3 text-white hover:opacity-90 disabled:opacity-50 transition-colors"
+              className="rounded-md bg-error px-4 py-1.5 typo-btn4 text-white hover:opacity-90 disabled:opacity-50 cursor-pointer transition-colors"
             >
               {loading ? "처리 중..." : "투표 종료"}
             </button>

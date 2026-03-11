@@ -21,7 +21,7 @@ export const AdminNav = () => {
           <Link
             key={item.href}
             href={item.href}
-            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            className={`rounded-md px-3 py-1.5 typo-caption1 font-medium transition-colors ${
               isActive ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             }`}
           >

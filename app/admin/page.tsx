@@ -51,17 +51,19 @@ const AdminPage = async () => {
   }));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="typo-h5">딸깍톤 Admin</h1>
-        <LogoutButton />
+    <div className="mx-auto max-w-[1600px] px-8 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-4">
+          <h1 className="typo-h6">딸깍톤 Admin</h1>
+          <AdminNav />
+        </div>
+        <div className="flex items-center gap-3">
+          <RegistrationSettingControl />
+          <LogoutButton />
+        </div>
       </div>
 
-      <div className="space-y-8">
-        <AdminNav />
-
-        <RegistrationSettingControl />
-
+      <div className="space-y-3">
         <StatsCards
           totalTeams={totalTeams}
           byParticipationType={statsByParticipationType}
