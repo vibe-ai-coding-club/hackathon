@@ -75,6 +75,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    signIn: "/team-building/login",
+    signIn: "/teams/login",
   },
 });

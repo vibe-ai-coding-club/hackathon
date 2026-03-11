@@ -52,21 +52,25 @@ export async function POST(request: NextRequest) {
     const remainingMembers = member.team.members.filter((m) => m.id !== memberId);
 
     await prisma.$transaction(async (tx) => {
-      // 팀장이 이동하는 경우
-      if (member.isLeader && remainingMembers.length > 0) {
-        const newLeader = remainingMembers[0];
-        await tx.member.update({
-          where: { id: newLeader.id },
-          data: { isLeader: true },
-        });
-        await tx.team.update({
-          where: { id: sourceTeamId },
-          data: {
-            name: newLeader.name,
-            email: newLeader.email,
-            phone: newLeader.phone,
-          },
-        });
+      // 원래 팀에 리더가 없어지는 경우 → 승격
+      if (remainingMembers.length > 0) {
+        const hasLeaderLeft = member.isLeader;
+        const noLeaderRemaining = !remainingMembers.some((m) => m.isLeader);
+        if (hasLeaderLeft || noLeaderRemaining) {
+          const newLeader = remainingMembers[0];
+          await tx.member.update({
+            where: { id: newLeader.id },
+            data: { isLeader: true },
+          });
+          await tx.team.update({
+            where: { id: sourceTeamId },
+            data: {
+              name: newLeader.name,
+              email: newLeader.email,
+              phone: newLeader.phone,
+            },
+          });
+        }
       }
 
       // 멤버 이동

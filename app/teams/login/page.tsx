@@ -38,7 +38,7 @@ const LoginPage = () => {
       if (result?.error) {
         setError("이메일 또는 전화번호가 일치하지 않습니다.");
       } else {
-        router.push("/team-building");
+        router.push("/teams");
         router.refresh();
       }
     } catch {
@@ -52,7 +52,7 @@ const LoginPage = () => {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
-          <h1 className="typo-h5">팀 빌딩</h1>
+          <h1 className="typo-h5">팀 대시보드</h1>
           <p className="typo-body3 mt-2 text-gray-500">
             신청 시 등록한 이메일과 전화번호 뒷자리로 로그인하세요
           </p>
