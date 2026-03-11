@@ -1,5 +1,5 @@
+import { FormError, FormRadioOption } from "@/app/_components/register";
 import type { FormState } from "./types";
-import { FormError, FormRadioOption } from "./ui";
 
 type Props = {
   form: FormState;
@@ -33,9 +33,7 @@ export const ParticipationTypeSection = ({ form, errors, update }: Props) => {
           description="팀장 포함 최대 4명"
         />
       </div>
-      {errors.participationType && (
-        <FormError>{errors.participationType}</FormError>
-      )}
+      {errors.participationType && <FormError>{errors.participationType}</FormError>}
     </fieldset>
   );
 };

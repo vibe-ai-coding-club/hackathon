@@ -1,6 +1,6 @@
-import type { ChangeEventHandler, ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { RadioDot } from "../radio-dot";
+import type { ChangeEventHandler, ReactNode } from "react";
+import { RadioDot } from "./radio-dot";
 
 type Props = {
   name: string;
@@ -34,20 +34,11 @@ export const FormRadioOption = ({
       className,
     )}
   >
-    <input
-      type="radio"
-      name={name}
-      value={value}
-      checked={checked}
-      onChange={onChange}
-      className="sr-only"
-    />
+    <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="sr-only" />
     <RadioDot checked={checked} />
     <span>
       <span className="typo-subtitle2">{label}</span>
-      {description && (
-        <span className="typo-body3 ml-2 text-gray-500">{description}</span>
-      )}
+      {description && <span className="typo-body3 ml-2 text-gray-500">{description}</span>}
     </span>
   </label>
 );

@@ -1,6 +1,6 @@
+import { FieldLabel, FormError, FormInput } from "@/app/_components/register";
 import type { DuplicateStatus, FormState, MemberState } from "./types";
 import { formatPhone, MAX_MEMBERS, toDigits } from "./types";
-import { FieldLabel, FormError, FormInput } from "./ui";
 
 type Props = {
   form: FormState;
@@ -42,9 +42,7 @@ export const TeamMembersSection = ({
           </button>
         )}
       </div>
-      <p className="typo-caption1 text-gray-400">
-        팀장을 제외하고 입력해주세요
-      </p>
+      <p className="typo-caption1 text-gray-400">팀장을 제외하고 입력해주세요</p>
 
       {form.members.map((member, i) => (
         <div key={i} className="space-y-3 rounded-xl bg-gray-50 p-4">
@@ -56,11 +54,7 @@ export const TeamMembersSection = ({
                 onClick={() => removeMember(i)}
                 className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
               >
-                <svg
-                  className="size-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
+                <svg className="size-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                 </svg>
               </button>
@@ -69,7 +63,9 @@ export const TeamMembersSection = ({
 
           {/* 이름 */}
           <div>
-            <FieldLabel size="sm" required>이름</FieldLabel>
+            <FieldLabel size="sm" required>
+              이름
+            </FieldLabel>
             <FormInput
               type="text"
               variant="white"
@@ -84,15 +80,15 @@ export const TeamMembersSection = ({
           <div className="grid gap-3 sm:grid-cols-2">
             {/* 연락처 */}
             <div>
-              <FieldLabel size="sm" required>연락처</FieldLabel>
+              <FieldLabel size="sm" required>
+                연락처
+              </FieldLabel>
               <FormInput
                 type="tel"
                 inputMode="numeric"
                 variant="white"
                 value={formatPhone(member.phone)}
-                onChange={(e) =>
-                  updateMember(i, "phone", toDigits(e.target.value))
-                }
+                onChange={(e) => updateMember(i, "phone", toDigits(e.target.value))}
                 placeholder="010-1234-5678"
                 error={errors[`members.${i}.phone`]}
               />
@@ -100,26 +96,22 @@ export const TeamMembersSection = ({
 
             {/* 이메일 */}
             <div>
-              <FieldLabel size="sm" required>이메일</FieldLabel>
+              <FieldLabel size="sm" required>
+                이메일
+              </FieldLabel>
               <div className="flex gap-2">
                 <FormInput
                   type="email"
                   variant="white"
                   value={member.email}
-                  onChange={(e) =>
-                    updateMember(i, "email", e.target.value)
-                  }
-                  onBlur={() =>
-                    checkMemberEmailDuplicate(i, member.email)
-                  }
+                  onChange={(e) => updateMember(i, "email", e.target.value)}
+                  onBlur={() => checkMemberEmailDuplicate(i, member.email)}
                   placeholder="example@email.com"
                   className="flex-1"
                 />
                 <button
                   type="button"
-                  onClick={() =>
-                    checkMemberEmailDuplicate(i, member.email)
-                  }
+                  onClick={() => checkMemberEmailDuplicate(i, member.email)}
                   disabled={
                     !member.email ||
                     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email) ||
@@ -127,21 +119,15 @@ export const TeamMembersSection = ({
                   }
                   className="shrink-0 rounded-lg bg-white px-3 py-2 typo-caption1 font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
                 >
-                  {dupStatus[`members.${i}.email`] === "checking"
-                    ? "확인 중..."
-                    : "중복확인"}
+                  {dupStatus[`members.${i}.email`] === "checking" ? "확인 중..." : "중복확인"}
                 </button>
               </div>
               {errors[`members.${i}.email`] ? (
                 <FormError>{errors[`members.${i}.email`]}</FormError>
               ) : dupStatus[`members.${i}.email`] === "available" ? (
-                <p className="typo-caption1 mt-1 text-success">
-                  사용 가능한 이메일입니다
-                </p>
+                <p className="typo-caption1 mt-1 text-success">사용 가능한 이메일입니다</p>
               ) : (
-                <p className="typo-caption1 mt-1 text-gray-400">
-                  투표 시 사용됩니다
-                </p>
+                <p className="typo-caption1 mt-1 text-gray-400">투표 시 사용됩니다</p>
               )}
             </div>
           </div>

@@ -1,11 +1,5 @@
+import { FieldLabel, FormCaption, FormInput, FormRadioOption, FormTextarea } from "@/app/_components/register";
 import type { FormState } from "./types";
-import {
-  FieldLabel,
-  FormCaption,
-  FormInput,
-  FormRadioOption,
-  FormTextarea,
-} from "./ui";
 
 type Props = {
   form: FormState;
@@ -17,17 +11,13 @@ export const RecruitmentSection = ({ form, errors, update }: Props) => {
   if (!form.participationType) return null;
 
   const isIndividual = form.participationType === "INDIVIDUAL";
-  const needsTeamName =
-    form.participationType === "TEAM" ||
-    form.recruitmentStatus === "RECRUITING";
+  const needsTeamName = form.participationType === "TEAM" || form.recruitmentStatus === "RECRUITING";
 
   return (
     <>
       {/* 모집 여부 */}
       <fieldset className="space-y-2">
-        <legend className="typo-subtitle1">
-          {isIndividual ? "팀 / 팀원 찾기" : "추가 인원 모집 여부"}
-        </legend>
+        <legend className="typo-subtitle1">{isIndividual ? "팀 / 팀원 찾기" : "추가 인원 모집 여부"}</legend>
         <FormCaption className="mb-0">
           {isIndividual
             ? "해커톤 당일 함께할 팀이나 팀원을 찾고 싶으신가요?"
@@ -40,22 +30,14 @@ export const RecruitmentSection = ({ form, errors, update }: Props) => {
             checked={form.recruitmentStatus === "RECRUITING"}
             onChange={(e) => update("recruitmentStatus", e.target.value)}
             label={isIndividual ? "모집 / 참여할래요" : "모집할래요"}
-            description={
-              isIndividual
-                ? "팀 / 팀원을 찾고 있어요"
-                : "팀원을 더 찾고 있어요"
-            }
+            description={isIndividual ? "팀 / 팀원을 찾고 있어요" : "팀원을 더 찾고 있어요"}
           />
           <FormRadioOption
             name="recruitmentStatus"
             value="NOT_RECRUITING"
             checked={form.recruitmentStatus === "NOT_RECRUITING"}
             onChange={(e) => update("recruitmentStatus", e.target.value)}
-            label={
-              isIndividual
-                ? "모집 / 참여하지 않을래요"
-                : "모집하지 않을래요"
-            }
+            label={isIndividual ? "모집 / 참여하지 않을래요" : "모집하지 않을래요"}
           />
         </div>
       </fieldset>
@@ -64,7 +46,9 @@ export const RecruitmentSection = ({ form, errors, update }: Props) => {
       {needsTeamName && (
         <div className="space-y-6">
           <div>
-            <FieldLabel htmlFor="reg-teamName" required>팀 이름</FieldLabel>
+            <FieldLabel htmlFor="reg-teamName" required>
+              팀 이름
+            </FieldLabel>
             <FormInput
               id="reg-teamName"
               type="text"

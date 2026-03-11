@@ -1,7 +1,7 @@
-import { RadioDot } from "./radio-dot";
+import { FormError } from "@/app/_components/register";
+import { RadioDot } from "@/app/_components/register/radio-dot";
 import type { FormState } from "./types";
 import { experienceOptions } from "./types";
-import { FormError } from "./ui";
 
 type Props = {
   form: FormState;
@@ -20,9 +20,7 @@ export const ExperienceSection = ({ form, errors, update }: Props) => {
           <label
             key={opt.value}
             className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-              form.experienceLevel === opt.value
-                ? "bg-primary-025 ring-2 ring-primary-400"
-                : "bg-gray-50"
+              form.experienceLevel === opt.value ? "bg-primary-025 ring-2 ring-primary-400" : "bg-gray-50"
             }`}
           >
             <input
@@ -38,9 +36,7 @@ export const ExperienceSection = ({ form, errors, update }: Props) => {
           </label>
         ))}
       </div>
-      {errors.experienceLevel && (
-        <FormError>{errors.experienceLevel}</FormError>
-      )}
+      {errors.experienceLevel && <FormError>{errors.experienceLevel}</FormError>}
     </fieldset>
   );
 };

@@ -1,5 +1,5 @@
+import { FieldLabel, FormTextarea } from "@/app/_components/register";
 import type { FormState } from "./types";
-import { FieldLabel, FormTextarea } from "./ui";
 
 type Props = {
   form: FormState;
@@ -11,9 +11,7 @@ export const MotivationSection = ({ form, update }: Props) => {
 
   return (
     <div>
-      <FieldLabel htmlFor="reg-motivation">
-        참여 동기 및 문의 사항
-      </FieldLabel>
+      <FieldLabel htmlFor="reg-motivation">참여 동기 및 문의 사항</FieldLabel>
       <FormTextarea
         id="reg-motivation"
         value={form.motivation}
