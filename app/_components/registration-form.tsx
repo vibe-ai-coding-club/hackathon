@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 
 type ParticipationType = "INDIVIDUAL" | "TEAM";
 type ExperienceLevel = "BEGINNER" | "JUNIOR" | "SENIOR" | "VIBE_CODER";
+type RecruitmentStatus = "RECRUITING" | "NOT_RECRUITING";
 
 const experienceOptions: { value: ExperienceLevel; label: string }[] = [
   { value: "BEGINNER", label: "비개발자/입문" },
@@ -16,6 +17,8 @@ type MemberState = { name: string; email: string; phone: string };
 
 type FormState = {
   participationType: ParticipationType | "";
+  recruitmentStatus: RecruitmentStatus | "";
+  recruitmentNote: string;
   email: string;
   name: string;
   phone: string;
@@ -44,6 +47,8 @@ const toDigits = (value: string): string => value.replace(/\D/g, "").slice(0, 11
 
 const initialForm: FormState = {
   participationType: "INDIVIDUAL",
+  recruitmentStatus: "NOT_RECRUITING",
+  recruitmentNote: "",
   email: "",
   name: "",
   phone: "",
@@ -199,9 +204,13 @@ export const RegistrationForm = () => {
     if (!form.phone) newErrors.phone = "전화번호를 입력해주세요";
     else if (!PHONE_REGEX.test(form.phone)) newErrors.phone = "올바른 전화번호를 입력해주세요";
 
-    // 팀 전용
-    if (form.participationType === "TEAM") {
+    // 팀 이름 (팀 참여 또는 모집 시 필수)
+    if (form.participationType === "TEAM" || form.recruitmentStatus === "RECRUITING") {
       if (!form.teamName.trim()) newErrors.teamName = "팀 이름을 입력해주세요";
+    }
+
+    // 팀원 (팀 참여 시 필수)
+    if (form.participationType === "TEAM") {
       form.members.forEach((member, i) => {
         if (!member.name.trim()) newErrors[`members.${i}.name`] = "이름을 입력해주세요";
         if (!member.email.trim()) newErrors[`members.${i}.email`] = "이메일을 입력해주세요";
@@ -240,6 +249,8 @@ export const RegistrationForm = () => {
     [],
   );
 
+  const needsTeamName = form.participationType === "TEAM" || form.recruitmentStatus === "RECRUITING";
+
   const isReady = (() => {
     if (!form.participationType || !form.experienceLevel) return false;
     const hasBasic =
@@ -253,15 +264,14 @@ export const RegistrationForm = () => {
 
     if (!hasBasic || !hasRefund || !form.hasDeposited || !form.privacyConsent) return false;
 
+    if (needsTeamName && !form.teamName.trim()) return false;
+
     if (form.participationType === "TEAM") {
-      return (
-        form.teamName.trim().length > 0 &&
-        form.members.every(
-          (m) =>
-            m.name.trim().length > 0 &&
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email) &&
-            PHONE_REGEX.test(m.phone),
-        )
+      return form.members.every(
+        (m) =>
+          m.name.trim().length > 0 &&
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email) &&
+          PHONE_REGEX.test(m.phone),
       );
     }
     return true;
@@ -276,10 +286,12 @@ export const RegistrationForm = () => {
     try {
       const payload = {
         participationType: form.participationType,
+        recruitmentStatus: form.recruitmentStatus || "NOT_RECRUITING",
+        recruitmentNote: form.recruitmentStatus === "RECRUITING" ? form.recruitmentNote || undefined : undefined,
         email: form.email,
         name: form.name,
         phone: form.phone,
-        teamName: form.participationType === "TEAM" ? form.teamName : undefined,
+        teamName: needsTeamName ? form.teamName : undefined,
         members: form.participationType === "TEAM" ? form.members : undefined,
         experienceLevel: form.experienceLevel,
         motivation: form.motivation || undefined,
@@ -357,6 +369,56 @@ export const RegistrationForm = () => {
           {errors.participationType && <p className="typo-caption1 text-error">{errors.participationType}</p>}
         </fieldset>
 
+        {/* 1-2. 추가 인원 모집 여부 */}
+        {form.participationType && (
+          <fieldset className="space-y-2">
+            <legend className="typo-subtitle1">
+              추가 인원 모집 여부
+            </legend>
+            <p className="typo-caption1 text-gray-500">해커톤 당일 팀원을 더 모집하고 싶으신가요?</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
+                  form.recruitmentStatus === "RECRUITING" ? "bg-primary-025 ring-2 ring-primary-400" : "bg-gray-50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="recruitmentStatus"
+                  value="RECRUITING"
+                  checked={form.recruitmentStatus === "RECRUITING"}
+                  onChange={(e) => update("recruitmentStatus", e.target.value)}
+                  className="sr-only"
+                />
+                <RadioDot checked={form.recruitmentStatus === "RECRUITING"} />
+                <span>
+                  <span className="typo-subtitle2">모집할래요</span>
+                  <span className="typo-body3 ml-2 text-gray-500">팀원을 더 찾고 있어요</span>
+                </span>
+              </label>
+
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3.5 transition-colors ${
+                  form.recruitmentStatus === "NOT_RECRUITING" ? "bg-primary-025 ring-2 ring-primary-400" : "bg-gray-50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="recruitmentStatus"
+                  value="NOT_RECRUITING"
+                  checked={form.recruitmentStatus === "NOT_RECRUITING"}
+                  onChange={(e) => update("recruitmentStatus", e.target.value)}
+                  className="sr-only"
+                />
+                <RadioDot checked={form.recruitmentStatus === "NOT_RECRUITING"} />
+                <span>
+                  <span className="typo-subtitle2">모집하지 않을래요</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        )}
+
         {/* 2. 대표자 정보 */}
         {form.participationType && (
           <div className="space-y-6">
@@ -429,8 +491,8 @@ export const RegistrationForm = () => {
           </div>
         )}
 
-        {/* 3. 팀 정보 */}
-        {form.participationType === "TEAM" && (
+        {/* 3. 팀 이름 (팀 참여 또는 모집 시) */}
+        {needsTeamName && (
           <div className="space-y-6">
             <div>
               <label htmlFor="reg-teamName" className="typo-subtitle1 mb-2 block">
@@ -447,6 +509,25 @@ export const RegistrationForm = () => {
               />
               {errors.teamName && <p className="typo-caption1 mt-1 text-error">{errors.teamName}</p>}
             </div>
+          </div>
+        )}
+
+        {/* 3-2. 모집 소개글 (모집 시에만) */}
+        {form.recruitmentStatus === "RECRUITING" && (
+          <div>
+            <label htmlFor="reg-recruitmentNote" className="typo-subtitle1 mb-1 block">
+              모집 소개글
+            </label>
+            <p className="typo-caption1 mb-2 text-gray-500">팀 빌딩 게시판에 표시됩니다</p>
+            <textarea
+              id="reg-recruitmentNote"
+              value={form.recruitmentNote}
+              onChange={(e) => update("recruitmentNote", e.target.value)}
+              placeholder="어떤 팀원을 찾고 있나요? 주제, 기술 스택 등을 자유롭게 작성해주세요"
+              maxLength={300}
+              rows={4}
+              className={`${inputClass} resize-y`}
+            />
           </div>
         )}
 
