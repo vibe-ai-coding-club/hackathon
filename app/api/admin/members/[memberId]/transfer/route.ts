@@ -48,23 +48,25 @@ export async function PATCH(
     const sourceTeamEmpty = remainingMembers.length === 0;
 
     await prisma.$transaction(async (tx) => {
-      // 팀장이 이동하는 경우
-      if (member.isLeader && remainingMembers.length > 0) {
-        const newLeader = remainingMembers[0];
-        // 새 팀장 승격
-        await tx.member.update({
-          where: { id: newLeader.id },
-          data: { isLeader: true },
-        });
-        // 팀 대표 정보 갱신
-        await tx.team.update({
-          where: { id: sourceTeamId },
-          data: {
-            name: newLeader.name,
-            email: newLeader.email,
-            phone: newLeader.phone,
-          },
-        });
+      // 원래 팀에 리더가 없어지는 경우 → 승격
+      if (remainingMembers.length > 0) {
+        const hasLeaderLeft = member.isLeader;
+        const noLeaderRemaining = !remainingMembers.some((m) => m.isLeader);
+        if (hasLeaderLeft || noLeaderRemaining) {
+          const newLeader = remainingMembers[0];
+          await tx.member.update({
+            where: { id: newLeader.id },
+            data: { isLeader: true },
+          });
+          await tx.team.update({
+            where: { id: sourceTeamId },
+            data: {
+              name: newLeader.name,
+              email: newLeader.email,
+              phone: newLeader.phone,
+            },
+          });
+        }
       }
 
       // 멤버 이동 (isLeader를 false로 변경)

@@ -1,7 +1,7 @@
 "use client";
 
-import { Fragment, useMemo, useState, useCallback } from "react";
 import { toggleDepositConfirmed } from "@/app/actions/admin-actions";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { ConfirmModal } from "./confirm-modal";
 
 export type SerializedMember = {
@@ -105,7 +105,11 @@ const CopyButton = ({ text, label }: { text: string; label?: string }) => {
     >
       {copied ? (
         <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+          <path
+            fillRule="evenodd"
+            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+            clipRule="evenodd"
+          />
         </svg>
       ) : (
         <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
@@ -137,7 +141,11 @@ const BulkCopyButton = ({ text, label }: { text: string; label: string }) => {
     >
       {copied ? (
         <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+          <path
+            fillRule="evenodd"
+            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+            clipRule="evenodd"
+          />
         </svg>
       ) : (
         <svg className="size-3" viewBox="0 0 20 20" fill="currentColor">
@@ -152,8 +160,16 @@ const BulkCopyButton = ({ text, label }: { text: string; label: string }) => {
 
 // 드래그 핸들 아이콘
 const DragHandle = () => (
-  <svg className="size-3.5 text-muted-foreground/50 shrink-0 cursor-grab active:cursor-grabbing" viewBox="0 0 20 20" fill="currentColor">
-    <path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 5A.75.75 0 012.75 9h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.75zm0 5a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+  <svg
+    className="size-3.5 text-muted-foreground/50 shrink-0 cursor-grab active:cursor-grabbing"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+  >
+    <path
+      fillRule="evenodd"
+      d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 5A.75.75 0 012.75 9h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.75zm0 5a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z"
+      clipRule="evenodd"
+    />
   </svg>
 );
 
@@ -200,12 +216,29 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   const filtered = useMemo(() => {
     return teams.filter((t) => {
       if (filters.status !== "ALL" && t.status !== filters.status) return false;
-      if (filters.recruitmentStatus !== "ALL" && t.recruitmentStatus !== filters.recruitmentStatus) return false;
-      if (filters.experienceLevel !== "ALL" && t.experienceLevel !== filters.experienceLevel) return false;
-      if (filters.participationType !== "ALL" && t.participationType !== filters.participationType) return false;
+      if (
+        filters.recruitmentStatus !== "ALL" &&
+        t.recruitmentStatus !== filters.recruitmentStatus
+      )
+        return false;
+      if (
+        filters.experienceLevel !== "ALL" &&
+        t.experienceLevel !== filters.experienceLevel
+      )
+        return false;
+      if (
+        filters.participationType !== "ALL" &&
+        t.participationType !== filters.participationType
+      )
+        return false;
       if (filters.search.trim()) {
         const q = filters.search.toLowerCase();
-        if (!t.name.toLowerCase().includes(q) && !t.email.toLowerCase().includes(q) && !(t.teamName?.toLowerCase().includes(q))) return false;
+        if (
+          !t.name.toLowerCase().includes(q) &&
+          !t.email.toLowerCase().includes(q) &&
+          !t.teamName?.toLowerCase().includes(q)
+        )
+          return false;
       }
       return true;
     });
@@ -215,22 +248,28 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const allEmails = useMemo(() => {
-    return teams.flatMap((t) => t.members.map((m) => m.email)).join(", ");
-  }, [teams]);
+    return filtered.flatMap((t) => t.members.map((m) => m.email)).join(", ");
+  }, [filtered]);
 
   const leaderEmails = useMemo(() => {
-    return teams.map((t) => {
-      const leader = t.members.find((m) => m.isLeader) ?? t.members[0];
-      return leader?.email ?? t.email;
-    }).join(", ");
-  }, [teams]);
+    return filtered
+      .map((t) => {
+        const leader = t.members.find((m) => m.isLeader) ?? t.members[0];
+        return leader?.email ?? t.email;
+      })
+      .join(", ");
+  }, [filtered]);
 
   const toggleDeposit = async (teamId: string, current: boolean) => {
     setTogglingId(teamId);
     try {
       const result = await toggleDepositConfirmed(teamId, !current);
       if (result.success) {
-        setTeams((prev) => prev.map((t) => (t.id === teamId ? { ...t, depositConfirmed: !current } : t)));
+        setTeams((prev) =>
+          prev.map((t) =>
+            t.id === teamId ? { ...t, depositConfirmed: !current } : t,
+          ),
+        );
       }
     } catch (error) {
       console.error("toggleDeposit error:", error);
@@ -249,16 +288,25 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         body: JSON.stringify({ status }),
       });
       if (!res.ok) {
-        setTeams((ts) => ts.map((t) => (t.id === teamId ? { ...t, status: prev! } : t)));
+        setTeams((ts) =>
+          ts.map((t) => (t.id === teamId ? { ...t, status: prev! } : t)),
+        );
       }
     } catch {
-      setTeams((ts) => ts.map((t) => (t.id === teamId ? { ...t, status: prev! } : t)));
+      setTeams((ts) =>
+        ts.map((t) => (t.id === teamId ? { ...t, status: prev! } : t)),
+      );
     }
   };
 
-  const updateRecruitmentStatus = async (teamId: string, recruitmentStatus: string) => {
+  const updateRecruitmentStatus = async (
+    teamId: string,
+    recruitmentStatus: string,
+  ) => {
     const prev = teams.find((t) => t.id === teamId)?.recruitmentStatus;
-    setTeams((ts) => ts.map((t) => (t.id === teamId ? { ...t, recruitmentStatus } : t)));
+    setTeams((ts) =>
+      ts.map((t) => (t.id === teamId ? { ...t, recruitmentStatus } : t)),
+    );
     try {
       const res = await fetch(`/api/admin/teams/${teamId}/recruitment`, {
         method: "PATCH",
@@ -266,36 +314,58 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         body: JSON.stringify({ recruitmentStatus }),
       });
       if (!res.ok) {
-        setTeams((ts) => ts.map((t) => (t.id === teamId ? { ...t, recruitmentStatus: prev! } : t)));
+        setTeams((ts) =>
+          ts.map((t) =>
+            t.id === teamId ? { ...t, recruitmentStatus: prev! } : t,
+          ),
+        );
       }
     } catch {
-      setTeams((ts) => ts.map((t) => (t.id === teamId ? { ...t, recruitmentStatus: prev! } : t)));
+      setTeams((ts) =>
+        ts.map((t) =>
+          t.id === teamId ? { ...t, recruitmentStatus: prev! } : t,
+        ),
+      );
     }
   };
 
   // 실제 이동 실행
-  const executeTransfer = useCallback(async (memberId: string, targetTeamId: string, deleteSourceTeam?: string) => {
-    try {
-      const res = await fetch(`/api/admin/members/${memberId}/transfer`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetTeamId }),
-      });
-      if (!res.ok) return;
+  const executeTransfer = useCallback(
+    async (
+      memberId: string,
+      targetTeamId: string,
+      deleteSourceTeam?: string,
+    ) => {
+      try {
+        const res = await fetch(`/api/admin/members/${memberId}/transfer`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ targetTeamId }),
+        });
+        if (!res.ok) return;
 
-      // 빈 팀 삭제
-      if (deleteSourceTeam) {
-        await fetch(`/api/admin/teams/${deleteSourceTeam}`, { method: "DELETE" });
+        // 빈 팀 삭제
+        if (deleteSourceTeam) {
+          await fetch(`/api/admin/teams/${deleteSourceTeam}`, {
+            method: "DELETE",
+          });
+        }
+
+        window.location.reload();
+      } catch (error) {
+        console.error("transfer error:", error);
       }
-
-      window.location.reload();
-    } catch (error) {
-      console.error("transfer error:", error);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // 드래그 시작
-  const handleDragStart = (e: React.DragEvent, memberId: string, sourceTeamId: string, memberName: string) => {
+  const handleDragStart = (
+    e: React.DragEvent,
+    memberId: string,
+    sourceTeamId: string,
+    memberName: string,
+  ) => {
     setDragData({ memberId, sourceTeamId, memberName });
     e.dataTransfer.effectAllowed = "move";
   };
@@ -350,7 +420,11 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   // 컨펌 모달: 삭제 확인 → 이동 + 팀 삭제
   const handleConfirmDelete = () => {
     if (!pendingTransfer) return;
-    executeTransfer(pendingTransfer.memberId, pendingTransfer.targetTeamId, pendingTransfer.sourceTeamId);
+    executeTransfer(
+      pendingTransfer.memberId,
+      pendingTransfer.targetTeamId,
+      pendingTransfer.sourceTeamId,
+    );
     setPendingTransfer(null);
   };
 
@@ -359,7 +433,8 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     setPendingTransfer(null);
   };
 
-  const thClass = "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
+  const thClass =
+    "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
   const tdClass = "px-2.5 py-1.5 typo-caption1";
 
   return (
@@ -375,7 +450,9 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         >
           <option value="ALL">상태: 전체</option>
           {Object.entries(statusLabel).map(([k, v]) => (
-            <option key={k} value={k}>{v} ({teams.filter((t) => t.status === k).length})</option>
+            <option key={k} value={k}>
+              {v} ({teams.filter((t) => t.status === k).length})
+            </option>
           ))}
         </select>
 
@@ -386,7 +463,9 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         >
           <option value="ALL">모집: 전체</option>
           {Object.entries(recruitmentLabel).map(([k, v]) => (
-            <option key={k} value={k}>{v} ({teams.filter((t) => t.recruitmentStatus === k).length})</option>
+            <option key={k} value={k}>
+              {v} ({teams.filter((t) => t.recruitmentStatus === k).length})
+            </option>
           ))}
         </select>
 
@@ -397,7 +476,9 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         >
           <option value="ALL">경험: 전체</option>
           {Object.entries(experienceLevelLabel).map(([k, v]) => (
-            <option key={k} value={k}>{v} ({teams.filter((t) => t.experienceLevel === k).length})</option>
+            <option key={k} value={k}>
+              {v} ({teams.filter((t) => t.experienceLevel === k).length})
+            </option>
           ))}
         </select>
 
@@ -408,13 +489,17 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         >
           <option value="ALL">유형: 전체</option>
           {Object.entries(participationTypeLabel).map(([k, v]) => (
-            <option key={k} value={k}>{v} ({teams.filter((t) => t.participationType === k).length})</option>
+            <option key={k} value={k}>
+              {v} ({teams.filter((t) => t.participationType === k).length})
+            </option>
           ))}
         </select>
 
         <div className="ml-auto flex items-center gap-1.5">
           {filtered.length !== teams.length && (
-            <span className="typo-caption2 text-muted-foreground mr-1">{filtered.length}/{teams.length}건</span>
+            <span className="typo-caption2 text-muted-foreground mr-1">
+              {filtered.length}/{teams.length}건
+            </span>
           )}
           <BulkCopyButton text={leaderEmails} label="대표 이메일" />
           <BulkCopyButton text={allEmails} label="전체 이메일" />
@@ -450,51 +535,83 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
           <tbody>
             {paged.length === 0 ? (
               <tr>
-                <td colSpan={12} className="px-4 py-6 text-center text-muted-foreground typo-caption1">
-                  {filters.search ? "검색 결과가 없습니다." : "신청 데이터가 없습니다."}
+                <td
+                  colSpan={12}
+                  className="px-4 py-6 text-center text-muted-foreground typo-caption1"
+                >
+                  {filters.search
+                    ? "검색 결과가 없습니다."
+                    : "신청 데이터가 없습니다."}
                 </td>
               </tr>
             ) : (
               paged.map((team, i) => {
-                const leader = team.members.find((m) => m.isLeader) ?? team.members[0];
-                const otherMembers = team.members.filter((m) => m.id !== leader?.id);
+                const leader =
+                  team.members.find((m) => m.isLeader) ?? team.members[0];
+                const otherMembers = team.members.filter(
+                  (m) => m.id !== leader?.id,
+                );
                 const hasEmptySlot = team.members.length < 4;
-                const totalRows = 1 + otherMembers.length + (hasEmptySlot ? 1 : 0);
+                const totalRows =
+                  1 + otherMembers.length + (hasEmptySlot ? 1 : 0);
                 const isDropTarget = dropTargetTeamId === team.id;
 
                 return (
                   <Fragment key={team.id}>
                     {/* 리더 행 */}
                     <tr className="border-b border-border/50 bg-background">
-                      <td className={`${tdClass} text-muted-foreground`} rowSpan={totalRows}>
+                      <td
+                        className={`${tdClass} text-muted-foreground`}
+                        rowSpan={totalRows}
+                      >
                         {page * PAGE_SIZE + i + 1}
                       </td>
                       <td className={tdClass} rowSpan={totalRows}>
                         <select
                           value={team.status}
-                          onChange={(e) => updateTeamStatus(team.id, e.target.value)}
+                          onChange={(e) =>
+                            updateTeamStatus(team.id, e.target.value)
+                          }
                           className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer border-none outline-none ${statusStyle[team.status] ?? ""}`}
                         >
                           {Object.entries(statusLabel).map(([k, v]) => (
-                            <option key={k} value={k}>{v}</option>
+                            <option key={k} value={k}>
+                              {v}
+                            </option>
                           ))}
                         </select>
                       </td>
                       <td className={tdClass} rowSpan={totalRows}>
-                        <span className={`inline-block rounded-full px-2 py-px typo-caption1 font-medium ${
-                          team.participationType === "TEAM" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"
-                        }`}>
-                          {participationTypeLabel[team.participationType] ?? team.participationType}
+                        <span
+                          className={`inline-block rounded-full px-2 py-px typo-caption1 font-medium ${
+                            team.participationType === "TEAM"
+                              ? "bg-accent/10 text-accent"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {participationTypeLabel[team.participationType] ??
+                            team.participationType}
                         </span>
                       </td>
-                      <td className={`${tdClass} whitespace-nowrap`} rowSpan={totalRows} title={team.recruitmentNote ?? undefined}>
-                        {team.teamName || <span className="text-muted-foreground">-</span>}
+                      <td
+                        className={`${tdClass} whitespace-nowrap`}
+                        rowSpan={totalRows}
+                        title={team.recruitmentNote ?? undefined}
+                      >
+                        {team.teamName || (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </td>
-                      <td className={`${tdClass} font-medium whitespace-nowrap`}>
+                      <td
+                        className={`${tdClass} font-medium whitespace-nowrap`}
+                      >
                         <div
                           className="flex items-center gap-1"
                           draggable
-                          onDragStart={(e) => leader && handleDragStart(e, leader.id, team.id, leader.name)}
+                          onDragStart={(e) =>
+                            leader &&
+                            handleDragStart(e, leader.id, team.id, leader.name)
+                          }
                           onDragEnd={handleDragEnd}
                         >
                           <DragHandle />
@@ -504,16 +621,26 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       </td>
                       <td className={tdClass}>
                         <div className="flex items-center gap-0.5">
-                          <span className="text-muted-foreground">{leader?.email ?? team.email}</span>
-                          <CopyButton text={leader?.email ?? team.email} label="이메일" />
+                          <span className="text-muted-foreground">
+                            {leader?.email ?? team.email}
+                          </span>
+                          <CopyButton
+                            text={leader?.email ?? team.email}
+                            label="이메일"
+                          />
                         </div>
                       </td>
-                      <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>{leader?.phone ?? team.phone}</td>
+                      <td
+                        className={`${tdClass} text-muted-foreground whitespace-nowrap`}
+                      >
+                        {leader?.phone ?? team.phone}
+                      </td>
                       <td className={tdClass}>
                         {leader?.refundBank ? (
                           <div className="flex items-center gap-0.5 text-muted-foreground">
-                            <span className="truncate max-w-[180px]">
-                              {leader.refundBank} {leader.refundAccount} ({leader.refundAccountHolder})
+                            <span className="truncate max-w-45">
+                              {leader.refundBank} {leader.refundAccount} (
+                              {leader.refundAccountHolder})
                             </span>
                             <CopyButton
                               text={`${leader.refundBank} ${leader.refundAccount} (${leader.refundAccountHolder})`}
@@ -525,12 +652,15 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                         )}
                       </td>
                       <td className={`${tdClass} whitespace-nowrap`}>
-                        {experienceLevelLabel[team.experienceLevel] ?? team.experienceLevel}
+                        {experienceLevelLabel[team.experienceLevel] ??
+                          team.experienceLevel}
                       </td>
                       <td className={tdClass}>
                         <button
                           type="button"
-                          onClick={() => toggleDeposit(team.id, team.depositConfirmed)}
+                          onClick={() =>
+                            toggleDeposit(team.id, team.depositConfirmed)
+                          }
                           disabled={togglingId === team.id}
                           className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer transition-colors disabled:opacity-50 ${
                             team.depositConfirmed
@@ -544,27 +674,38 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       <td className={tdClass}>
                         <select
                           value={team.recruitmentStatus}
-                          onChange={(e) => updateRecruitmentStatus(team.id, e.target.value)}
+                          onChange={(e) =>
+                            updateRecruitmentStatus(team.id, e.target.value)
+                          }
                           className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer border-none outline-none ${recruitmentStyle[team.recruitmentStatus] ?? ""}`}
                         >
                           {Object.entries(recruitmentLabel).map(([k, v]) => (
-                            <option key={k} value={k}>{v}</option>
+                            <option key={k} value={k}>
+                              {v}
+                            </option>
                           ))}
                         </select>
                       </td>
-                      <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>
+                      <td
+                        className={`${tdClass} text-muted-foreground whitespace-nowrap`}
+                      >
                         {formatDate(team.createdAt)}
                       </td>
                     </tr>
 
                     {/* 멤버 행 */}
                     {otherMembers.map((m) => (
-                      <tr key={m.id} className="border-b border-border/30 bg-muted/20">
+                      <tr
+                        key={m.id}
+                        className="border-b border-border/30 bg-muted/20"
+                      >
                         <td className={`${tdClass} whitespace-nowrap`}>
                           <div
                             className="flex items-center gap-1"
                             draggable
-                            onDragStart={(e) => handleDragStart(e, m.id, team.id, m.name)}
+                            onDragStart={(e) =>
+                              handleDragStart(e, m.id, team.id, m.name)
+                            }
                             onDragEnd={handleDragEnd}
                           >
                             <DragHandle />
@@ -573,16 +714,23 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                         </td>
                         <td className={tdClass}>
                           <div className="flex items-center gap-0.5">
-                            <span className="text-muted-foreground">{m.email}</span>
+                            <span className="text-muted-foreground">
+                              {m.email}
+                            </span>
                             <CopyButton text={m.email} label="이메일" />
                           </div>
                         </td>
-                        <td className={`${tdClass} text-muted-foreground whitespace-nowrap`}>{m.phone}</td>
+                        <td
+                          className={`${tdClass} text-muted-foreground whitespace-nowrap`}
+                        >
+                          {m.phone}
+                        </td>
                         <td className={tdClass}>
                           {m.refundBank ? (
                             <div className="flex items-center gap-0.5 text-muted-foreground">
-                              <span className="truncate max-w-[180px]">
-                                {m.refundBank} {m.refundAccount} ({m.refundAccountHolder})
+                              <span className="truncate max-w-45">
+                                {m.refundBank} {m.refundAccount} (
+                                {m.refundAccountHolder})
                               </span>
                               <CopyButton
                                 text={`${m.refundBank} ${m.refundAccount} (${m.refundAccountHolder})`}
@@ -612,9 +760,14 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                         onDragLeave={handleDragLeave}
                         onDrop={(e) => handleDrop(e, team.id)}
                       >
-                        <td className={`${tdClass} typo-caption2 text-muted-foreground/40`} colSpan={8}>
+                        <td
+                          className={`${tdClass} typo-caption2 text-muted-foreground/40`}
+                          colSpan={8}
+                        >
                           {isDropTarget ? (
-                            <span className="text-accent font-medium">여기에 놓기</span>
+                            <span className="text-accent font-medium">
+                              여기에 놓기
+                            </span>
                           ) : (
                             `+${4 - team.members.length}명 추가 가능`
                           )}
