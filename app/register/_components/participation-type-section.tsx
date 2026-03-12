@@ -1,4 +1,4 @@
-import { FormError, FormRadioOption } from "@/app/_components/register";
+import { FieldLabel, FormError, FormRadioOption } from "@/app/_components/register";
 import type { FormState } from "./types";
 
 type Props = {
@@ -12,9 +12,9 @@ export const ParticipationTypeSection = ({ form, errors, update }: Props) => {
 
   return (
     <fieldset className="space-y-2">
-      <legend className="typo-subtitle1">
-        참가 유형 <span className="text-error">*</span>
-      </legend>
+      <FieldLabel as="legend" required>
+        참가 유형
+      </FieldLabel>
       <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
         <FormRadioOption
           name="participationType"

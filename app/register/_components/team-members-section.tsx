@@ -26,12 +26,12 @@ export const TeamMembersSection = ({
   return (
     <fieldset className="space-y-3">
       <div className="flex min-h-9 items-center justify-between">
-        <legend className="typo-subtitle1">
+        <FieldLabel as="legend">
           팀원{" "}
           <span className="typo-body3 font-normal text-gray-500">
             ({form.members.length}/{MAX_MEMBERS})
           </span>
-        </legend>
+        </FieldLabel>
         {form.members.length < MAX_MEMBERS && (
           <button
             type="button"

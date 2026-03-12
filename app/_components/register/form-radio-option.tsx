@@ -34,11 +34,24 @@ export const FormRadioOption = ({
       className,
     )}
   >
-    <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="sr-only" />
-    <RadioDot checked={checked} />
+    <input
+      type="radio"
+      name={name}
+      value={value}
+      checked={checked}
+      onChange={onChange}
+      className="sr-only"
+    />
+    <RadioDot checked={checked} variant={variant} />
     <span className="flex items-center gap-2">
-      <span className="typo-subtitle6 text-gray-900 sm:typo-subtitle5 sm:text-gray-700">{label}</span>
-      {description && <span className="typo-body3 text-gray-850 sm:typo-body1 sm:text-gray-500">{description}</span>}
+      <span className="typo-subtitle6 text-gray-900 sm:typo-subtitle5 sm:text-gray-700">
+        {label}
+      </span>
+      {description && (
+        <span className="typo-body3 sm:typo-body1 text-gray-500">
+          {description}
+        </span>
+      )}
     </span>
   </label>
 );

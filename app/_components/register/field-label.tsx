@@ -21,12 +21,16 @@ export const FieldLabel = ({
   <Tag
     {...(Tag === "label" ? { htmlFor } : {})}
     className={cn(
-      "block",
-      size === "lg" ? "typo-subtitle1 mb-2" : "typo-subtitle4 mb-1",
+      "block text-gray-900",
+      size === "lg"
+        ? "typo-subtitle5 sm:typo-h6 mb-2"
+        : "typo-subtitle4 mb-1",
       className,
     )}
   >
     {children}
-    {required && <span className="text-error"> *</span>}
+    {required && (
+      <span className="text-[#F55959] typo-subtitle3 sm:typo-h6"> *</span>
+    )}
   </Tag>
 );

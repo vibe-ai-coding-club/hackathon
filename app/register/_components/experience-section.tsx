@@ -1,4 +1,4 @@
-import { FormError, FormRadioOption } from "@/app/_components/register";
+import { FieldLabel, FormError, FormRadioOption } from "@/app/_components/register";
 import type { FormState } from "./types";
 import { experienceOptions } from "./types";
 
@@ -13,7 +13,7 @@ export const ExperienceSection = ({ form, errors, update }: Props) => {
 
   return (
     <fieldset className="space-y-2">
-      <legend className="typo-subtitle1">개발 경험</legend>
+      <FieldLabel as="legend">개발 경험</FieldLabel>
       <div className="grid gap-2 grid-cols-1 sm:grid-cols-4">
         {experienceOptions.map((opt) => (
           <FormRadioOption

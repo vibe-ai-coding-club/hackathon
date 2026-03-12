@@ -25,18 +25,16 @@ export const PaymentSection = ({ form, errors, setForm, update }: Props) => {
   return (
     <div className="space-y-6">
       <div className="rounded-xl bg-gray-50 p-5 space-y-3">
-        <p className="typo-subtitle1 flex items-center gap-1.5">
-          <span className="text-base">
-            <Image
-              src="/images/alert.png"
-              alt="참가비 안내"
-              width={25}
-              height={25}
-              sizes="25px"
-            />
-          </span>{" "}
+        <FieldLabel as="p" className="flex items-center gap-1.5">
+          <Image
+            src="/images/alert.png"
+            alt=""
+            width={25}
+            height={25}
+            sizes="25px"
+          />
           참가비 안내
-        </p>
+        </FieldLabel>
         <div className="rounded-xl bg-gray-0 p-5 space-y-3">
           <div className="space-y-1">
             <p className="typo-body3 text-gray-600">
