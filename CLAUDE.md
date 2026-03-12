@@ -67,6 +67,13 @@ ttalkkakthon/
 - 프로젝트 설계, 기획, 아키텍처 결정 등을 기록
 - 한 주제당 하나의 파일로 관리
 
+### 참가 신청 컴포넌트 명세 (`docs/feature/components/register/`)
+
+- 참가 신청(`/register`) 관련 컴포넌트 명세를 컴포넌트별 개별 파일로 관리
+- 컴포넌트의 Props/스타일/동작이 변경되면 **같은 작업 턴 내에** 해당 컴포넌트 문서를 반드시 갱신
+- 신규 컴포넌트 추가 시 명세 파일 생성 + `register/README.md` 인덱스 등록
+- 랜딩 페이지 컴포넌트(`docs/feature/components/`)와 분리하여 `register/` 하위 디렉토리에서 관리
+
 ### 개발 일지 (`logs/`)
 
 - 파일명: `YYYYMMDD-{제목}.md` (예: `20260224-initial-setup.md`)
