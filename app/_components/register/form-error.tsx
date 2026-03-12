@@ -6,5 +6,5 @@ type Props = {
 };
 
 export const FormError = ({ children, className }: Props) => (
-  <p className={cn("typo-caption1 mt-1 text-error", className)}>{children}</p>
+  <p className={cn("typo-body1 mt-1 text-[#F55959]", className)}>{children}</p>
 );
