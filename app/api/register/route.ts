@@ -29,11 +29,16 @@ export async function POST(request: NextRequest) {
 
     // 허니팟 체크
     if (body.website) {
-      return NextResponse.json({ success: false, message: "잘못된 요청입니다." }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "잘못된 요청입니다." },
+        { status: 400 },
+      );
     }
 
     // 레이트 리밋
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      "unknown";
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         {
@@ -49,13 +54,19 @@ export async function POST(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
     if (registrationSetting?.isClosed) {
-      return NextResponse.json({ success: false, message: "신청이 마감되었습니다." }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "신청이 마감되었습니다." },
+        { status: 403 },
+      );
     }
 
     // 팀 정원 확인
     const teamCount = await prisma.team.count();
     if (teamCount >= MAX_TEAMS) {
-      return NextResponse.json({ success: false, message: "모집이 마감되었습니다." }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "모집이 마감되었습니다." },
+        { status: 400 },
+      );
     }
 
     // 유효성 검사
@@ -67,7 +78,10 @@ export async function POST(request: NextRequest) {
         if (!errors[field]) errors[field] = [];
         errors[field].push(issue.message);
       });
-      return NextResponse.json({ success: false, message: "입력값을 확인해주세요.", errors }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "입력값을 확인해주세요.", errors },
+        { status: 400 },
+      );
     }
 
     const data = result.data;

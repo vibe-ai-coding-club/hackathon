@@ -3,7 +3,10 @@ import type { FormState } from "./types";
 
 type Props = {
   form: FormState;
-  update: (field: keyof Omit<FormState, "members" | "hasDeposited">, value: string) => void;
+  update: (
+    field: keyof Omit<FormState, "members" | "hasDeposited">,
+    value: string,
+  ) => void;
 };
 
 export const MotivationSection = ({ form, update }: Props) => {

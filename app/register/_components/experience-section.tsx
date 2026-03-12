@@ -1,11 +1,18 @@
-import { FieldLabel, FormError, FormRadioOption } from "@/app/_components/register";
+import {
+  FieldLabel,
+  FormError,
+  FormRadioOption,
+} from "@/app/_components/register";
 import type { FormState } from "./types";
 import { experienceOptions } from "./types";
 
 type Props = {
   form: FormState;
   errors: Record<string, string>;
-  update: (field: keyof Omit<FormState, "members" | "hasDeposited">, value: string) => void;
+  update: (
+    field: keyof Omit<FormState, "members" | "hasDeposited">,
+    value: string,
+  ) => void;
 };
 
 export const ExperienceSection = ({ form, errors, update }: Props) => {
@@ -27,7 +34,9 @@ export const ExperienceSection = ({ form, errors, update }: Props) => {
           />
         ))}
       </div>
-      {errors.experienceLevel && <FormError>{errors.experienceLevel}</FormError>}
+      {errors.experienceLevel && (
+        <FormError>{errors.experienceLevel}</FormError>
+      )}
     </fieldset>
   );
 };

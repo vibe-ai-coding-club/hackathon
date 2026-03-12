@@ -13,7 +13,13 @@ type Props = {
   checkEmailDuplicate: () => void;
 };
 
-export const PersonalInfoSection = ({ form, errors, dupStatus, update, checkEmailDuplicate }: Props) => {
+export const PersonalInfoSection = ({
+  form,
+  errors,
+  dupStatus,
+  update,
+  checkEmailDuplicate,
+}: Props) => {
   if (form.participationType !== "INDIVIDUAL") return null;
 
   return (

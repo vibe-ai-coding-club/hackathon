@@ -1,10 +1,17 @@
-import { FieldLabel, FormError, FormRadioOption } from "@/app/_components/register";
+import {
+  FieldLabel,
+  FormError,
+  FormRadioOption,
+} from "@/app/_components/register";
 import type { FormState } from "./types";
 
 type Props = {
   form: FormState;
   errors: Record<string, string>;
-  update: (field: keyof Omit<FormState, "members" | "hasDeposited">, value: string) => void;
+  update: (
+    field: keyof Omit<FormState, "members" | "hasDeposited">,
+    value: string,
+  ) => void;
 };
 
 export const ParticipationTypeSection = ({ form, errors, update }: Props) => {
@@ -33,7 +40,9 @@ export const ParticipationTypeSection = ({ form, errors, update }: Props) => {
           description="단체로 참여해요"
         />
       </div>
-      {errors.participationType && <FormError>{errors.participationType}</FormError>}
+      {errors.participationType && (
+        <FormError>{errors.participationType}</FormError>
+      )}
     </fieldset>
   );
 };
