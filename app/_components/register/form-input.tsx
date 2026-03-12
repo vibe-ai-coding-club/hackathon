@@ -30,9 +30,9 @@ export const FormInput = ({
       {...props}
     />
     {error ? (
-      <p className="typo-body2 sm:typo-body1 mt-1 text-[#F55959]">{error}</p>
+      <p className="typo-body3 sm:typo-body1 mt-1 text-[#F55959]">{error}</p>
     ) : description ? (
-      <p className="typo-body2 sm:typo-body1 mt-1 text-gray-500">
+      <p className="typo-body3 sm:typo-body1 mt-1 text-gray-500">
         {description}
       </p>
     ) : null}
