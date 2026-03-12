@@ -19,15 +19,16 @@
 ## 스타일 토큰
 
 ### 컨테이너
-- 공통: `flex items-center gap-3 rounded-lg p-4 bg-gray-50 border`
+- 공통: `flex items-center gap-3 rounded-lg bg-gray-50 border`
+- Padding: Mobile `p-3.5` (14px), Desktop `sm:p-4` (16px)
 - Checked (primary): `border-primary-400`
 - Checked (gray): `border-gray-300`
 - Unchecked: `border-transparent`
 
 ### 라벨
-- Typography: `typo-subtitle5` (16px/24px/600)
-- Color: `text-gray-700`
+- Mobile: `typo-subtitle6` (14px/24px/700), `text-gray-900`
+- Desktop: `typo-subtitle5` (16px/24px/600), `text-gray-700`
 
 ### 설명
-- Typography: `typo-body1` (16px/26px/400)
-- Color: `text-gray-500`
+- Mobile: `typo-body3` (14px/24px/400), `text-gray-850`
+- Desktop: `typo-body1` (16px/26px/400), `text-gray-500`

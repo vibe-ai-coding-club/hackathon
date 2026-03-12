@@ -10,6 +10,7 @@
 ## 현재 인덱스
 
 - `001-landing-page.md`
+- `002-registration-page.md`
 
 ## 컴포넌트 명세
 
