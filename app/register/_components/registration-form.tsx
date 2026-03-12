@@ -8,7 +8,6 @@ import { MotivationSection } from "./motivation-section";
 import { ParticipationTypeSection } from "./participation-type-section";
 import { PaymentSection } from "./payment-section";
 import { PrivacySection } from "./privacy-section";
-import { RecruitmentSection } from "./recruitment-section";
 import { TeamMembersSection } from "./team-members-section";
 import { Toast } from "./toast";
 import type { DuplicateStatus, FormState, MemberState } from "./types";
@@ -131,9 +130,7 @@ export const RegistrationForm = () => {
     [],
   );
 
-  const needsTeamName =
-    form.participationType === "TEAM" ||
-    form.recruitmentStatus === "RECRUITING";
+  const needsTeamName = form.participationType === "TEAM";
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -235,11 +232,6 @@ export const RegistrationForm = () => {
     try {
       const payload = {
         participationType: form.participationType,
-        recruitmentStatus: form.recruitmentStatus || "NOT_RECRUITING",
-        recruitmentNote:
-          form.recruitmentStatus === "RECRUITING"
-            ? form.recruitmentNote || undefined
-            : undefined,
         email: form.email,
         name: form.name,
         phone: form.phone,
@@ -285,8 +277,6 @@ export const RegistrationForm = () => {
           update={update}
           checkEmailDuplicate={checkEmailDuplicate}
         />
-
-        <RecruitmentSection form={form} errors={errors} update={update} />
 
         <TeamMembersSection
           form={form}

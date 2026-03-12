@@ -40,10 +40,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "대상 팀을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    if (targetTeam.recruitmentStatus !== "RECRUITING") {
-      return NextResponse.json({ success: false, message: "해당 팀은 모집 중이 아닙니다." }, { status: 400 });
-    }
-
     if (targetTeam.members.length >= MAX_MEMBERS_PER_TEAM) {
       return NextResponse.json({ success: false, message: "해당 팀의 인원이 가득 찼습니다." }, { status: 400 });
     }

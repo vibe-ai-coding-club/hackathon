@@ -1,7 +1,5 @@
 export type ParticipationType = "INDIVIDUAL" | "TEAM";
 export type ExperienceLevel = "BEGINNER" | "JUNIOR" | "SENIOR" | "VIBE_CODER";
-export type RecruitmentStatus = "RECRUITING" | "NOT_RECRUITING";
-
 export const experienceOptions: { value: ExperienceLevel; label: string }[] = [
   { value: "BEGINNER", label: "비개발자/입문" },
   { value: "JUNIOR", label: "주니어" },
@@ -13,8 +11,6 @@ export type MemberState = { name: string; email: string; phone: string };
 
 export type FormState = {
   participationType: ParticipationType | "";
-  recruitmentStatus: RecruitmentStatus | "";
-  recruitmentNote: string;
   email: string;
   name: string;
   phone: string;
@@ -48,8 +44,6 @@ export const toDigits = (value: string): string =>
 
 export const initialForm: FormState = {
   participationType: "INDIVIDUAL",
-  recruitmentStatus: "NOT_RECRUITING",
-  recruitmentNote: "",
   email: "",
   name: "",
   phone: "",

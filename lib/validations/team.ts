@@ -11,8 +11,6 @@ const experienceLevelEnum = z.enum([
 
 const participationTypeEnum = z.enum(["INDIVIDUAL", "TEAM"]);
 
-const recruitmentStatusEnum = z.enum(["RECRUITING", "NOT_RECRUITING"]);
-
 /** 팀원 스키마 (팀 참여 시 추가 팀원) */
 const teamMemberSchema = z.object({
   name: z
@@ -28,12 +26,6 @@ const teamMemberSchema = z.object({
 export const teamRegistrationSchema = z
   .object({
     participationType: participationTypeEnum,
-    recruitmentStatus: recruitmentStatusEnum,
-    recruitmentNote: z
-      .string()
-      .max(300, "모집 소개글은 300자 이하로 입력해주세요")
-      .optional()
-      .or(z.literal("")),
     // 대표자 정보
     email: z.string().email("올바른 이메일 주소를 입력해주세요"),
     name: z
@@ -77,7 +69,7 @@ export const teamRegistrationSchema = z
   })
   .refine(
     (data) => {
-      if (data.participationType === "TEAM" || data.recruitmentStatus === "RECRUITING") {
+      if (data.participationType === "TEAM") {
         return data.teamName && data.teamName.length > 0;
       }
       return true;

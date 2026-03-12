@@ -4,6 +4,6 @@ export const RadioDot = ({ checked }: { checked: boolean }) => (
       checked ? "border-primary-400" : "border-gray-300"
     }`}
   >
-    {checked && <span className="size-[7.2px] rounded-full bg-primary-400" />}
+    {checked && <span className="size-2 rounded-full bg-primary-400" />}
   </span>
 );

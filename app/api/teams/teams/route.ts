@@ -21,7 +21,6 @@ export async function GET() {
       teamName: true,
       motivation: true,
       recruitmentNote: true,
-      recruitmentStatus: true,
       participationType: true,
       experienceLevel: true,
       members: {
@@ -44,7 +43,6 @@ export async function GET() {
     teamName: t.teamName,
     motivation: t.motivation,
     recruitmentNote: t.recruitmentNote,
-    recruitmentStatus: t.recruitmentStatus,
     participationType: t.participationType,
     experienceLevel: t.experienceLevel,
     members: t.members.map((m) => ({ id: m.id, name: m.name, isLeader: m.isLeader })),

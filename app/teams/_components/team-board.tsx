@@ -23,7 +23,6 @@ type Team = {
   teamName: string | null;
   motivation: string | null;
   recruitmentNote: string | null;
-  recruitmentStatus: string;
   participationType: string;
   experienceLevel: string;
   members: Member[];
@@ -306,10 +305,7 @@ export const TeamBoard = () => {
   }, [teams, search, expFilter]);
 
   const recruitingTeams = useMemo(() => {
-    return teams.filter(
-      (t) =>
-        t.recruitmentStatus === "RECRUITING" && t.membersCount < t.maxMembers,
-    );
+    return teams.filter((t) => t.membersCount < t.maxMembers);
   }, [teams]);
 
   const totalMembers = useMemo(() => {
@@ -330,7 +326,6 @@ export const TeamBoard = () => {
 
   const handleTransferClick = (team: Team) => {
     if (team.isMyTeam) return;
-    if (team.recruitmentStatus !== "RECRUITING") return;
     if (team.membersCount >= team.maxMembers) return;
     setTransferTarget(team);
   };
@@ -480,8 +475,6 @@ export const TeamBoard = () => {
                   const others = team.members.filter(
                     (m) => m.id !== leader?.id,
                   );
-                  const isRecruiting =
-                    team.recruitmentStatus === "RECRUITING";
                   const canEdit = team.isMyTeam && isLeader;
 
                   return (
@@ -522,8 +515,7 @@ export const TeamBoard = () => {
                               내 팀
                             </span>
                           )}
-                          {isRecruiting &&
-                            !team.isMyTeam &&
+                          {!team.isMyTeam &&
                             team.membersCount < team.maxMembers && (
                               <span className="shrink-0 rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-medium text-blue-600">
                                 모집중
@@ -749,86 +741,6 @@ export const TeamBoard = () => {
           )}
         </div>
 
-        {/* 팀 구해요 섹션 — 개인 참가자 중 모집중 */}
-        {teams.some(
-          (t) =>
-            t.participationType === "INDIVIDUAL" &&
-            t.recruitmentStatus === "RECRUITING",
-        ) && (
-          <div className="rounded-lg border border-blue-300/30 bg-blue-50/5 p-3">
-            <h3 className="text-sm font-bold text-blue-600 mb-3 text-center">
-              팀 구해요
-            </h3>
-            <div className="space-y-1.5">
-              {teams
-                .filter(
-                  (t) =>
-                    t.participationType === "INDIVIDUAL" &&
-                    t.recruitmentStatus === "RECRUITING",
-                )
-                .map((team) => (
-                  <div
-                    key={team.id}
-                    className={`rounded-md border px-2.5 py-2 ${
-                      team.isMyTeam
-                        ? "border-accent/30 bg-accent/5"
-                        : "border-border bg-background"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-1 mb-0.5">
-                      <span className="text-sm font-medium truncate">
-                        {team.leaderName}
-                      </span>
-                      <span
-                        className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${
-                          experienceLevelStyle[team.experienceLevel] ??
-                          "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {experienceLevelLabel[team.experienceLevel]}
-                      </span>
-                    </div>
-                    {team.recruitmentNote && (
-                      <p className="text-[11px] text-muted-foreground line-clamp-2">
-                        {team.recruitmentNote}
-                      </p>
-                    )}
-                    {team.isMyTeam && (
-                      <span className="mt-1 inline-block rounded-full bg-accent/10 px-1.5 py-px text-[10px] font-medium text-accent">
-                        나
-                      </span>
-                    )}
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* 팀 구성 완료 섹션 */}
-        {teams.some((t) => t.recruitmentStatus === "CLOSED") && (
-          <div className="rounded-lg border border-border bg-muted/30 p-3">
-            <h3 className="text-sm font-bold text-muted-foreground mb-3 text-center">
-              팀 구성 완료
-            </h3>
-            <div className="space-y-1.5">
-              {teams
-                .filter((t) => t.recruitmentStatus === "CLOSED")
-                .map((team) => (
-                  <div
-                    key={team.id}
-                    className="flex items-center justify-between rounded-md border border-border bg-background px-2.5 py-1.5"
-                  >
-                    <span className="text-xs font-medium truncate">
-                      {team.teamName || team.leaderName}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground shrink-0">
-                      {team.membersCount}명
-                    </span>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 팀 이동 컨펌 모달 */}

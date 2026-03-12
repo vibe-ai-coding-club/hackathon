@@ -33,8 +33,6 @@ export type SerializedTeam = {
   hasDeposited: boolean;
   depositConfirmed: boolean;
   status: string;
-  recruitmentStatus: string;
-  recruitmentNote: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -69,18 +67,6 @@ const statusStyle: Record<string, string> = {
   CONFIRMED: "bg-green-100 text-green-700",
   WAITLISTED: "bg-yellow-100 text-yellow-700",
   REFUNDED: "bg-red-100 text-red-700",
-};
-
-const recruitmentLabel: Record<string, string> = {
-  NOT_RECRUITING: "모집안함",
-  RECRUITING: "모집중",
-  CLOSED: "모집완료",
-};
-
-const recruitmentStyle: Record<string, string> = {
-  NOT_RECRUITING: "bg-gray-100 text-gray-600",
-  RECRUITING: "bg-blue-100 text-blue-700",
-  CLOSED: "bg-gray-200 text-gray-700",
 };
 
 const formatDate = (iso: string) => {
@@ -177,7 +163,6 @@ type DragData = { memberId: string; sourceTeamId: string; memberName: string };
 
 type Filters = {
   status: string;
-  recruitmentStatus: string;
   experienceLevel: string;
   participationType: string;
   search: string;
@@ -187,7 +172,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   const [teams, setTeams] = useState(initialTeams);
   const [filters, setFilters] = useState<Filters>({
     status: "ALL",
-    recruitmentStatus: "ALL",
     experienceLevel: "ALL",
     participationType: "ALL",
     search: "",
@@ -216,11 +200,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   const filtered = useMemo(() => {
     return teams.filter((t) => {
       if (filters.status !== "ALL" && t.status !== filters.status) return false;
-      if (
-        filters.recruitmentStatus !== "ALL" &&
-        t.recruitmentStatus !== filters.recruitmentStatus
-      )
-        return false;
       if (
         filters.experienceLevel !== "ALL" &&
         t.experienceLevel !== filters.experienceLevel
@@ -295,36 +274,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     } catch {
       setTeams((ts) =>
         ts.map((t) => (t.id === teamId ? { ...t, status: prev! } : t)),
-      );
-    }
-  };
-
-  const updateRecruitmentStatus = async (
-    teamId: string,
-    recruitmentStatus: string,
-  ) => {
-    const prev = teams.find((t) => t.id === teamId)?.recruitmentStatus;
-    setTeams((ts) =>
-      ts.map((t) => (t.id === teamId ? { ...t, recruitmentStatus } : t)),
-    );
-    try {
-      const res = await fetch(`/api/admin/teams/${teamId}/recruitment`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recruitmentStatus }),
-      });
-      if (!res.ok) {
-        setTeams((ts) =>
-          ts.map((t) =>
-            t.id === teamId ? { ...t, recruitmentStatus: prev! } : t,
-          ),
-        );
-      }
-    } catch {
-      setTeams((ts) =>
-        ts.map((t) =>
-          t.id === teamId ? { ...t, recruitmentStatus: prev! } : t,
-        ),
       );
     }
   };
@@ -457,19 +406,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         </select>
 
         <select
-          value={filters.recruitmentStatus}
-          onChange={(e) => updateFilter("recruitmentStatus", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
-        >
-          <option value="ALL">모집: 전체</option>
-          {Object.entries(recruitmentLabel).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v} ({teams.filter((t) => t.recruitmentStatus === k).length})
-            </option>
-          ))}
-        </select>
-
-        <select
           value={filters.experienceLevel}
           onChange={(e) => updateFilter("experienceLevel", e.target.value)}
           className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
@@ -528,7 +464,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
               <th className={thClass}>계좌정보</th>
               <th className={thClass}>경험</th>
               <th className={thClass}>입금</th>
-              <th className={thClass}>모집</th>
               <th className={thClass}>신청일</th>
             </tr>
           </thead>
@@ -536,7 +471,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={12}
+                  colSpan={11}
                   className="px-4 py-6 text-center text-muted-foreground typo-caption1"
                 >
                   {filters.search
@@ -596,7 +531,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       <td
                         className={`${tdClass} whitespace-nowrap`}
                         rowSpan={totalRows}
-                        title={team.recruitmentNote ?? undefined}
                       >
                         {team.teamName || (
                           <span className="text-muted-foreground">-</span>
@@ -671,21 +605,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                           {team.depositConfirmed ? "입금확인" : "미확인"}
                         </button>
                       </td>
-                      <td className={tdClass}>
-                        <select
-                          value={team.recruitmentStatus}
-                          onChange={(e) =>
-                            updateRecruitmentStatus(team.id, e.target.value)
-                          }
-                          className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer border-none outline-none ${recruitmentStyle[team.recruitmentStatus] ?? ""}`}
-                        >
-                          {Object.entries(recruitmentLabel).map(([k, v]) => (
-                            <option key={k} value={k}>
-                              {v}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
                       <td
                         className={`${tdClass} text-muted-foreground whitespace-nowrap`}
                       >
@@ -744,7 +663,6 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                         <td className={tdClass} />
                         <td className={tdClass} />
                         <td className={tdClass} />
-                        <td className={tdClass} />
                       </tr>
                     ))}
 
@@ -762,7 +680,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       >
                         <td
                           className={`${tdClass} typo-caption2 text-muted-foreground/40`}
-                          colSpan={8}
+                          colSpan={7}
                         >
                           {isDropTarget ? (
                             <span className="text-accent font-medium">
