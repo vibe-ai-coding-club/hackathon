@@ -27,7 +27,11 @@ export async function GET() {
         team: {
           select: {
             teamName: true,
-            name: true,
+            members: {
+              where: { isLeader: true },
+              select: { name: true },
+              take: 1,
+            },
           },
         },
         _count: {
@@ -53,7 +57,7 @@ export async function GET() {
         results: results.map((p) => ({
           projectId: p.id,
           title: p.title,
-          teamName: p.team.teamName || p.team.name,
+          teamName: p.team.teamName || p.team.members[0]?.name || "",
           voteCount: p._count.votes,
         })),
         totalVotes,

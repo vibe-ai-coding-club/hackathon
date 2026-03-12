@@ -58,14 +58,6 @@ export async function PATCH(
             where: { id: newLeader.id },
             data: { isLeader: true },
           });
-          await tx.team.update({
-            where: { id: sourceTeamId },
-            data: {
-              name: newLeader.name,
-              email: newLeader.email,
-              phone: newLeader.phone,
-            },
-          });
         }
       }
 

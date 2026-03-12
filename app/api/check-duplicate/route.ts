@@ -18,14 +18,6 @@ export async function POST(request: NextRequest) {
 
     const { value } = result.data;
 
-    // 팀 대표 이메일 중복 확인
-    const existingTeam = await prisma.team.findUnique({
-      where: { email: value },
-    });
-    if (existingTeam) {
-      return NextResponse.json({ duplicate: true });
-    }
-
     // 멤버 이메일 중복 확인
     const existingMember = await prisma.member.findUnique({
       where: { email: value },

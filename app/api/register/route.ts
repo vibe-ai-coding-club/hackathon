@@ -72,14 +72,6 @@ export async function POST(request: NextRequest) {
 
     const data = result.data;
 
-    // 이메일 중복 확인 (팀 대표 이메일)
-    const existingTeam = await prisma.team.findUnique({
-      where: { email: data.email },
-    });
-    if (existingTeam) {
-      return NextResponse.json({ success: false, message: "이미 등록된 이메일입니다." }, { status: 400 });
-    }
-
     // 모든 이메일 중복 일괄 체크 (멤버 테이블)
     const allEmails = [data.email];
     if (data.participationType === "TEAM" && data.members) {
@@ -139,9 +131,6 @@ export async function POST(request: NextRequest) {
     // 팀 + 멤버 생성
     await prisma.team.create({
       data: {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
         participationType: data.participationType,
         teamName: data.participationType === "TEAM" ? data.teamName : null,
         experienceLevel: data.experienceLevel,

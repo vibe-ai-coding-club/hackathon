@@ -82,9 +82,9 @@ export const ProjectDetailModal = ({ project, onClose }: ProjectDetailModalProps
           <h3 className="typo-caption1 font-medium text-muted-foreground">팀 정보</h3>
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 typo-caption1">
             <dt className="text-muted-foreground">대표자</dt>
-            <dd>{project.team.name}</dd>
+            <dd>{project.team.leaderName}</dd>
             <dt className="text-muted-foreground">이메일</dt>
-            <dd>{project.team.email}</dd>
+            <dd>{project.team.leaderEmail}</dd>
             {project.team.teamName && (
               <>
                 <dt className="text-muted-foreground">팀명</dt>

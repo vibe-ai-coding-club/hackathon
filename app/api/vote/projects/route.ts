@@ -24,7 +24,11 @@ export async function GET() {
           select: {
             id: true,
             teamName: true,
-            name: true,
+            members: {
+              where: { isLeader: true },
+              select: { name: true },
+              take: 1,
+            },
           },
         },
         _count: {
@@ -45,7 +49,7 @@ export async function GET() {
           imageUrl: p.imageUrl,
           linkUrl: p.linkUrl,
           teamId: p.teamId,
-          teamName: p.team.teamName || p.team.name,
+          teamName: p.team.teamName || p.team.members[0]?.name || "",
           voteCount: p._count.votes,
         })),
         session: session

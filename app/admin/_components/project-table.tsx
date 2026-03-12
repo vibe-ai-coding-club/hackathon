@@ -15,8 +15,8 @@ export type SerializedProject = {
   updatedAt: string;
   team: {
     id: string;
-    name: string;
-    email: string;
+    leaderName: string;
+    leaderEmail: string;
     teamName: string | null;
     participationType: string;
   };
@@ -42,8 +42,8 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
     return projects.filter(
       (p) =>
         p.title.toLowerCase().includes(q) ||
-        p.team.name.toLowerCase().includes(q) ||
-        p.team.email.toLowerCase().includes(q),
+        p.team.leaderName.toLowerCase().includes(q) ||
+        p.team.leaderEmail.toLowerCase().includes(q),
     );
   }, [projects, search]);
 
@@ -97,7 +97,7 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
                 >
                   <td className={`${tdClass} text-muted-foreground`}>{page * PAGE_SIZE + i + 1}</td>
                   <td className={`${tdClass} font-medium`}>{project.title}</td>
-                  <td className={`${tdClass} text-muted-foreground`}>{project.team.name}</td>
+                  <td className={`${tdClass} text-muted-foreground`}>{project.team.leaderName}</td>
                   <td className={`${tdClass} text-muted-foreground`}>{project.team.teamName ?? "-"}</td>
                   <td className={tdClass}>
                     <a

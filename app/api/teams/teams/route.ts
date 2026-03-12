@@ -17,7 +17,6 @@ export async function GET() {
     },
     select: {
       id: true,
-      name: true,
       teamName: true,
       motivation: true,
       recruitmentNote: true,
@@ -39,7 +38,7 @@ export async function GET() {
 
   const result = teams.map((t) => ({
     id: t.id,
-    leaderName: t.name,
+    leaderName: t.members.find((m) => m.isLeader)?.name ?? t.members[0]?.name ?? "",
     teamName: t.teamName,
     motivation: t.motivation,
     recruitmentNote: t.recruitmentNote,

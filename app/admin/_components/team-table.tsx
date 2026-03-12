@@ -19,9 +19,6 @@ export type SerializedMember = {
 
 export type SerializedTeam = {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
   participationType: string;
   teamName: string | null;
   members: SerializedMember[];
@@ -212,11 +209,10 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         return false;
       if (filters.search.trim()) {
         const q = filters.search.toLowerCase();
-        if (
-          !t.name.toLowerCase().includes(q) &&
-          !t.email.toLowerCase().includes(q) &&
-          !t.teamName?.toLowerCase().includes(q)
-        )
+        const matchesMember = t.members.some(
+          (m) => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q),
+        );
+        if (!matchesMember && !t.teamName?.toLowerCase().includes(q))
           return false;
       }
       return true;
@@ -234,7 +230,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     return filtered
       .map((t) => {
         const leader = t.members.find((m) => m.isLeader) ?? t.members[0];
-        return leader?.email ?? t.email;
+        return leader?.email ?? "";
       })
       .join(", ");
   }, [filtered]);
@@ -356,7 +352,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         sourceTeamId: dragData.sourceTeamId,
         targetTeamId,
         memberName: dragData.memberName,
-        sourceTeamName: sourceTeam.teamName || sourceTeam.name,
+        sourceTeamName: sourceTeam.teamName || sourceTeam.members.find((m) => m.isLeader)?.name || sourceTeam.members[0]?.name || "",
       });
       setDragData(null);
       return;
@@ -549,17 +545,17 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                           onDragEnd={handleDragEnd}
                         >
                           <DragHandle />
-                          <span>{leader?.name ?? team.name}</span>
+                          <span>{leader?.name ?? ""}</span>
                           <span className="typo-caption2 text-accent">(L)</span>
                         </div>
                       </td>
                       <td className={tdClass}>
                         <div className="flex items-center gap-0.5">
                           <span className="text-muted-foreground">
-                            {leader?.email ?? team.email}
+                            {leader?.email ?? ""}
                           </span>
                           <CopyButton
-                            text={leader?.email ?? team.email}
+                            text={leader?.email ?? ""}
                             label="이메일"
                           />
                         </div>
@@ -567,7 +563,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       <td
                         className={`${tdClass} text-muted-foreground whitespace-nowrap`}
                       >
-                        {leader?.phone ?? team.phone}
+                        {leader?.phone ?? ""}
                       </td>
                       <td className={tdClass}>
                         {leader?.refundBank ? (

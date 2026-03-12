@@ -11,10 +11,13 @@ const AdminProjectsPage = async () => {
         team: {
           select: {
             id: true,
-            name: true,
-            email: true,
             teamName: true,
             participationType: true,
+            members: {
+              where: { isLeader: true },
+              select: { name: true, email: true },
+              take: 1,
+            },
           },
         },
       },
@@ -22,11 +25,21 @@ const AdminProjectsPage = async () => {
     prisma.project.count(),
   ]);
 
-  const serializedProjects = projects.map((project) => ({
-    ...project,
-    createdAt: project.createdAt.toISOString(),
-    updatedAt: project.updatedAt.toISOString(),
-  }));
+  const serializedProjects = projects.map((project) => {
+    const leader = project.team.members[0];
+    return {
+      ...project,
+      team: {
+        id: project.team.id,
+        leaderName: leader?.name ?? "",
+        leaderEmail: leader?.email ?? "",
+        teamName: project.team.teamName,
+        participationType: project.team.participationType,
+      },
+      createdAt: project.createdAt.toISOString(),
+      updatedAt: project.updatedAt.toISOString(),
+    };
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-4">

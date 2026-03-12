@@ -26,14 +26,6 @@ export async function POST() {
       where: { id: newLeader.id },
       data: { isLeader: true },
     });
-    await prisma.team.update({
-      where: { id: team.id },
-      data: {
-        name: newLeader.name,
-        email: newLeader.email,
-        phone: newLeader.phone,
-      },
-    });
     fixed++;
   }
 

@@ -33,11 +33,7 @@ enum TeamStatus {
 }
 
 model Team {
-  id    String @id @default(cuid())
-  // 기본 정보 (신청자 = 대표자)
-  name  String // 이름 (대표자)
-  email String @unique // 이메일 (프로젝트 등록 매칭용)
-  phone String // 연락처 (필수)
+  id String @id @default(cuid())
 
   // 참가 유형
   participationType ParticipationType @default(INDIVIDUAL) @map("participation_type")
