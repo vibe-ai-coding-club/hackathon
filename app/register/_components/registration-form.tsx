@@ -14,6 +14,7 @@ import type { DuplicateStatus, FormState, MemberState } from "./types";
 import {
   checkDuplicateEmail,
   createEmptyMember,
+  EMAIL_REGEX,
   initialForm,
   MAX_MEMBERS,
   PHONE_REGEX,
@@ -96,7 +97,7 @@ export const RegistrationForm = () => {
   };
 
   const checkEmailDuplicate = useCallback(async () => {
-    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return;
+    if (!form.email || !EMAIL_REGEX.test(form.email)) return;
     setDupStatus((prev) => ({ ...prev, email: "checking" }));
     setErrors((prev) => {
       const next = { ...prev };
@@ -114,7 +115,7 @@ export const RegistrationForm = () => {
 
   const checkMemberEmailDuplicate = useCallback(
     async (index: number, value: string) => {
-      if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return;
+      if (!value || !EMAIL_REGEX.test(value)) return;
       const field = `members.${index}.email`;
       setDupStatus((prev) => ({ ...prev, [field]: "checking" }));
       setErrors((prev) => {
@@ -140,7 +141,7 @@ export const RegistrationForm = () => {
       newErrors.participationType = "참가 유형을 선택해주세요";
 
     if (!form.email.trim()) newErrors.email = "이메일을 입력해주세요";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+    else if (!EMAIL_REGEX.test(form.email))
       newErrors.email = "올바른 이메일을 입력해주세요";
 
     if (!form.name.trim()) newErrors.name = "이름을 입력해주세요";
@@ -155,7 +156,7 @@ export const RegistrationForm = () => {
           newErrors[`members.${i}.name`] = "이름을 입력해주세요";
         if (!member.email.trim())
           newErrors[`members.${i}.email`] = "이메일을 입력해주세요";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email))
+        else if (!EMAIL_REGEX.test(member.email))
           newErrors[`members.${i}.email`] = "올바른 이메일을 입력해주세요";
         if (!member.phone)
           newErrors[`members.${i}.phone`] = "전화번호를 입력해주세요";
@@ -197,7 +198,7 @@ export const RegistrationForm = () => {
     if (!form.participationType || !form.experienceLevel) return false;
     const hasBasic =
       form.name.trim().length > 0 &&
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) &&
+      EMAIL_REGEX.test(form.email) &&
       PHONE_REGEX.test(form.phone);
     const hasRefund =
       form.refundBank.trim().length > 0 &&
@@ -211,7 +212,7 @@ export const RegistrationForm = () => {
       return form.members.every(
         (m) =>
           m.name.trim().length > 0 &&
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email) &&
+          EMAIL_REGEX.test(m.email) &&
           PHONE_REGEX.test(m.phone),
       );
     }
