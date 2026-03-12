@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { AdminNav } from "../_components/admin-nav";
 import { LogoutButton } from "../_components/logout-button";
 import { ProjectTable } from "../_components/project-table";
+
+export const metadata: Metadata = {
+  title: "프로젝트 관리",
+};
 
 const AdminProjectsPage = async () => {
   const [projects, totalProjects] = await Promise.all([

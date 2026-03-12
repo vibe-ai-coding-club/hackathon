@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "행사 정보 - 딸깍톤 2026",
+  title: "행사 정보",
   description: "딸깍톤 2026 행사 안내사항, 규칙, 심사기준, 문의처 등 모든 정보를 확인하세요.",
 };
 

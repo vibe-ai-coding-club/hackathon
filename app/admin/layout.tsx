@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { AdminAuthGuard } from "./_components/admin-auth-guard";
 
 export const metadata: Metadata = {
-  title: "Admin - 딸깍톤 2026",
+  title: "Admin",
+  description: "딸깍톤 2026 관리자 대시보드.",
   robots: { index: false, follow: false },
 };
 
