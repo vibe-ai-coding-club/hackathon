@@ -7,7 +7,7 @@
 
 ## 참가비 안내 카드
 - 외부 카드: `bg-gray-50 rounded-xl p-5`
-- 제목: 🔺 아이콘 (`/images/alert.png`) + "참가비 안내" (`typo-subtitle1`)
+- 제목: 🔺 아이콘 (`/images/alert.png`) + "참가비 안내" (`FieldLabel` 사용)
 - 내부 카드: `bg-gray-0 rounded-xl p-5` (border 없음)
 - 참가비/입금계좌: 모바일에서만 줄바꿈 (`<br className="sm:hidden" />`)
 - 유의사항: `typo-caption1 text-gray-500`

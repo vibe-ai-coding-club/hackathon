@@ -30,5 +30,5 @@
 - Desktop: `typo-subtitle5` (16px/24px/600), `text-gray-700`
 
 ### 설명
-- Mobile: `typo-body3` (14px/24px/400), `text-gray-850`
+- Mobile: `typo-body3` (14px/24px/400), `text-gray-500`
 - Desktop: `typo-body1` (16px/26px/400), `text-gray-500`
