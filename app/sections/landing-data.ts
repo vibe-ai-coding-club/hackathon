@@ -39,12 +39,12 @@ export const ABOUT_CARDS: AboutCard[] = [
 ];
 
 export const TIMETABLE: TimetableItem[] = [
-  { title: "참가자 입장", time: "10:00 - 11:00" },
-  { title: "팀별 1분 소개", time: "11:00 - 11:30" },
-  { title: "개발 시간", time: "11:30 - 16:00" },
-  { title: "점심 시간", time: "12:30 - 13:30" },
-  { title: "발표 및 심사", time: "16:00 - 17:30" },
-  { title: "마무리 이벤트", time: "17:30 - 18:00" },
+  { title: "바이브코딩 OT", time: "10:00 - 11:00" },
+  { title: "팀별 간단 소개", time: "11:00 - 12:00" },
+  { title: "점심시간", time: "12:00 - 13:00" },
+  { title: "개발 시간", time: "13:00 - 16:00" },
+  { title: "발표 (참가자 심사)", time: "16:00 - 17:30" },
+  { title: "이벤트 / 시상 및 단체사진 촬영", time: "17:30 - 18:00" },
 ];
 
 export const CULTURE_ITEMS: CultureItem[] = [

@@ -8,37 +8,32 @@ export type TimetableEntry = {
 export const timetable: TimetableEntry[] = [
   {
     time: "10:00 – 11:00",
-    title: "참가자 입장",
-    note: "현장 등록 및 자리 배치",
+    title: "바이브코딩 OT",
     type: "default",
   },
   {
-    time: "11:00 – 11:30",
-    title: "팀별 1분 소개",
-    note: "발표 순서 추첨",
+    time: "11:00 – 12:00",
+    title: "팀별 간단 소개",
     type: "highlight",
   },
   {
-    time: "11:30 – 16:00",
-    title: "개발 시간",
-    note: "자유롭게 개발 진행",
-    type: "default",
-  },
-  {
-    time: "12:30 – 13:30",
-    title: "점심시간",
-    note: "식사 및 휴식",
+    time: "12:00 – 13:00",
+    title: "점심",
     type: "break",
   },
   {
+    time: "13:00 – 16:00",
+    title: "개발시간",
+    type: "default",
+  },
+  {
     time: "16:00 – 17:30",
-    title: "발표 및 심사",
-    note: "팀당 2분 발표",
+    title: "발표 (참가자 심사)",
     type: "highlight",
   },
   {
     time: "17:30 – 18:00",
-    title: "이벤트 + 시상 + 단체사진",
+    title: "이벤트(10분) / 시상 및 단체사진 촬영(19분, 1분)",
     type: "highlight",
   },
 ];
