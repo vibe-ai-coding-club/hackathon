@@ -39,7 +39,7 @@ export const PaymentSection = ({ form, errors, setForm, update }: Props) => {
           <div>
             <p className="typo-body3 text-gray-600">
               참가비:{" "}
-              <span className="font-semibold text-foreground">
+              <span className="typo-subtitle6 sm:typo-subtitle5 text-foreground">
                 1인당 ₩20,000
               </span>{" "}
               <br className="sm:hidden" />
@@ -47,29 +47,29 @@ export const PaymentSection = ({ form, errors, setForm, update }: Props) => {
             </p>
             <p className="typo-body3 text-gray-600">
               입금 계좌:{" "}
-              <span className="font-semibold text-foreground">
+              <span className="typo-subtitle6 sm:typo-subtitle5 text-foreground">
                 3333-12-1608630 카카오뱅크
               </span>{" "}
               <br className="sm:hidden" />
-              <span className="font-semibold text-foreground">
+              <span className="typo-subtitle6 sm:typo-subtitle5 text-foreground">
                 (예금주: 송채영)
               </span>
             </p>
           </div>
           <div className="space-y-0.5">
-            <p className="typo-caption1 text-gray-500">
+            <p className="typo-body3 sm:typo-body1 text-gray-500">
               참가비는 노쇼 방지 및 원활한 행사 운영을 위한 최소 비용으로
               사용됩니다.
             </p>
-            <p className="typo-caption1 text-gray-500">
+            <p className="typo-body3 sm:typo-body1 text-gray-500">
               행사 준비가 시작된 이후에는 환불이 어려울 수 있으니 신청 시 참고해
               주세요.
             </p>
-            <p className="typo-caption1 text-gray-500">
+            <p className="typo-body3 sm:typo-body1 text-gray-500">
               선착순 접수로 마감이 된 경우, 환불 처리해드려요.
             </p>
           </div>
-          <p className="typo-caption1 font-medium text-error">
+          <p className="typo-subtitle6 sm:typo-subtitle5 text-error">
             *원활한 참가를 위해 입금시 참가자 명으로 입금 부탁드려요!
           </p>
         </div>
