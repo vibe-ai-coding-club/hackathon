@@ -1,4 +1,10 @@
 import { Button } from "@/app/_components/button";
+import Image from "next/image";
+
+const sponsors = [
+  { name: "링티", src: "/images/sponsor-image-001.png" },
+  { name: "나만의 네컷", src: "/images/sponsor-image-002.png" },
+];
 
 export const SponsorSection = () => {
   return (
@@ -12,9 +18,16 @@ export const SponsorSection = () => {
             대관, 장비 대여, 참여자 식사 등 더 좋은 해커톤 경험을 위해 후원을 받고 있어요
           </p>
 
-          <div className="mt-[26px] grid grid-cols-3 gap-3 md:mt-[52px] md:gap-5">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="aspect-[4/3] bg-gray-300 md:aspect-[2/1]" />
+          <div className="mt-[26px] flex flex-wrap items-center justify-center gap-3 md:mt-[52px] md:gap-5">
+            {sponsors.map((sponsor) => (
+              <Image
+                key={sponsor.name}
+                src={sponsor.src}
+                alt={sponsor.name}
+                width={300}
+                height={200}
+                className="object-contain"
+              />
             ))}
           </div>
         </div>
