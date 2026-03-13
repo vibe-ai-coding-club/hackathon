@@ -305,7 +305,11 @@ export const TeamBoard = () => {
   }, [teams, search, expFilter]);
 
   const recruitingTeams = useMemo(() => {
-    return teams.filter((t) => t.membersCount < t.maxMembers);
+    return teams.filter((t) => t.membersCount < t.maxMembers && t.participationType === "TEAM");
+  }, [teams]);
+
+  const lookingForTeam = useMemo(() => {
+    return teams.filter((t) => t.participationType === "INDIVIDUAL");
   }, [teams]);
 
   const totalMembers = useMemo(() => {
@@ -313,6 +317,24 @@ export const TeamBoard = () => {
   }, [filtered]);
 
   const myTeam = useMemo(() => teams.find((t) => t.isMyTeam), [teams]);
+
+  const isIndividual = myTeam?.participationType === "INDIVIDUAL";
+  const isInFullTeam = !!myTeam && myTeam.membersCount >= 2;
+
+  const [recruitingOpen, setRecruitingOpen] = useState(true);
+  const [lookingOpen, setLookingOpen] = useState(true);
+
+  // 데이터 로드 후 아코디언 초기 상태 설정
+  useEffect(() => {
+    if (!myTeam) return;
+    if (isInFullTeam) {
+      setRecruitingOpen(false);
+      setLookingOpen(true);
+    } else if (isIndividual) {
+      setRecruitingOpen(true);
+      setLookingOpen(false);
+    }
+  }, [myTeam, isInFullTeam, isIndividual]);
   const isLeader = useMemo(() => {
     if (!myTeam || !myMemberId) return false;
     // 정상: isLeader 플래그로 판별
@@ -662,85 +684,177 @@ export const TeamBoard = () => {
         </div>
       </div>
 
-      {/* 우측: 팀원 구해요 사이드바 */}
+      {/* 우측: 사이드바 */}
       <div className="w-56 shrink-0 space-y-3">
-        <div className="rounded-lg border border-accent/30 bg-accent/5 p-3">
-          <h3 className="text-sm font-bold text-accent mb-3 text-center">
-            팀원 구해요
-          </h3>
-          {recruitingTeams.length === 0 ? (
-            <p className="text-xs text-muted-foreground text-center py-2">
-              모집 중인 팀이 없습니다.
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {recruitingTeams.map((team) => {
-                const canJoin =
-                  !team.isMyTeam && team.membersCount < team.maxMembers;
-                return (
-                  <div
-                    key={team.id}
-                    role={canJoin ? "button" : undefined}
-                    tabIndex={canJoin ? 0 : undefined}
-                    onClick={() => canJoin && handleTransferClick(team)}
-                    onKeyDown={(e) => {
-                      if (canJoin && (e.key === "Enter" || e.key === " ")) handleTransferClick(team);
-                    }}
-                    className={`w-full rounded-md border p-2.5 text-left transition-colors ${
-                      team.isMyTeam
-                        ? "border-accent/30 bg-accent/5"
-                        : canJoin
-                          ? "border-border bg-background hover:border-accent/40 hover:bg-accent/5 cursor-pointer"
-                          : "border-border bg-muted/30 opacity-50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className="text-sm font-medium truncate">
-                        {team.teamName || team.leaderName}
-                      </span>
-                      <span
-                        className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${
-                          experienceLevelStyle[team.experienceLevel] ??
-                          "bg-gray-100 text-gray-600"
+        {/* 팀원 구해요 */}
+        <div className="rounded-lg border border-accent/30 bg-accent/5 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setRecruitingOpen((v) => !v)}
+            className="flex w-full items-center justify-between p-3 cursor-pointer"
+          >
+            <h3 className="text-sm font-bold text-accent">
+              팀원 구해요
+              <span className="ml-1 text-xs font-normal text-accent/60">
+                ({recruitingTeams.length})
+              </span>
+            </h3>
+            <svg
+              className={`size-4 text-accent/60 transition-transform ${recruitingOpen ? "rotate-180" : ""}`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+            </svg>
+          </button>
+          {recruitingOpen && (
+            <div className="px-3 pb-3">
+              {recruitingTeams.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-2">
+                  모집 중인 팀이 없습니다.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {recruitingTeams.map((team) => {
+                    const canJoin =
+                      !team.isMyTeam && team.membersCount < team.maxMembers;
+                    return (
+                      <div
+                        key={team.id}
+                        role={canJoin ? "button" : undefined}
+                        tabIndex={canJoin ? 0 : undefined}
+                        onClick={() => canJoin && handleTransferClick(team)}
+                        onKeyDown={(e) => {
+                          if (canJoin && (e.key === "Enter" || e.key === " ")) handleTransferClick(team);
+                        }}
+                        className={`w-full rounded-md border p-2.5 text-left transition-colors ${
+                          team.isMyTeam
+                            ? "border-accent/30 bg-accent/5"
+                            : canJoin
+                              ? "border-border bg-background hover:border-accent/40 hover:bg-accent/5 cursor-pointer"
+                              : "border-border bg-muted/30 opacity-50"
                         }`}
                       >
-                        {experienceLevelLabel[team.experienceLevel]}
-                      </span>
-                    </div>
-                    {team.isMyTeam && isLeader ? (
-                      <div className="mb-1" onClick={(e) => e.stopPropagation()}>
-                        <EditableCell
-                          value={team.recruitmentNote ?? ""}
-                          placeholder="모집글 입력"
-                          onSave={(v) => updateMyTeam("recruitmentNote", v)}
-                          className="text-[11px] text-muted-foreground"
-                        />
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span className="text-sm font-medium truncate">
+                            {team.teamName || team.leaderName}
+                          </span>
+                          <span
+                            className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${
+                              experienceLevelStyle[team.experienceLevel] ??
+                              "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {experienceLevelLabel[team.experienceLevel]}
+                          </span>
+                        </div>
+                        {team.isMyTeam && isLeader ? (
+                          <div className="mb-1" onClick={(e) => e.stopPropagation()}>
+                            <EditableCell
+                              value={team.recruitmentNote ?? ""}
+                              placeholder="모집글 입력"
+                              onSave={(v) => updateMyTeam("recruitmentNote", v)}
+                              className="text-[11px] text-muted-foreground"
+                            />
+                          </div>
+                        ) : team.recruitmentNote ? (
+                          <p className="text-[11px] text-muted-foreground line-clamp-2 mb-1">
+                            {team.recruitmentNote}
+                          </p>
+                        ) : null}
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] text-muted-foreground">
+                            {team.leaderName}
+                          </span>
+                          <span className="text-[11px] font-medium">
+                            {team.membersCount}/{team.maxMembers}명
+                          </span>
+                        </div>
+                        {team.isMyTeam && (
+                          <span className="mt-1 inline-block rounded-full bg-accent/10 px-1.5 py-px text-[10px] font-medium text-accent">
+                            내 팀
+                          </span>
+                        )}
                       </div>
-                    ) : team.recruitmentNote ? (
-                      <p className="text-[11px] text-muted-foreground line-clamp-2 mb-1">
-                        {team.recruitmentNote}
-                      </p>
-                    ) : null}
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-muted-foreground">
-                        {team.leaderName}
-                      </span>
-                      <span className="text-[11px] font-medium">
-                        {team.membersCount}/{team.maxMembers}명
-                      </span>
-                    </div>
-                    {team.isMyTeam && (
-                      <span className="mt-1 inline-block rounded-full bg-accent/10 px-1.5 py-px text-[10px] font-medium text-accent">
-                        내 팀
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>
 
+        {/* 팀 구해요 */}
+        <div className="rounded-lg border border-blue-300/50 bg-blue-50/50 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setLookingOpen((v) => !v)}
+            className="flex w-full items-center justify-between p-3 cursor-pointer"
+          >
+            <h3 className="text-sm font-bold text-blue-600">
+              팀 구해요
+              <span className="ml-1 text-xs font-normal text-blue-400">
+                ({lookingForTeam.length})
+              </span>
+            </h3>
+            <svg
+              className={`size-4 text-blue-400 transition-transform ${lookingOpen ? "rotate-180" : ""}`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+            </svg>
+          </button>
+          {lookingOpen && (
+            <div className="px-3 pb-3">
+              {lookingForTeam.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-2">
+                  팀을 찾는 참가자가 없습니다.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {lookingForTeam.map((team) => {
+                    const member = team.members[0];
+                    return (
+                      <div
+                        key={team.id}
+                        className={`w-full rounded-md border p-2.5 text-left transition-colors ${
+                          team.isMyTeam
+                            ? "border-blue-300/50 bg-blue-50/50"
+                            : "border-border bg-background"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span className="text-sm font-medium truncate">
+                            {member?.name ?? team.leaderName}
+                          </span>
+                          <span
+                            className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${
+                              experienceLevelStyle[team.experienceLevel] ??
+                              "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {experienceLevelLabel[team.experienceLevel]}
+                          </span>
+                        </div>
+                        {team.motivation && (
+                          <p className="text-[11px] text-muted-foreground line-clamp-2">
+                            {team.motivation}
+                          </p>
+                        )}
+                        {team.isMyTeam && (
+                          <span className="mt-1 inline-block rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-medium text-blue-600">
+                            나
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 팀 이동 컨펌 모달 */}
