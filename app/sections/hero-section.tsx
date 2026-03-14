@@ -13,6 +13,7 @@ import confetti from "canvas-confetti";
 import Image from "next/image";
 
 import { Icon } from "@/app/_components/icon";
+import clsx from "clsx";
 
 type Position = {
   x: number;
@@ -606,13 +607,13 @@ export const HeroSection = () => {
           onPointerCancel={onRunawayPointerEnd}
         >
           <span
-            className={
+            className={clsx(
               phase === "success"
                 ? "opacity-100"
                 : phase === "active"
                   ? "opacity-100"
                   : "opacity-0"
-            }
+            , "flex items-center")}
           >
             {phase === "success" ? (
               <span className="inline-flex items-center gap-[10px]">
