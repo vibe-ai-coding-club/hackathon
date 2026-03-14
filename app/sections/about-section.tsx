@@ -30,28 +30,26 @@ const ABOUT_ITEMS: { label: string; value: ReactNode }[] = [
 export const AboutSection = () => {
   return (
     <section id="about" className="px-4 pt-[90px] md:px-8 md:pt-[180px]">
-      <div className="mx-auto max-w-[1280px] md:max-w-[960px]">
+      <div className="mx-auto max-w-[1280px]">
         <MotionItem>
           <SectionTitle chipLabel="About" title="행사 소개" />
         </MotionItem>
 
-        <div className="mx-auto mt-10 max-w-[640px] divide-y divide-gray-100 rounded-2xl bg-gray-50 px-6 py-2 md:mt-14 md:px-10 md:py-4">
+        <div className="mt-10 w-full overflow-hidden rounded-2xl bg-gray-50 md:mt-14 md:rounded-[20px]">
           {ABOUT_ITEMS.map((item, i) => (
             <MotionItem key={item.label} delay={0.08 * (i + 1)}>
-              <div className="flex flex-col gap-1 py-4 md:flex-row md:items-center md:gap-0 md:py-5">
-                <span className="typo-subtitle2 w-[160px] shrink-0 text-gray-900">{item.label}</span>
-                <span className="typo-body2 text-gray-700">{item.value}</span>
+              <div className="flex items-start gap-6 border-b border-gray-200 px-5 py-5 text-left last:border-b-0 md:flex-row md:items-center md:gap-8 md:px-8 md:py-7">
+                <span className="typo-subtitle1 w-[140px] shrink-0 text-gray-900 md:typo-h6 md:w-[180px]">{item.label}</span>
+                <span className="typo-body2 text-gray-700 md:typo-subtitle1">{item.value}</span>
               </div>
             </MotionItem>
           ))}
         </div>
 
         <MotionItem delay={0.5}>
-          <div className="mx-auto max-w-[640px]">
-            <p className="typo-caption mt-4 text-left text-gray-400 md:mt-6 text-sm md:text-md">
-              * 상기 내용은 변경될 수 있습니다.
-            </p>
-          </div>
+          <p className="typo-caption mt-4 text-left text-gray-400 md:mt-6">
+            * 상기 내용은 변경될 수 있습니다.
+          </p>
         </MotionItem>
       </div>
     </section>
