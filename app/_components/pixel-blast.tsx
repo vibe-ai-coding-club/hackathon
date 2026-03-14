@@ -663,7 +663,7 @@ export const PixelBlast = ({
         touch,
         liquidEffect,
       };
-    } else {
+    } else if (threeRef.current) {
       const t = threeRef.current;
       t.uniforms.uShapeType.value = SHAPE_MAP[variant] ?? 0;
       t.uniforms.uPixelSize.value = pixelSize * t.renderer.getPixelRatio();
