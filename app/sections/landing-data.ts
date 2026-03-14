@@ -7,6 +7,7 @@ export type PointCard = {
 export type TimetableItem = {
   title: string;
   time: string;
+  description?: string;
 };
 
 export type CultureItem = {
@@ -23,7 +24,7 @@ export type InfoTabItem = {
 export const POINT_CARDS: PointCard[] = [
   {
     title: "단 하루, 8시간 만 진행해요",
-    description: "2026.03.28 (10:00-18:00)",
+    description: "2026.03.28 (09:30-18:00)",
     image: "/images/about-001.webp",
   },
   {
@@ -39,12 +40,30 @@ export const POINT_CARDS: PointCard[] = [
 ];
 
 export const TIMETABLE: TimetableItem[] = [
-  { title: "바이브코딩 OT", time: "10:00 - 11:00" },
-  { title: "팀별 간단 소개", time: "11:00 - 12:00" },
-  { title: "점심시간", time: "12:00 - 13:00" },
-  { title: "개발 시간", time: "13:00 - 16:00" },
-  { title: "발표 (참가자 심사)", time: "16:00 - 17:30" },
-  { title: "이벤트 / 시상 및 단체사진 촬영", time: "17:30 - 18:00" },
+  { title: "참가자 현장 체크인", time: "09:30 - 10:00" },
+  { title: "개회식 및 행사 안내", time: "10:00 - 10:30" },
+  {
+    title: "바이브코딩 세션",
+    time: "10:30 - 11:30",
+    description:
+      "\"개발을 할 줄 모른다구요? '딸깍'이면 충분합니다\" AI를 내 비서로 부려 초고속으로 서비스를 빌딩하는 치트키 전수",
+  },
+  {
+    title: "팀별 아이디어 피칭",
+    time: "11:30 - 12:00",
+    description: "우리가 만들 '세상 킹받는 서비스'는 무엇? 짧고 굵은 팀 소개",
+  },
+  {
+    title: "집중 개발 시간",
+    time: "12:00 - 16:00",
+    description: "상상을 현실로 만드는 시간! 중간중간 다른 팀 구경은 필수(AI와 함께라면 4시간도 넉넉합니다)",
+  },
+  {
+    title: "발표 및 심사",
+    time: "16:00 - 17:30",
+    description: '"누가 더 엉뚱한가!" 서로의 결과물을 시연하고 즐기는 시간. 다양한 이벤트도 준비되어있어요!',
+  },
+  { title: "시상 및 단체사진 촬영", time: "17:30 - 18:00" },
 ];
 
 export const CULTURE_ITEMS: CultureItem[] = [
@@ -84,7 +103,7 @@ export const INFO_TABS: InfoTabItem[] = [
       "기기 대여가 어려우니 참가자는 반드시 개인 노트북을 지참해 주세요.",
       "신청 폼에서 개인 참여와 팀 참여를 선택할 수 있어요.",
       "접수는 꼭 정해진 배포 링크를 사용해 주세요.",
-      "행사 관련 공지와 안내는 피그잼을 통해 전달돼요.",
+      "행사 관련 공지와 안내는 메일 및 디스코드를 통해 전달돼요.",
       "행사장은 주차 지원이 어려워서 대중교통 이용을 권장해요.",
     ],
   },

@@ -13,6 +13,11 @@ export const TimetableRow = ({ item }: TimetableRowProps) => {
       <p className="order-1 shrink-0 whitespace-nowrap typo-subtitle1 text-primary-400 md:order-2 md:typo-h5">
         {item.time}
       </p>
+      {item.description && (
+        <p className="order-3 hidden typo-body2 text-gray-500 md:order-3 md:block">
+          {item.description}
+        </p>
+      )}
     </div>
   );
 };
