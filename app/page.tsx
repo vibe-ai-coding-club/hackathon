@@ -3,6 +3,7 @@ import { CultureSection } from "./sections/culture-section";
 import { FloatingStopwatch } from "./sections/floating-stopwatch";
 import { HeroSection } from "./sections/hero-section";
 import { InfoSection } from "./sections/info-section";
+import { IntroSection } from "./sections/intro-section";
 import { PointSection } from "./sections/point-section";
 import { ScheduleSection } from "./sections/schedule-section";
 import { SponsorSection } from "./sections/sponsor-section";
@@ -25,6 +26,7 @@ export default function Home() {
     <div>
       <HeroSection />
       <StopwatchSection />
+      <IntroSection />
       <AboutSection />
       <PointSection />
       <ScheduleSection />
