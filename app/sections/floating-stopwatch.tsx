@@ -2,12 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import {
-  calcTimeLeft,
-  padTimeUnit,
-  type TimeLeft,
-  ZERO_TIME_LEFT,
-} from "./stopwatch-time";
+import { useRegistrationCountdown } from "@/app/_hooks/use-registration-countdown";
+import { pad } from "@/lib/registration-time";
 
 const BASE_BOTTOM = 50;
 const FOOTER_MARGIN = 30;
@@ -35,29 +31,9 @@ const getVisibleHeight = (rect: DOMRect, viewportHeight: number) => {
 };
 
 export const FloatingStopwatch = () => {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(ZERO_TIME_LEFT);
-  const [isExpired, setIsExpired] = useState(false);
+  const { phase, timeLeft, label } = useRegistrationCountdown();
   const [isVisible, setIsVisible] = useState(false);
   const [bottomOffset, setBottomOffset] = useState(BASE_BOTTOM);
-
-  useEffect(() => {
-    const updateTime = () => {
-      const next = calcTimeLeft();
-
-      if (next) {
-        setTimeLeft(next);
-        setIsExpired(false);
-        return;
-      }
-
-      setIsExpired(true);
-    };
-
-    updateTime();
-    const timerId = setInterval(updateTime, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
 
   useEffect(() => {
     let rafId = 0;
@@ -111,18 +87,18 @@ export const FloatingStopwatch = () => {
     >
       <div className="flex items-center justify-center gap-2 overflow-hidden rounded-[32px] border border-primary-200 bg-transparent px-6 py-2.5 whitespace-nowrap backdrop-blur-[10px] md:gap-3.5 md:rounded-[44px] md:px-[34px] md:py-5">
         <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:typo-h6 md:text-primary-900">
-          신청 마감까지
+          {phase === "closed" ? "" : label}
         </p>
         <div className="flex items-center justify-center gap-1 md:gap-2">
-          {!isExpired ? (
+          {phase !== "closed" ? (
             <>
-              <TimeBlock value={padTimeUnit(timeLeft.days)} label="일" />
+              <TimeBlock value={pad(timeLeft.days)} label="일" />
               <Colon />
-              <TimeBlock value={padTimeUnit(timeLeft.hours)} label="시" />
+              <TimeBlock value={pad(timeLeft.hours)} label="시" />
               <Colon />
-              <TimeBlock value={padTimeUnit(timeLeft.minutes)} label="분" />
+              <TimeBlock value={pad(timeLeft.minutes)} label="분" />
               <Colon />
-              <TimeBlock value={padTimeUnit(timeLeft.seconds)} label="초" />
+              <TimeBlock value={pad(timeLeft.seconds)} label="초" />
             </>
           ) : (
             <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-gray-850 md:typo-h6 md:font-bold">

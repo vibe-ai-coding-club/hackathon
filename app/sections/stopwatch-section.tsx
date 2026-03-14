@@ -1,14 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { Icon } from "@/app/_components/icon";
-import {
-  calcTimeLeft,
-  padTimeUnit,
-  type TimeLeft,
-  ZERO_TIME_LEFT,
-} from "./stopwatch-time";
+import { useRegistrationCountdown } from "@/app/_hooks/use-registration-countdown";
+import { pad } from "@/lib/registration-time";
 
 const TimeBlock = ({ label, value }: { label: string; value: string }) => {
   return (
@@ -31,27 +25,7 @@ const Colon = () => (
 );
 
 export const StopwatchSection = () => {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(ZERO_TIME_LEFT);
-  const [isExpired, setIsExpired] = useState(false);
-
-  useEffect(() => {
-    const updateTime = () => {
-      const next = calcTimeLeft();
-
-      if (next) {
-        setTimeLeft(next);
-        setIsExpired(false);
-        return;
-      }
-
-      setIsExpired(true);
-    };
-
-    updateTime();
-    const timerId = setInterval(updateTime, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
+  const { phase, timeLeft, label } = useRegistrationCountdown();
 
   return (
     <section
@@ -67,7 +41,7 @@ export const StopwatchSection = () => {
             className="text-white md:size-6"
           />
           <p className="text-[20px] leading-[30px] font-bold tracking-[-0.4px] text-white md:text-[34px] md:leading-[52px]">
-            신청 마감까지
+            {phase === "closed" ? "신청이 마감되었어요" : label}
           </p>
           <Icon
             type="twinkle"
@@ -78,15 +52,15 @@ export const StopwatchSection = () => {
         </div>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-3.5 md:mt-[14px] md:gap-7">
-          {!isExpired ? (
+          {phase !== "closed" ? (
             <>
-              <TimeBlock value={padTimeUnit(timeLeft.days)} label="일" />
+              <TimeBlock value={pad(timeLeft.days)} label="일" />
               <Colon />
-              <TimeBlock value={padTimeUnit(timeLeft.hours)} label="시" />
+              <TimeBlock value={pad(timeLeft.hours)} label="시" />
               <Colon />
-              <TimeBlock value={padTimeUnit(timeLeft.minutes)} label="분" />
+              <TimeBlock value={pad(timeLeft.minutes)} label="분" />
               <Colon />
-              <TimeBlock value={padTimeUnit(timeLeft.seconds)} label="초" />
+              <TimeBlock value={pad(timeLeft.seconds)} label="초" />
             </>
           ) : (
             <p className="typo-h6 text-white md:typo-h3">신청이 마감되었어요</p>
