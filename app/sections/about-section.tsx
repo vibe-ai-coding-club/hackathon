@@ -23,7 +23,14 @@ const ABOUT_ITEMS: { label: string; value: ReactNode }[] = [
     label: "주제",
     value: "만우절에 세상을 뒤집을 엉뚱한 서비스 만들기",
   },
-  { label: "참가비", value: "20,000원 (점심식사 비용이 포함되어있습니다.)" },
+  {
+    label: "참가비",
+    value: (
+      <>
+        20,000원 <span className="ml-1 text-gray-400 typo-body2">* 점심식사 비용이 포함되어있습니다.</span>
+      </>
+    ),
+  },
   { label: "심사기준 및 방식", value: "AI 평가 및 상호평가" },
 ];
 
@@ -39,7 +46,9 @@ export const AboutSection = () => {
           {ABOUT_ITEMS.map((item, i) => (
             <MotionItem key={item.label} delay={0.08 * (i + 1)}>
               <div className="flex items-start gap-6 border-b border-gray-200 px-5 py-5 text-left last:border-b-0 md:flex-row md:items-center md:gap-8 md:px-8 md:py-7">
-                <span className="typo-subtitle1 w-[140px] shrink-0 text-gray-900 md:typo-h6 md:w-[180px]">{item.label}</span>
+                <span className="typo-subtitle1 w-[140px] shrink-0 text-gray-900 md:typo-h6 md:w-[180px]">
+                  {item.label}
+                </span>
                 <span className="typo-body2 text-gray-700 md:typo-subtitle1">{item.value}</span>
               </div>
             </MotionItem>
@@ -47,9 +56,7 @@ export const AboutSection = () => {
         </div>
 
         <MotionItem delay={0.5}>
-          <p className="typo-caption mt-4 text-left text-gray-400 md:mt-6">
-            * 상기 내용은 변경될 수 있습니다.
-          </p>
+          <p className="typo-caption mt-4 text-left text-gray-400 md:mt-6">* 상기 내용은 변경될 수 있습니다.</p>
         </MotionItem>
       </div>
     </section>
