@@ -75,6 +75,7 @@ export const HeroSection = () => {
   const [isOverDropZone, setIsOverDropZone] = useState(false);
   const [isRunawayVisible, setIsRunawayVisible] = useState(true);
   const [transitionMs, setTransitionMs] = useState(240);
+  const [isGlitchBurst, setIsGlitchBurst] = useState(false);
 
   const clearDesktopEscapeTimer = useCallback(() => {
     if (desktopEscapeTimerRef.current !== null) {
@@ -536,20 +537,74 @@ export const HeroSection = () => {
     clearSuccessTimers,
   ]);
 
+  // 글리치 버스트 타이밍: 8s 주기, 0.6s 버스트 → 3.4s 대기 → 0.6s 버스트 → 3.4s 대기
+  useEffect(() => {
+    const BURST_MS = 600;
+    const IDLE_MS = 3400;
+    let timerId: number;
+
+    const loop = () => {
+      setIsGlitchBurst(true);
+      timerId = window.setTimeout(() => {
+        setIsGlitchBurst(false);
+        timerId = window.setTimeout(() => {
+          loop();
+        }, IDLE_MS);
+      }, BURST_MS);
+    };
+
+    loop();
+    return () => window.clearTimeout(timerId);
+  }, []);
+
   return (
     <section
       id="hero"
       ref={sectionRef}
       className="relative bg-primary-400 flex h-[1112px] max-h-[100svh] flex-col items-center justify-center gap-10 overflow-hidden bg-[#FE2A80] px-4 pt-[140px] pb-[80px] md:gap-14 md:px-8 md:pt-[230px] md:pb-[130px]"
     >
-      <Image
-        src="/images/hero.webp"
-        alt="딸깍톤 히어로"
-        width={941}
-        height={660}
-        priority
-        className="w-[120%] max-w-[941px] object-contain xl:w-[50%]"
-      />
+      <div className="hero-glitch w-[120%] max-w-[941px] xl:w-[50%]">
+        <Image
+          src="/images/hero.webp"
+          alt="딸깍톤 히어로"
+          width={941}
+          height={660}
+          priority
+          className={clsx("w-full object-contain", isGlitchBurst && "hero-glitch-base--active")}
+        />
+        <Image
+          src="/images/hero.webp"
+          alt=""
+          width={941}
+          height={660}
+          aria-hidden
+          className="hero-glitch-layer-1 pointer-events-none absolute object-contain"
+        />
+        <Image
+          src="/images/hero.webp"
+          alt=""
+          width={941}
+          height={660}
+          aria-hidden
+          className="hero-glitch-layer-2 pointer-events-none absolute object-contain"
+        />
+        <Image
+          src="/images/hero.webp"
+          alt=""
+          width={941}
+          height={660}
+          aria-hidden
+          className="hero-glitch-layer-3 pointer-events-none absolute object-contain"
+        />
+        <Image
+          src="/images/hero.webp"
+          alt=""
+          width={941}
+          height={660}
+          aria-hidden
+          className="hero-glitch-layer-4 pointer-events-none absolute object-contain"
+        />
+      </div>
 
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-col items-center text-center">
         <div ref={ctaSlotRef} className="relative inline-flex">
