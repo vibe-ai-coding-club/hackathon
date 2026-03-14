@@ -24,6 +24,10 @@ const ABOUT_ITEMS: { label: string; value: ReactNode }[] = [
     value: "만우절에 세상을 뒤집을 엉뚱한 서비스 만들기",
   },
   {
+    label: "신청 유형",
+    value: "개인 및 팀 단위 지원 (최대 4인, 개인으로 신청 후 다른 참여자와 추가 팀빌딩 가능)",
+  },
+  {
     label: "참가비",
     value: (
       <>
