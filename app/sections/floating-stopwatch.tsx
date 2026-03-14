@@ -11,7 +11,7 @@ const FOOTER_TRIGGER = 20;
 
 const TimeBlock = ({ label, value }: { label: string; value: string }) => {
   return (
-    <div className="flex items-center gap-[1px] text-center text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-gray-850 md:gap-0.5 md:typo-h6 md:font-bold md:tracking-[-0.4px]">
+    <div className="flex items-center gap-[1px] text-center text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:gap-0.5 md:typo-h6 md:font-bold md:tracking-[-0.4px]">
       <span>{value}</span>
       <span>{label}</span>
     </div>
@@ -20,8 +20,8 @@ const TimeBlock = ({ label, value }: { label: string; value: string }) => {
 
 const Colon = () => (
   <div className="flex flex-col gap-[2px] md:h-3 md:w-1 md:justify-between md:gap-0">
-    <span className="size-0.5 rounded-full bg-gray-850 md:size-1" />
-    <span className="size-0.5 rounded-full bg-gray-850 md:size-1" />
+    <span className="size-0.5 rounded-full bg-primary-900 md:size-1" />
+    <span className="size-0.5 rounded-full bg-primary-900 md:size-1" />
   </div>
 );
 
@@ -101,7 +101,7 @@ export const FloatingStopwatch = () => {
               <TimeBlock value={pad(timeLeft.seconds)} label="초" />
             </>
           ) : (
-            <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-gray-850 md:typo-h6 md:font-bold">
+            <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:typo-h6 md:font-bold">
               신청이 마감되었어요
             </p>
           )}
