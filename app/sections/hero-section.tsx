@@ -8,6 +8,7 @@ import Image from "next/image";
 
 import { Icon } from "@/app/_components/icon";
 import { PixelBlast } from "@/app/_components/pixel-blast";
+import { SplashCursor } from "@/app/_components/splash-cursor";
 import clsx from "clsx";
 
 type Position = {
@@ -519,6 +520,18 @@ export const HeroSection = () => {
           edgeFade={0.3}
           enableRipples={false}
           transparent
+        />
+      </div>
+
+      <div className="pointer-events-none absolute inset-0 z-[1]">
+        <SplashCursor
+          BACK_COLOR={{ r: 0.5, g: 0, b: 0 }}
+          TRANSPARENT
+          DENSITY_DISSIPATION={3}
+          VELOCITY_DISSIPATION={2}
+          SPLAT_RADIUS={0.3}
+          SPLAT_FORCE={5000}
+          CURL={5}
         />
       </div>
 
