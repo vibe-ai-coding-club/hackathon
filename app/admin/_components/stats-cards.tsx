@@ -1,5 +1,6 @@
 type StatsCardsProps = {
   totalTeams: number;
+  totalMembers: number;
   byParticipationType: { participationType: string; _count: number }[];
   byExperienceLevel: { experienceLevel: string; _count: number }[];
   recentWeekCount: number;
@@ -19,6 +20,7 @@ const experienceLevelLabel: Record<string, string> = {
 
 export const StatsCards = ({
   totalTeams,
+  totalMembers,
   byParticipationType,
   byExperienceLevel,
   recentWeekCount,
@@ -26,7 +28,11 @@ export const StatsCards = ({
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 typo-caption1 text-muted-foreground">
       <span>
-        총 <strong className="text-foreground">{totalTeams}</strong>건
+        총 <strong className="text-foreground">{totalTeams}</strong>팀
+      </span>
+      <span className="text-border">|</span>
+      <span>
+        총 <strong className="text-foreground">{totalMembers}</strong>명
       </span>
       <span className="text-border">|</span>
       {byParticipationType.map((item) => (

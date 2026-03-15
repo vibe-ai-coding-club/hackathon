@@ -12,6 +12,7 @@ const AdminPage = async () => {
   const [
     teams,
     totalTeams,
+    totalMembers,
     byParticipationType,
     byExperienceLevel,
     recentWeekCount,
@@ -21,6 +22,7 @@ const AdminPage = async () => {
       orderBy: { createdAt: "desc" },
     }),
     prisma.team.count(),
+    prisma.member.count(),
     prisma.team.groupBy({
       by: ["participationType"],
       _count: true,
@@ -72,6 +74,7 @@ const AdminPage = async () => {
       <div className="space-y-3">
         <StatsCards
           totalTeams={totalTeams}
+          totalMembers={totalMembers}
           byParticipationType={statsByParticipationType}
           byExperienceLevel={statsByExperienceLevel}
           recentWeekCount={recentWeekCount}
