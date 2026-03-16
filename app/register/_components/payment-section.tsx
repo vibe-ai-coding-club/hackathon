@@ -62,8 +62,8 @@ export const PaymentSection = ({ form, errors, setForm, update }: Props) => {
               사용됩니다.
             </p>
             <p className="typo-body3 sm:typo-body1 text-gray-500">
-              행사 준비가 시작된 이후에는 환불이 어려울 수 있으니 신청 시 참고해
-              주세요.
+              행사 준비가 시작된 이후(3월 20일)에는 환불이 어려울 수 있으니 신청
+              시 참고해 주세요.
             </p>
             <p className="typo-body3 sm:typo-body1 text-gray-500">
               선착순 접수로 마감이 된 경우, 환불 처리해드려요.
