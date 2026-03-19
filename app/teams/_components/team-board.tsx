@@ -299,21 +299,29 @@ export const TeamBoard = () => {
   }, []);
 
   const filtered = useMemo(() => {
-    return teams.filter((t) => {
-      if (expFilter !== "ALL" && t.experienceLevel !== expFilter) return false;
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        if (
-          !t.teamName?.toLowerCase().includes(q) &&
-          !t.motivation?.toLowerCase().includes(q) &&
-          !t.recruitmentNote?.toLowerCase().includes(q) &&
-          !t.leaderName.toLowerCase().includes(q) &&
-          !t.members.some((m) => m.name.toLowerCase().includes(q))
-        )
+    return teams
+      .filter((t) => {
+        if (expFilter !== "ALL" && t.experienceLevel !== expFilter)
           return false;
-      }
-      return true;
-    });
+        if (search.trim()) {
+          const q = search.toLowerCase();
+          if (
+            !t.teamName?.toLowerCase().includes(q) &&
+            !t.motivation?.toLowerCase().includes(q) &&
+            !t.recruitmentNote?.toLowerCase().includes(q) &&
+            !t.leaderName.toLowerCase().includes(q) &&
+            !t.members.some((m) => m.name.toLowerCase().includes(q))
+          )
+            return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (a.isMyTeam !== b.isMyTeam) return a.isMyTeam ? -1 : 1;
+        const aFull = a.membersCount >= a.maxMembers ? 1 : 0;
+        const bFull = b.membersCount >= b.maxMembers ? 1 : 0;
+        return aFull - bFull;
+      });
   }, [teams, search, expFilter]);
 
   const recruitingTeams = useMemo(() => {
