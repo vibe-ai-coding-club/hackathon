@@ -18,6 +18,7 @@ const AdminPage = async () => {
     recentWeekCount,
   ] = await Promise.all([
     prisma.team.findMany({
+      where: { members: { some: {} } },
       include: { members: true },
       orderBy: { createdAt: "desc" },
     }),

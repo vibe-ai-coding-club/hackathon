@@ -525,8 +525,9 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
               paged.map((team, i) => {
                 const leader =
                   team.members.find((m) => m.isLeader) ?? team.members[0];
+                if (!leader) return null;
                 const otherMembers = team.members.filter(
-                  (m) => m.id !== leader?.id,
+                  (m) => m.id !== leader.id,
                 );
                 const hasEmptySlot = team.members.length < 4;
                 const totalRows =
