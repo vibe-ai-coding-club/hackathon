@@ -1,0 +1,144 @@
+"use client";
+
+import { useState } from "react";
+import { useTeamBoard } from "./context";
+
+export const ProjectModal = () => {
+  const { myTeam, setShowProjectModal, handleProjectSaved } = useTeamBoard();
+  const project = myTeam?.project ?? null;
+
+  const [title, setTitle] = useState(project?.title ?? "");
+  const [description, setDescription] = useState(project?.description ?? "");
+  const [githubUrl, setGithubUrl] = useState(project?.githubUrl ?? "");
+  const [demoUrl, setDemoUrl] = useState(project?.demoUrl ?? "");
+  const [linkUrl, setLinkUrl] = useState(project?.linkUrl ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const onClose = () => setShowProjectModal(false);
+
+  const handleSubmit = async () => {
+    if (!title.trim()) {
+      setError("프로젝트명을 입력해주세요.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/teams/project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description, githubUrl, demoUrl, linkUrl }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        handleProjectSaved({
+          id: project?.id ?? "",
+          title: title.trim(),
+          description: description.trim(),
+          githubUrl: githubUrl.trim(),
+          demoUrl: demoUrl.trim() || null,
+          linkUrl: linkUrl.trim() || null,
+        });
+        onClose();
+      } else {
+        setError(json.message);
+      }
+    } catch {
+      setError("서버 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputClass =
+    "w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent transition-colors";
+  const labelClass = "text-xs font-medium text-muted-foreground mb-1 block";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !saving) onClose();
+      }}
+    >
+      <div className="w-full max-w-md rounded-lg border border-border bg-background p-5 space-y-4">
+        <h3 className="typo-subtitle1">
+          {project ? "프로젝트 수정" : "프로젝트 등록"}
+        </h3>
+
+        <div>
+          <label className={labelClass}>프로젝트명 *</label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="프로젝트 이름"
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label className={labelClass}>설명</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="프로젝트 설명"
+            rows={3}
+            className={`${inputClass} resize-none`}
+          />
+        </div>
+
+        <div>
+          <label className={labelClass}>GitHub URL</label>
+          <input
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/..."
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label className={labelClass}>데모 URL</label>
+          <input
+            value={demoUrl}
+            onChange={(e) => setDemoUrl(e.target.value)}
+            placeholder="https://..."
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label className={labelClass}>추가 링크</label>
+          <input
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="발표자료, 노션 등"
+            className={inputClass}
+          />
+        </div>
+
+        {error && <p className="text-xs text-red-500">{error}</p>}
+
+        <div className="flex justify-end gap-2 pt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            className="rounded-md border border-border px-4 py-2 text-sm cursor-pointer transition-colors hover:bg-muted disabled:opacity-50"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={saving}
+            className="rounded-md bg-accent px-4 py-2 text-sm text-white cursor-pointer transition-colors hover:bg-accent-hover disabled:opacity-50"
+          >
+            {saving ? "저장 중..." : project ? "수정" : "등록"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
