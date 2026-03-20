@@ -43,7 +43,8 @@ model Team {
 
   // 상태 관리
   status          TeamStatus @default(PENDING)
-  recruitmentNote String?    @map("recruitment_note") // 팀 모집 소개글
+  recruiting      Boolean    @default(false) // 팀원 모집 중 여부
+  recruitmentNote String?    @map("recruitment_note") // 팀 주제
 
   // 추가 정보
   experienceLevel ExperienceLevel @default(BEGINNER) @map("experience_level")

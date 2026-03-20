@@ -22,6 +22,7 @@ export async function GET() {
     select: {
       id: true,
       teamName: true,
+      recruiting: true,
       recruitmentNote: true,
       participationType: true,
       experienceLevel: true,
@@ -55,6 +56,7 @@ export async function GET() {
     leaderName:
       t.members.find((m) => m.isLeader)?.name ?? t.members[0]?.name ?? "",
     teamName: t.teamName,
+    recruiting: t.recruiting,
     recruitmentNote: t.recruitmentNote,
     participationType: t.participationType,
     experienceLevel: t.experienceLevel,
