@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { Project, Team } from "./types";
+import type { Project, SeekingMember, Team } from "./types";
 
 type TransferMode = "transfer" | "recruit";
 
@@ -16,7 +16,7 @@ type TeamBoardContextValue = {
   teams: Team[];
   filtered: Team[];
   recruitingTeams: Team[];
-  lookingForTeam: Team[];
+  lookingForTeam: SeekingMember[];
   totalMembers: number;
   myMemberId: string | null;
   isAdmin: boolean;
@@ -39,6 +39,7 @@ type TeamBoardContextValue = {
   // team update
   updateTeam: (teamId: string, field: string, value: string) => void;
   toggleRecruiting: (teamId: string, value: boolean) => void;
+  toggleSeeking: (value: boolean, memberId?: string) => void;
   // project
   showProjectModal: boolean;
   setShowProjectModal: (v: boolean) => void;
@@ -122,7 +123,15 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
   }, [teams]);
 
   const lookingForTeam = useMemo(() => {
-    return teams.filter((t) => t.participationType === "INDIVIDUAL");
+    const result: SeekingMember[] = [];
+    for (const team of teams) {
+      for (const member of team.members) {
+        if (member.seekingTeam) {
+          result.push({ memberId: member.id, memberName: member.name, team });
+        }
+      }
+    }
+    return result;
   }, [teams]);
 
   const totalMembers = useMemo(() => {
@@ -252,6 +261,49 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
     [isAdmin],
   );
 
+  const toggleSeeking = useCallback(
+    async (value: boolean, targetMemberId?: string) => {
+      const mid = targetMemberId ?? myMemberId;
+      if (!mid) return;
+      // 낙관적 업데이트
+      setTeams((prev) =>
+        prev.map((t) => ({
+          ...t,
+          members: t.members.map((m) =>
+            m.id === mid ? { ...m, seekingTeam: value } : m,
+          ),
+        })),
+      );
+      try {
+        // 어드민이 다른 멤버를 토글할 때는 어드민 API 사용
+        const useAdminApi = isAdmin && targetMemberId && targetMemberId !== myMemberId;
+        const url = useAdminApi
+          ? `/api/admin/members/${mid}/seeking`
+          : "/api/teams/seeking";
+        const res = await fetch(url, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ seekingTeam: value }),
+        });
+        const json = await res.json();
+        if (!json.success) {
+          // 롤백
+          setTeams((prev) =>
+            prev.map((t) => ({
+              ...t,
+              members: t.members.map((m) =>
+                m.id === mid ? { ...m, seekingTeam: !value } : m,
+              ),
+            })),
+          );
+        }
+      } catch {
+        console.error("Failed to toggle seeking");
+      }
+    },
+    [myMemberId, isAdmin],
+  );
+
   const handleProjectSaved = useCallback(
     (project: Project) => {
       if (!myTeam) return;
@@ -288,6 +340,7 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
       cancelTransfer,
       updateTeam,
       toggleRecruiting,
+      toggleSeeking,
       showProjectModal,
       setShowProjectModal,
       handleProjectSaved,
@@ -319,6 +372,7 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
       cancelTransfer,
       updateTeam,
       toggleRecruiting,
+      toggleSeeking,
       showProjectModal,
       handleProjectSaved,
       recruitingOpen,

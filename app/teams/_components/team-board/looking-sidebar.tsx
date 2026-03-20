@@ -1,20 +1,18 @@
 "use client";
 
 import { useTeamBoard } from "./context";
-import { EditableCell } from "./editable-cell";
 import { Tooltip } from "./tooltip";
 import { experienceLevelLabel, experienceLevelStyle } from "./types";
 
 export const LookingSidebar = () => {
   const {
     lookingForTeam,
-    isAdmin,
     isInFullTeam,
     myTeam,
+    myMemberId,
     lookingOpen,
     setLookingOpen,
     handleTransferClick,
-    updateTeam,
   } = useTeamBoard();
 
   return (
@@ -29,8 +27,8 @@ export const LookingSidebar = () => {
           <Tooltip
             text={
               isInFullTeam
-                ? "팀을 찾고 있는 개인 참가자 목록입니다. 카드를 클릭하면 해당 참가자를 내 팀으로 데려올 수 있습니다. 데려온 참가자의 원래 팀은 빈 경우 자동 삭제됩니다."
-                : "팀을 찾고 있는 개인 참가자 목록입니다. 카드를 클릭하면 해당 참가자의 팀에 합류하여 함께 팀이 됩니다. 합류하면 현재 팀에서 나가게 되며, 빈 팀은 자동 삭제됩니다."
+                ? "팀을 찾고 있는 참가자 목록입니다. 카드를 클릭하면 해당 참가자를 내 팀으로 데려올 수 있습니다."
+                : "팀을 찾고 있는 참가자 목록입니다. 카드를 클릭하면 해당 참가자의 팀에 합류하여 함께 팀이 됩니다."
             }
           />
         </div>
@@ -67,19 +65,20 @@ export const LookingSidebar = () => {
               </p>
             ) : (
               <div className="space-y-2">
-                {lookingForTeam.map((team) => {
-                  const member = team.members[0];
+                {lookingForTeam.map(({ memberId, memberName, team }) => {
+                  const isMe = memberId === myMemberId;
                   const mode = isInFullTeam
                     ? ("recruit" as const)
                     : ("transfer" as const);
                   const canJoin =
+                    !isMe &&
                     !team.isMyTeam &&
                     (mode === "recruit"
                       ? !!myTeam && myTeam.membersCount < myTeam.maxMembers
                       : team.membersCount < team.maxMembers);
                   return (
                     <div
-                      key={team.id}
+                      key={memberId}
                       role={canJoin ? "button" : undefined}
                       tabIndex={canJoin ? 0 : undefined}
                       onClick={() =>
@@ -90,16 +89,16 @@ export const LookingSidebar = () => {
                           handleTransferClick(team, mode);
                       }}
                       className={`w-full rounded-md border p-2.5 text-left transition-colors ${
-                        team.isMyTeam
+                        isMe
                           ? "border-blue-300/50 bg-blue-50/50"
                           : canJoin
                             ? "border-border bg-background hover:border-blue-300/50 hover:bg-blue-50/30 cursor-pointer"
                             : "border-border bg-background"
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-1 mb-1">
+                      <div className="flex items-center justify-between gap-1">
                         <span className="text-sm font-medium truncate">
-                          {member?.name ?? team.leaderName}
+                          {memberName}
                         </span>
                         <span
                           className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${
@@ -110,26 +109,12 @@ export const LookingSidebar = () => {
                           {experienceLevelLabel[team.experienceLevel]}
                         </span>
                       </div>
-                      {isAdmin || team.isMyTeam ? (
-                        <div
-                          className="mb-1"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <EditableCell
-                            value={team.recruitmentNote ?? ""}
-                            placeholder="주제 입력"
-                            onSave={(v) =>
-                              updateTeam(team.id, "recruitmentNote", v)
-                            }
-                            className="w-full text-[11px] text-muted-foreground"
-                          />
-                        </div>
-                      ) : team.recruitmentNote ? (
-                        <p className="text-[11px] text-muted-foreground line-clamp-2 mb-1">
-                          {team.recruitmentNote}
+                      {team.teamName && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          {team.teamName}
                         </p>
-                      ) : null}
-                      {team.isMyTeam && (
+                      )}
+                      {isMe && (
                         <span className="mt-1 inline-block rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-medium text-blue-600">
                           나
                         </span>
