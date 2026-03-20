@@ -6,9 +6,12 @@ import { ProjectDetailModal } from "./project-detail-modal";
 export type SerializedProject = {
   id: string;
   title: string;
-  description: string;
-  githubUrl: string;
+  description: string | null;
+  features: string | null;
+  tools: string | null;
+  githubUrl: string | null;
   demoUrl: string | null;
+  videoUrl: string | null;
   imageUrl: string | null;
   linkUrl: string | null;
   createdAt: string;

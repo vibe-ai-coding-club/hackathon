@@ -219,7 +219,7 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                       {team.project ? (
                         <span
                           className="text-muted-foreground"
-                          title={team.project.description}
+                          title={team.project.description ?? undefined}
                         >
                           {team.project.title}
                         </span>

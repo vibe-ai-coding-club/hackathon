@@ -64,7 +64,7 @@ export const ProjectDetailModal = ({
             )}
             {project.demoUrl && (
               <>
-                <dt className="text-muted-foreground">데모</dt>
+                <dt className="text-muted-foreground">배포</dt>
                 <dd>
                   <a
                     href={project.demoUrl}
@@ -77,18 +77,68 @@ export const ProjectDetailModal = ({
                 </dd>
               </>
             )}
+            {project.videoUrl && (
+              <>
+                <dt className="text-muted-foreground">영상</dt>
+                <dd>
+                  <a
+                    href={project.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline break-all"
+                  >
+                    {project.videoUrl}
+                  </a>
+                </dd>
+              </>
+            )}
+            {project.linkUrl && (
+              <>
+                <dt className="text-muted-foreground">추가 링크</dt>
+                <dd>
+                  <a
+                    href={project.linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline break-all"
+                  >
+                    {project.linkUrl}
+                  </a>
+                </dd>
+              </>
+            )}
+            {project.tools && (
+              <>
+                <dt className="text-muted-foreground">사용 도구</dt>
+                <dd>{project.tools}</dd>
+              </>
+            )}
           </dl>
         </section>
 
         {/* 설명 */}
-        <section className="space-y-2">
-          <h3 className="typo-caption1 font-medium text-muted-foreground">
-            프로젝트 설명
-          </h3>
-          <p className="typo-caption1 whitespace-pre-wrap">
-            {project.description}
-          </p>
-        </section>
+        {project.description && (
+          <section className="space-y-2">
+            <h3 className="typo-caption1 font-medium text-muted-foreground">
+              프로젝트 설명
+            </h3>
+            <p className="typo-caption1 whitespace-pre-wrap">
+              {project.description}
+            </p>
+          </section>
+        )}
+
+        {/* 핵심 기능 */}
+        {project.features && (
+          <section className="space-y-2">
+            <h3 className="typo-caption1 font-medium text-muted-foreground">
+              핵심 기능 / 기획 내용
+            </h3>
+            <p className="typo-caption1 whitespace-pre-wrap">
+              {project.features}
+            </p>
+          </section>
+        )}
 
         {/* 팀 정보 */}
         <section className="space-y-2">
