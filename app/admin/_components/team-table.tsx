@@ -13,6 +13,7 @@ export type SerializedMember = {
   email: string;
   phone: string;
   isLeader: boolean;
+  seekingTeam: boolean;
   refundBank: string | null;
   refundAccount: string | null;
   refundAccountHolder: string | null;
@@ -305,6 +306,59 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     }
   };
 
+  const toggleSeeking = async (
+    teamId: string,
+    memberId: string,
+    current: boolean,
+  ) => {
+    setTeams((prev) =>
+      prev.map((t) =>
+        t.id === teamId
+          ? {
+              ...t,
+              members: t.members.map((m) =>
+                m.id === memberId ? { ...m, seekingTeam: !current } : m,
+              ),
+            }
+          : t,
+      ),
+    );
+    try {
+      const res = await fetch(`/api/admin/members/${memberId}/seeking`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seekingTeam: !current }),
+      });
+      if (!res.ok) {
+        setTeams((prev) =>
+          prev.map((t) =>
+            t.id === teamId
+              ? {
+                  ...t,
+                  members: t.members.map((m) =>
+                    m.id === memberId ? { ...m, seekingTeam: current } : m,
+                  ),
+                }
+              : t,
+          ),
+        );
+      }
+    } catch {
+      setTeams((prev) =>
+        prev.map((t) =>
+          t.id === teamId
+            ? {
+                ...t,
+                members: t.members.map((m) =>
+                  m.id === memberId ? { ...m, seekingTeam: current } : m,
+                ),
+              }
+            : t,
+        ),
+      );
+    }
+  };
+
   const toggleDeposit = async (teamId: string, current: boolean) => {
     setTogglingId(teamId);
     try {
@@ -530,6 +584,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
               <th className={thClass}>모집</th>
               <th className={thClass}>팀이름</th>
               <th className={thClass}>이름</th>
+              <th className={thClass}>구직</th>
               <th className={thClass}>이메일</th>
               <th className={thClass}>연락처</th>
               <th className={thClass}>계좌정보</th>
@@ -543,7 +598,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={13}
+                  colSpan={14}
                   className="px-4 py-6 text-center text-muted-foreground typo-caption1"
                 >
                   {filters.search
@@ -642,6 +697,23 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                         </div>
                       </td>
                       <td className={tdClass}>
+                        {leader && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              toggleSeeking(team.id, leader.id, leader.seekingTeam)
+                            }
+                            className={`rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
+                              leader.seekingTeam
+                                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                                : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                            }`}
+                          >
+                            {leader.seekingTeam ? "구직" : "OFF"}
+                          </button>
+                        )}
+                      </td>
+                      <td className={tdClass}>
                         <div className="flex items-center gap-0.5">
                           <span className="text-muted-foreground">
                             {leader?.email ?? ""}
@@ -726,6 +798,21 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                           </div>
                         </td>
                         <td className={tdClass}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              toggleSeeking(team.id, m.id, m.seekingTeam)
+                            }
+                            className={`rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
+                              m.seekingTeam
+                                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                                : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                            }`}
+                          >
+                            {m.seekingTeam ? "구직" : "OFF"}
+                          </button>
+                        </td>
+                        <td className={tdClass}>
                           <div className="flex items-center gap-0.5">
                             <span className="text-muted-foreground">
                               {m.email}
@@ -780,7 +867,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       >
                         <td
                           className={`${tdClass} typo-caption2 text-muted-foreground/40`}
-                          colSpan={9}
+                          colSpan={10}
                         >
                           {isDropTarget ? (
                             <span className="text-accent font-medium">
