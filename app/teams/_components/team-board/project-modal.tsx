@@ -9,8 +9,11 @@ export const ProjectModal = () => {
 
   const [title, setTitle] = useState(project?.title ?? "");
   const [description, setDescription] = useState(project?.description ?? "");
+  const [features, setFeatures] = useState(project?.features ?? "");
+  const [tools, setTools] = useState(project?.tools ?? "");
   const [githubUrl, setGithubUrl] = useState(project?.githubUrl ?? "");
   const [demoUrl, setDemoUrl] = useState(project?.demoUrl ?? "");
+  const [videoUrl, setVideoUrl] = useState(project?.videoUrl ?? "");
   const [linkUrl, setLinkUrl] = useState(project?.linkUrl ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -28,16 +31,19 @@ export const ProjectModal = () => {
       const res = await fetch("/api/teams/project", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, githubUrl, demoUrl, linkUrl }),
+        body: JSON.stringify({ title, description, features, tools, githubUrl, demoUrl, videoUrl, linkUrl }),
       });
       const json = await res.json();
       if (json.success) {
         handleProjectSaved({
           id: project?.id ?? "",
           title: title.trim(),
-          description: description.trim(),
-          githubUrl: githubUrl.trim(),
+          description: description.trim() || null,
+          features: features.trim() || null,
+          tools: tools.trim() || null,
+          githubUrl: githubUrl.trim() || null,
           demoUrl: demoUrl.trim() || null,
+          videoUrl: videoUrl.trim() || null,
           linkUrl: linkUrl.trim() || null,
         });
         onClose();
@@ -62,7 +68,7 @@ export const ProjectModal = () => {
         if (e.target === e.currentTarget && !saving) onClose();
       }}
     >
-      <div className="w-full max-w-md rounded-lg border border-border bg-background p-5 space-y-4">
+      <div className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-lg border border-border bg-background p-5 space-y-4">
         <h3 className="typo-subtitle1">
           {project ? "프로젝트 수정" : "프로젝트 등록"}
         </h3>
@@ -82,9 +88,30 @@ export const ProjectModal = () => {
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="프로젝트 설명"
+            placeholder="프로젝트에 대한 간단한 설명"
             rows={3}
             className={`${inputClass} resize-none`}
+          />
+        </div>
+
+        <div>
+          <label className={labelClass}>핵심 기능 / 기획 내용</label>
+          <textarea
+            value={features}
+            onChange={(e) => setFeatures(e.target.value)}
+            placeholder="주요 기능, 해결하려는 문제, 타겟 사용자 등"
+            rows={3}
+            className={`${inputClass} resize-none`}
+          />
+        </div>
+
+        <div>
+          <label className={labelClass}>제작 방식 / 사용 도구</label>
+          <input
+            value={tools}
+            onChange={(e) => setTools(e.target.value)}
+            placeholder="예: Claude, Cursor, React, Bubble 등"
+            className={inputClass}
           />
         </div>
 
@@ -98,14 +125,25 @@ export const ProjectModal = () => {
           />
         </div>
 
-        <div>
-          <label className={labelClass}>데모 URL</label>
-          <input
-            value={demoUrl}
-            onChange={(e) => setDemoUrl(e.target.value)}
-            placeholder="https://..."
-            className={inputClass}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>배포 URL</label>
+            <input
+              value={demoUrl}
+              onChange={(e) => setDemoUrl(e.target.value)}
+              placeholder="https://..."
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>데모 영상 링크</label>
+            <input
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              placeholder="YouTube, Google Drive 등"
+              className={inputClass}
+            />
+          </div>
         </div>
 
         <div>

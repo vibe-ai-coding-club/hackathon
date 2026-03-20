@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PARTICIPANT_PROMPT, EVALUATION_PROMPT } from "@/lib/prompts";
 import { useTeamBoard } from "./context";
+import type { Project } from "./types";
 
 type PromptTab = "participant" | "evaluation";
 
@@ -26,13 +27,16 @@ const PROMPT_MAP: Record<PromptTab, string> = {
 
 function fillPrompt(
   template: string,
-  project: { title: string; description: string; githubUrl: string; demoUrl: string | null; linkUrl: string | null } | null,
+  project: Project | null,
 ) {
   const placeholders: Record<string, string> = {
     "{{title}}": project?.title || "(프로젝트명을 입력하세요)",
     "{{description}}": project?.description || "(프로젝트 설명을 입력하세요)",
+    "{{features}}": project?.features || "(핵심 기능/기획 내용을 입력하세요)",
+    "{{tools}}": project?.tools || "(제작 방식/사용 도구를 입력하세요)",
     "{{githubUrl}}": project?.githubUrl || "(GitHub URL을 입력하세요)",
-    "{{demoUrl}}": project?.demoUrl || "(데모 URL을 입력하세요)",
+    "{{demoUrl}}": project?.demoUrl || "(배포 URL을 입력하세요)",
+    "{{videoUrl}}": project?.videoUrl || "(데모 영상 링크를 입력하세요)",
     "{{linkUrl}}": project?.linkUrl || "(추가 링크를 입력하세요)",
   };
   let result = template;

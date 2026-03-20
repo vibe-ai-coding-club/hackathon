@@ -249,10 +249,22 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
-                              title="데모"
+                              title="배포"
                             >
                               <LinkIcon />
-                              데모
+                              배포
+                            </a>
+                          )}
+                          {team.project.videoUrl && (
+                            <a
+                              href={team.project.videoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
+                              title="영상"
+                            >
+                              <LinkIcon />
+                              영상
                             </a>
                           )}
                           {team.project.linkUrl && (
