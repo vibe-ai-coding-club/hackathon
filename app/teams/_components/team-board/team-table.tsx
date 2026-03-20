@@ -34,6 +34,7 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
     setExpFilter,
     setShowProjectModal,
     updateTeam,
+    toggleRecruiting,
   } = useTeamBoard();
 
   return (
@@ -152,12 +153,27 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                             내 팀
                           </span>
                         )}
-                        {!team.isMyTeam &&
+                        {canEdit && team.membersCount < team.maxMembers ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleRecruiting(team.id, !team.recruiting)}
+                            className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium cursor-pointer transition-colors ${
+                              team.recruiting
+                                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                                : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                            }`}
+                          >
+                            {team.recruiting ? "모집중" : "모집 OFF"}
+                          </button>
+                        ) : (
+                          !team.isMyTeam &&
+                          team.recruiting &&
                           team.membersCount < team.maxMembers && (
                             <span className="shrink-0 rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-medium text-blue-600">
                               모집중
                             </span>
-                          )}
+                          )
+                        )}
                       </div>
                     </td>
                     {/* 주제 */}

@@ -38,6 +38,7 @@ type TeamBoardContextValue = {
   cancelTransfer: () => void;
   // team update
   updateTeam: (teamId: string, field: string, value: string) => void;
+  toggleRecruiting: (teamId: string, value: boolean) => void;
   // project
   showProjectModal: boolean;
   setShowProjectModal: (v: boolean) => void;
@@ -116,7 +117,7 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
 
   const recruitingTeams = useMemo(() => {
     return teams.filter(
-      (t) => t.membersCount < t.maxMembers && t.participationType === "TEAM",
+      (t) => t.recruiting && t.membersCount < t.maxMembers,
     );
   }, [teams]);
 
@@ -225,6 +226,32 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
     [isAdmin],
   );
 
+  const toggleRecruiting = useCallback(
+    async (teamId: string, value: boolean) => {
+      try {
+        const res = await fetch("/api/teams/teams/update", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            recruiting: value,
+            ...(isAdmin ? { teamId } : {}),
+          }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          setTeams((prev) =>
+            prev.map((t) =>
+              t.id === teamId ? { ...t, recruiting: value } : t,
+            ),
+          );
+        }
+      } catch {
+        console.error("Failed to toggle recruiting");
+      }
+    },
+    [isAdmin],
+  );
+
   const handleProjectSaved = useCallback(
     (project: Project) => {
       if (!myTeam) return;
@@ -260,6 +287,7 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
       handleTransfer,
       cancelTransfer,
       updateTeam,
+      toggleRecruiting,
       showProjectModal,
       setShowProjectModal,
       handleProjectSaved,
@@ -290,6 +318,7 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
       handleTransfer,
       cancelTransfer,
       updateTeam,
+      toggleRecruiting,
       showProjectModal,
       handleProjectSaved,
       recruitingOpen,

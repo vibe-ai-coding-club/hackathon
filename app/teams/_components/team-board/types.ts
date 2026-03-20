@@ -21,6 +21,7 @@ export type Team = {
   order: number;
   leaderName: string;
   teamName: string | null;
+  recruiting: boolean;
   recruitmentNote: string | null;
   participationType: string;
   experienceLevel: string;

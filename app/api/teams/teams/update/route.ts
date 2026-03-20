@@ -37,12 +37,13 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
-  const { teamName, recruitmentNote } = body;
+  const { teamName, recruitmentNote, recruiting } = body;
 
-  const data: Record<string, string | null> = {};
+  const data: Record<string, string | boolean | null> = {};
   if (teamName !== undefined) data.teamName = teamName || null;
   if (recruitmentNote !== undefined)
     data.recruitmentNote = recruitmentNote || null;
+  if (recruiting !== undefined) data.recruiting = !!recruiting;
 
   if (Object.keys(data).length === 0) {
     return NextResponse.json(

@@ -25,6 +25,7 @@ export type SerializedTeam = {
   id: string;
   participationType: string;
   teamName: string | null;
+  recruiting: boolean;
   members: SerializedMember[];
   experienceLevel: string;
   motivation: string | null;
@@ -276,6 +277,34 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
       .join(", ");
   }, [filtered]);
 
+  const toggleRecruiting = async (teamId: string, current: boolean) => {
+    setTeams((prev) =>
+      prev.map((t) =>
+        t.id === teamId ? { ...t, recruiting: !current } : t,
+      ),
+    );
+    try {
+      const res = await fetch(`/api/admin/teams/${teamId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recruiting: !current }),
+      });
+      if (!res.ok) {
+        setTeams((prev) =>
+          prev.map((t) =>
+            t.id === teamId ? { ...t, recruiting: current } : t,
+          ),
+        );
+      }
+    } catch {
+      setTeams((prev) =>
+        prev.map((t) =>
+          t.id === teamId ? { ...t, recruiting: current } : t,
+        ),
+      );
+    }
+  };
+
   const toggleDeposit = async (teamId: string, current: boolean) => {
     setTogglingId(teamId);
     try {
@@ -498,6 +527,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
               <th className={thClass}>#</th>
               <th className={thClass}>상태</th>
               <th className={thClass}>유형</th>
+              <th className={thClass}>모집</th>
               <th className={thClass}>팀이름</th>
               <th className={thClass}>이름</th>
               <th className={thClass}>이메일</th>
@@ -513,7 +543,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={12}
+                  colSpan={13}
                   className="px-4 py-6 text-center text-muted-foreground typo-caption1"
                 >
                   {filters.search
@@ -570,6 +600,21 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                           {participationTypeLabel[team.participationType] ??
                             team.participationType}
                         </span>
+                      </td>
+                      <td className={tdClass} rowSpan={totalRows}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            toggleRecruiting(team.id, team.recruiting)
+                          }
+                          className={`rounded-full px-2 py-px typo-caption1 font-medium cursor-pointer transition-colors ${
+                            team.recruiting
+                              ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                              : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                          }`}
+                        >
+                          {team.recruiting ? "모집중" : "OFF"}
+                        </button>
                       </td>
                       <td
                         className={`${tdClass} whitespace-nowrap`}
@@ -735,7 +780,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       >
                         <td
                           className={`${tdClass} typo-caption2 text-muted-foreground/40`}
-                          colSpan={8}
+                          colSpan={9}
                         >
                           {isDropTarget ? (
                             <span className="text-accent font-medium">
