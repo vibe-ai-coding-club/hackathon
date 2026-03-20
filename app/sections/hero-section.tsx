@@ -542,7 +542,7 @@ export const HeroSection = () => {
           width={760}
           height={660}
           priority
-          className={clsx("w-full object-contain", isGlitchBurst && "hero-glitch-base--active")}
+          className={clsx("w-full h-auto object-contain", isGlitchBurst && "hero-glitch-base--active")}
         />
         <Image
           src="/images/hero.webp"
@@ -550,7 +550,7 @@ export const HeroSection = () => {
           width={760}
           height={660}
           aria-hidden
-          className="hero-glitch-layer-1 pointer-events-none absolute object-contain"
+          className="hero-glitch-layer-1 pointer-events-none absolute h-auto object-contain"
         />
         <Image
           src="/images/hero.webp"
@@ -558,7 +558,7 @@ export const HeroSection = () => {
           width={760}
           height={660}
           aria-hidden
-          className="hero-glitch-layer-2 pointer-events-none absolute object-contain"
+          className="hero-glitch-layer-2 pointer-events-none absolute h-auto object-contain"
         />
         <Image
           src="/images/hero.webp"
@@ -566,7 +566,7 @@ export const HeroSection = () => {
           width={760}
           height={660}
           aria-hidden
-          className="hero-glitch-layer-3 pointer-events-none absolute object-contain"
+          className="hero-glitch-layer-3 pointer-events-none absolute h-auto object-contain"
         />
         <Image
           src="/images/hero.webp"
@@ -574,7 +574,7 @@ export const HeroSection = () => {
           width={760}
           height={660}
           aria-hidden
-          className="hero-glitch-layer-4 pointer-events-none absolute object-contain"
+          className="hero-glitch-layer-4 pointer-events-none absolute h-auto object-contain"
         />
       </div>
 
