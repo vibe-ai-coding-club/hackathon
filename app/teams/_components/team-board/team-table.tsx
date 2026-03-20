@@ -2,7 +2,6 @@
 
 import { useTeamBoard } from "./context";
 import { EditableCell } from "./editable-cell";
-import { Tooltip } from "./tooltip";
 import { experienceLevelLabel } from "./types";
 
 const LinkIcon = () => (
@@ -21,7 +20,7 @@ const tdClass =
   "px-2.5 py-1.5 text-sm border-b border-r border-border last:border-r-0";
 const colSpanAll = 9;
 
-export const TeamTable = () => {
+export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) => {
   const {
     teams,
     filtered,
@@ -61,15 +60,24 @@ export const TeamTable = () => {
             </option>
           ))}
         </select>
-        {myTeam && (
+        <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setShowProjectModal(true)}
-            className="ml-auto rounded-md bg-accent px-3 py-1 text-xs text-white cursor-pointer transition-colors hover:bg-accent-hover"
+            onClick={onShowAiPrompt}
+            className="rounded-md border border-border px-3 py-1 text-xs cursor-pointer transition-colors hover:bg-muted"
           >
-            {myTeam?.project ? "프로젝트 수정" : "프로젝트 등록"}
+            AI 심사 프롬프트
           </button>
-        )}
+          {myTeam && (
+            <button
+              type="button"
+              onClick={() => setShowProjectModal(true)}
+              className="rounded-md bg-accent px-3 py-1 text-xs text-white cursor-pointer transition-colors hover:bg-accent-hover"
+            >
+              {myTeam?.project ? "프로젝트 수정" : "프로젝트 등록"}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border">

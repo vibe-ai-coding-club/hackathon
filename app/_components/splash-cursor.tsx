@@ -66,6 +66,32 @@ type MaterialProgram = {
   bind: () => void;
 };
 
+class GLProgram {
+  gl: WebGL2RenderingContext;
+  program: WebGLProgram;
+  uniforms: Record<string, WebGLUniformLocation>;
+
+  constructor(gl: WebGL2RenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
+    this.gl = gl;
+    this.uniforms = {};
+    this.program = gl.createProgram()!;
+    gl.attachShader(this.program, vertexShader);
+    gl.attachShader(this.program, fragmentShader);
+    gl.linkProgram(this.program);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS))
+      console.trace(gl.getProgramInfoLog(this.program));
+    const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < uniformCount; i++) {
+      const uniformName = gl.getActiveUniform(this.program, i)!.name;
+      this.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName)!;
+    }
+  }
+
+  bind() {
+    this.gl.useProgram(this.program);
+  }
+}
+
 function pointerPrototype(): PointerData {
   return {
     id: -1,
@@ -134,7 +160,6 @@ export const SplashCursor = ({
   useEffect(() => {
     const canvasEl = canvasRef.current;
     if (!canvasEl) return;
-    // eslint-disable-next-line prefer-const -- early-return guarantees non-null
     const canvas = canvasEl as HTMLCanvasElement;
 
     const config = {
@@ -287,29 +312,8 @@ export const SplashCursor = ({
       return keywordsString + source;
     }
 
-    class GLProgram {
-      program: WebGLProgram;
-      uniforms: Record<string, WebGLUniformLocation>;
-
-      constructor(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
-        this.uniforms = {};
-        this.program = gl.createProgram()!;
-        gl.attachShader(this.program, vertexShader);
-        gl.attachShader(this.program, fragmentShader);
-        gl.linkProgram(this.program);
-        if (!gl.getProgramParameter(this.program, gl.LINK_STATUS))
-          console.trace(gl.getProgramInfoLog(this.program));
-        const uniformCount = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
-        for (let i = 0; i < uniformCount; i++) {
-          const uniformName = gl.getActiveUniform(this.program, i)!.name;
-          this.uniforms[uniformName] = gl.getUniformLocation(this.program, uniformName)!;
-        }
-      }
-
-      bind() {
-        gl.useProgram(this.program);
-      }
-    }
+    const createGLProgram = (vertexShader: WebGLShader, fragmentShader: WebGLShader) =>
+      new GLProgram(gl, vertexShader, fragmentShader);
 
     const baseVertexShader = compileShader(
       gl.VERTEX_SHADER,
@@ -333,42 +337,6 @@ export const SplashCursor = ({
     `
     );
 
-    const blurVertexShader = compileShader(
-      gl.VERTEX_SHADER,
-      `
-      precision highp float;
-      attribute vec2 aPosition;
-      varying vec2 vUv;
-      varying vec2 vL;
-      varying vec2 vR;
-      uniform vec2 texelSize;
-      void main () {
-          vUv = aPosition * 0.5 + 0.5;
-          float offset = 1.33333333;
-          vL = vUv - texelSize * offset;
-          vR = vUv + texelSize * offset;
-          gl_Position = vec4(aPosition, 0.0, 1.0);
-      }
-    `
-    );
-
-    const blurShader = compileShader(
-      gl.FRAGMENT_SHADER,
-      `
-      precision mediump float;
-      precision mediump sampler2D;
-      varying vec2 vUv;
-      varying vec2 vL;
-      varying vec2 vR;
-      uniform sampler2D uTexture;
-      void main () {
-          vec4 sum = texture2D(uTexture, vUv) * 0.29411764;
-          sum += texture2D(uTexture, vL) * 0.35294117;
-          sum += texture2D(uTexture, vR) * 0.35294117;
-          gl_FragColor = sum;
-      }
-    `
-    );
 
     const copyShader = compileShader(
       gl.FRAGMENT_SHADER,
@@ -646,22 +614,22 @@ export const SplashCursor = ({
     let curl: FBO;
     let pressure: DoubleFBO;
 
-    const copyProgram = new GLProgram(baseVertexShader, copyShader);
-    const clearProgram = new GLProgram(baseVertexShader, clearShader);
-    const colorProgram = new GLProgram(baseVertexShader, colorShader);
-    const splatProgram = new GLProgram(baseVertexShader, splatShader);
-    const advectionProgram = new GLProgram(baseVertexShader, advectionShader);
-    const divergenceProgram = new GLProgram(baseVertexShader, divergenceShader);
-    const curlProgram = new GLProgram(baseVertexShader, curlShader);
-    const vorticityProgram = new GLProgram(baseVertexShader, vorticityShader);
-    const pressureProgram = new GLProgram(baseVertexShader, pressureShader);
-    const gradienSubtractProgram = new GLProgram(baseVertexShader, gradientSubtractShader);
+    const copyProgram = createGLProgram(baseVertexShader, copyShader);
+    const clearProgram = createGLProgram(baseVertexShader, clearShader);
+    const colorProgram = createGLProgram(baseVertexShader, colorShader);
+    const splatProgram = createGLProgram(baseVertexShader, splatShader);
+    const advectionProgram = createGLProgram(baseVertexShader, advectionShader);
+    const divergenceProgram = createGLProgram(baseVertexShader, divergenceShader);
+    const curlProgram = createGLProgram(baseVertexShader, curlShader);
+    const vorticityProgram = createGLProgram(baseVertexShader, vorticityShader);
+    const pressureProgram = createGLProgram(baseVertexShader, pressureShader);
+    const gradienSubtractProgram = createGLProgram(baseVertexShader, gradientSubtractShader);
 
     const displayMaterial = createDisplayMaterial();
 
     function createDisplayMaterial(): MaterialProgram {
       const shader = compileShader(gl.FRAGMENT_SHADER, displayShaderSource);
-      const prog = new GLProgram(baseVertexShader, shader);
+      const prog = createGLProgram(baseVertexShader, shader);
       return {
         program: prog.program,
         uniforms: prog.uniforms,
@@ -981,24 +949,6 @@ export const SplashCursor = ({
       const aspectRatio = canvas.width / canvas.height;
       if (aspectRatio > 1) radius *= aspectRatio;
       return radius;
-    }
-
-    function updatePointerDownData(
-      pointer: PointerData,
-      id: number,
-      posX: number,
-      posY: number
-    ) {
-      pointer.id = id;
-      pointer.down = true;
-      pointer.moved = false;
-      pointer.texcoordX = posX / canvas.width;
-      pointer.texcoordY = 1.0 - posY / canvas.height;
-      pointer.prevTexcoordX = pointer.texcoordX;
-      pointer.prevTexcoordY = pointer.texcoordY;
-      pointer.deltaX = 0;
-      pointer.deltaY = 0;
-      pointer.color = generateColor();
     }
 
     function updatePointerMoveData(
