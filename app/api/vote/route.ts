@@ -46,18 +46,7 @@ export async function POST(request: NextRequest) {
 
     const { memberId, projectId } = result.data;
 
-    // 1. 세션 활성 확인
-    const session = await prisma.voteSession.findFirst({
-      where: { isActive: true },
-    });
-    if (!session) {
-      return NextResponse.json(
-        { success: false, message: "현재 투표가 진행 중이 아닙니다." },
-        { status: 403 },
-      );
-    }
-
-    // 2. 멤버 존재 확인
+    // 1. 멤버 존재 확인
     const member = await prisma.member.findUnique({
       where: { id: memberId },
       select: { id: true, teamId: true },
@@ -69,7 +58,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. 프로젝트 존재 확인
+    // 2. 프로젝트 존재 확인
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       select: { id: true, teamId: true },
@@ -81,7 +70,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. 자기 팀 투표 차단
+    // 3. 자기 팀 투표 차단
     if (member.teamId === project.teamId) {
       return NextResponse.json(
         { success: false, message: "자기 팀 프로젝트에는 투표할 수 없습니다." },
@@ -89,21 +78,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. 투표 수 제한 확인
+    // 4. 투표 수 제한 확인 (EventSetting에서 maxVotes 조회)
+    const setting = await prisma.eventSetting.findFirst({
+      orderBy: { createdAt: "desc" },
+    });
+    const maxVotes = setting?.maxVotes ?? 5;
+
     const voteCount = await prisma.vote.count({
       where: { memberId },
     });
-    if (voteCount >= session.maxVotes) {
+    if (voteCount >= maxVotes) {
       return NextResponse.json(
         {
           success: false,
-          message: `최대 ${session.maxVotes}개까지 투표할 수 있습니다.`,
+          message: `최대 ${maxVotes}개까지 투표할 수 있습니다.`,
         },
         { status: 403 },
       );
     }
 
-    // 6. 중복 투표 확인
+    // 5. 중복 투표 확인
     const existingVote = await prisma.vote.findUnique({
       where: { memberId_projectId: { memberId, projectId } },
     });
@@ -146,17 +140,6 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { memberId, projectId } = result.data;
-
-    // 세션 활성 확인
-    const session = await prisma.voteSession.findFirst({
-      where: { isActive: true },
-    });
-    if (!session) {
-      return NextResponse.json(
-        { success: false, message: "현재 투표가 진행 중이 아닙니다." },
-        { status: 403 },
-      );
-    }
 
     // 투표 삭제
     const deleted = await prisma.vote.deleteMany({
