@@ -3,12 +3,12 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // 투표 세션 조회 (가장 최근 1개)
-    const session = await prisma.voteSession.findFirst({
+    // 이벤트 설정 조회
+    const setting = await prisma.eventSetting.findFirst({
       orderBy: { createdAt: "desc" },
     });
 
-    // 프로젝트 목록 + 투표 수 + 팀 정보
+    // 프로젝트 목록 + 투표 수 + 좋아요 수 + 팀 정보
     const projects = await prisma.project.findMany({
       orderBy: { createdAt: "asc" },
       select: {
@@ -32,7 +32,7 @@ export async function GET() {
           },
         },
         _count: {
-          select: { votes: true },
+          select: { votes: true, likes: true },
         },
       },
     });
@@ -51,13 +51,10 @@ export async function GET() {
           teamId: p.teamId,
           teamName: p.team.teamName || p.team.members[0]?.name || "",
           voteCount: p._count.votes,
+          likeCount: p._count.likes,
         })),
-        session: session
-          ? {
-              isActive: session.isActive,
-              maxVotes: session.maxVotes,
-            }
-          : null,
+        maxVotes: setting?.maxVotes ?? 5,
+        presentingProjectId: setting?.presentingProjectId ?? null,
       },
     });
   } catch (error) {

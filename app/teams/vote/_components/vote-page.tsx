@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { ProjectGrid } from "./project-grid";
+import { PresentingProject } from "./presenting-project";
 
 type ProjectData = {
   id: string;
@@ -10,16 +11,12 @@ type ProjectData = {
   teamName: string;
   teamId: string;
   voteCount: number;
+  likeCount: number;
   githubUrl: string;
   demoUrl: string | null;
   imageUrl: string | null;
   linkUrl: string | null;
 };
-
-type SessionData = {
-  isActive: boolean;
-  maxVotes: number;
-} | null;
 
 type VoterData = {
   memberId: string;
@@ -33,22 +30,30 @@ type Props = {
 
 export const VotePage = ({ voter }: Props) => {
   const [projects, setProjects] = useState<ProjectData[]>([]);
-  const [session, setSession] = useState<SessionData>(null);
+  const [maxVotes, setMaxVotes] = useState(5);
+  const [presentingProjectId, setPresentingProjectId] = useState<string | null>(
+    null,
+  );
   const [votedProjectIds, setVotedProjectIds] = useState<Set<string>>(
     new Set(),
   );
+  const [likedProjectIds, setLikedProjectIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [loadingProjectId, setLoadingProjectId] = useState<string | null>(null);
+  const [likingProjectId, setLikingProjectId] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // 프로젝트 목록 + 세션 상태 로드
+  // 프로젝트 목록 + 설정 로드
   const fetchProjects = useCallback(async () => {
     try {
       const res = await fetch("/api/vote/projects");
       const json = await res.json();
       if (json.success) {
         setProjects(json.data.projects);
-        setSession(json.data.session);
+        setMaxVotes(json.data.maxVotes);
+        setPresentingProjectId(json.data.presentingProjectId);
       }
     } catch {
       setError("프로젝트 목록을 불러올 수 없습니다.");
@@ -70,11 +75,31 @@ export const VotePage = ({ voter }: Props) => {
     }
   }, [voter.memberId]);
 
+  // 내 좋아요 현황 로드
+  const fetchMyLikes = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/like?memberId=${voter.memberId}`);
+      const json = await res.json();
+      if (json.success) {
+        setLikedProjectIds(new Set(json.data.likedProjectIds));
+      }
+    } catch {
+      // silent
+    }
+  }, [voter.memberId]);
+
   // 초기 로드
   useEffect(() => {
     fetchProjects();
     fetchMyVotes();
-  }, [fetchProjects, fetchMyVotes]);
+    fetchMyLikes();
+  }, [fetchProjects, fetchMyVotes, fetchMyLikes]);
+
+  // 3초 폴링 — 좋아요 수 + 발표 중 프로젝트 실시간 갱신
+  useEffect(() => {
+    const interval = setInterval(fetchProjects, 3000);
+    return () => clearInterval(interval);
+  }, [fetchProjects]);
 
   // 투표 실행
   const handleVote = async (projectId: string) => {
@@ -136,8 +161,73 @@ export const VotePage = ({ voter }: Props) => {
     }
   };
 
-  const isSessionActive = session?.isActive ?? false;
-  const remainingVotes = session ? session.maxVotes - votedProjectIds.size : 0;
+  // 좋아요
+  const handleLike = async (projectId: string) => {
+    setLikingProjectId(projectId);
+    try {
+      const res = await fetch("/api/like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId: voter.memberId, projectId }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        setLikedProjectIds((prev) => new Set([...prev, projectId]));
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId ? { ...p, likeCount: p.likeCount + 1 } : p,
+          ),
+        );
+      } else {
+        alert(json.message);
+      }
+    } catch {
+      alert("서버 오류가 발생했습니다.");
+    } finally {
+      setLikingProjectId(null);
+    }
+  };
+
+  // 좋아요 취소
+  const handleUnlike = async (projectId: string) => {
+    setLikingProjectId(projectId);
+    try {
+      const res = await fetch("/api/like", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId: voter.memberId, projectId }),
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        setLikedProjectIds((prev) => {
+          const next = new Set(prev);
+          next.delete(projectId);
+          return next;
+        });
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId ? { ...p, likeCount: p.likeCount - 1 } : p,
+          ),
+        );
+      } else {
+        alert(json.message);
+      }
+    } catch {
+      alert("서버 오류가 발생했습니다.");
+    } finally {
+      setLikingProjectId(null);
+    }
+  };
+
+  const remainingVotes = maxVotes - votedProjectIds.size;
+  const presentingProject = presentingProjectId
+    ? projects.find((p) => p.id === presentingProjectId)
+    : null;
+  const otherProjects = presentingProjectId
+    ? projects.filter((p) => p.id !== presentingProjectId)
+    : projects;
 
   if (pageLoading) {
     return (
@@ -159,29 +249,13 @@ export const VotePage = ({ voter }: Props) => {
 
       {/* 상태 바 */}
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border p-4">
-        {/* 세션 상태 */}
-        <div className="flex items-center gap-2">
-          <span
-            className={`h-2.5 w-2.5 rounded-full ${isSessionActive ? "bg-success animate-pulse" : "bg-gray-300"}`}
-          />
-          <span className="typo-subtitle4">
-            {isSessionActive ? "투표 진행 중" : "투표 준비 중"}
-          </span>
-        </div>
-
-        <div className="h-4 w-px bg-border" />
         <span className="typo-body3 text-muted-foreground">{voter.name}님</span>
-
-        {isSessionActive && (
-          <>
-            <div className="h-4 w-px bg-border" />
-            <span className="typo-body3 text-muted-foreground">
-              남은 투표:{" "}
-              <strong className="text-foreground">{remainingVotes}</strong>/
-              {session?.maxVotes}
-            </span>
-          </>
-        )}
+        <div className="h-4 w-px bg-border" />
+        <span className="typo-body3 text-muted-foreground">
+          남은 투표:{" "}
+          <strong className="text-foreground">{remainingVotes}</strong>/
+          {maxVotes}
+        </span>
       </div>
 
       {error && (
@@ -190,15 +264,34 @@ export const VotePage = ({ voter }: Props) => {
         </div>
       )}
 
+      {/* 발표 중 프로젝트 */}
+      {presentingProject && (
+        <PresentingProject
+          project={presentingProject}
+          isMyTeam={voter.teamId === presentingProject.teamId}
+          isVoted={votedProjectIds.has(presentingProject.id)}
+          isLiked={likedProjectIds.has(presentingProject.id)}
+          onVote={handleVote}
+          onCancel={handleCancel}
+          onLike={handleLike}
+          onUnlike={handleUnlike}
+          voteLoading={loadingProjectId === presentingProject.id}
+          likeLoading={likingProjectId === presentingProject.id}
+        />
+      )}
+
       {/* 프로젝트 그리드 */}
       <ProjectGrid
-        projects={projects}
+        projects={otherProjects}
         votedProjectIds={votedProjectIds}
+        likedProjectIds={likedProjectIds}
         myTeamId={voter.teamId}
-        isSessionActive={isSessionActive}
         onVote={handleVote}
         onCancel={handleCancel}
+        onLike={handleLike}
+        onUnlike={handleUnlike}
         loadingProjectId={loadingProjectId}
+        likingProjectId={likingProjectId}
       />
     </div>
   );

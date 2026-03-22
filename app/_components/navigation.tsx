@@ -2,12 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type MouseEvent, useEffect, useRef, useState } from "react";
-
-import { useRegistrationCountdown } from "@/app/_hooks/use-registration-countdown";
+import { type MouseEvent } from "react";
 
 import { Logo } from "./logo";
-import { Toast } from "./toast";
 
 const navItems = [
   { label: "행사 소개", href: "/" },
@@ -17,39 +14,11 @@ const navItems = [
 export const Navigation = () => {
   const pathname = usePathname();
   const isLanding = pathname === "/";
-  const { isOpen, countdownText } = useRegistrationCountdown();
-
-  const [toast, setToast] = useState<{
-    success: boolean;
-    message: string;
-  } | null>(null);
-  const toastTimer = useRef<ReturnType<typeof setTimeout>>(null);
-
-  const showToast = (message: string) => {
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    setToast({ success: false, message });
-    toastTimer.current = setTimeout(() => setToast(null), 3000);
-  };
-
-  useEffect(
-    () => () => {
-      if (toastTimer.current) clearTimeout(toastTimer.current);
-    },
-    [],
-  );
-
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (!isLanding) return;
 
     event.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleRegisterClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!isOpen) {
-      event.preventDefault();
-      showToast(countdownText);
-    }
   };
 
   return (
@@ -89,11 +58,10 @@ export const Navigation = () => {
               ))}
             </ul>
             <Link
-              href="/register"
-              onClick={handleRegisterClick}
+              href="/teams"
               className="rounded-xl bg-primary-400 px-5 py-3 text-[18px] leading-6.5 font-semibold tracking-[-0.4px] text-white transition-colors hover:bg-primary-500"
             >
-              딸깍톤 신청하기
+              참가자 대시보드
             </Link>
           </div>
         </nav>
@@ -132,8 +100,6 @@ export const Navigation = () => {
           </ul>
         </nav>
       </header>
-
-      <Toast toast={toast} onClose={() => setToast(null)} />
     </>
   );
 };

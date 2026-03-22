@@ -1,9 +1,9 @@
 import { verifyAdminSession } from "@/app/actions/admin-auth";
 import { prisma } from "@/lib/prisma";
-import { voteSessionActionSchema } from "@/lib/validations/vote";
+import { eventSettingSchema } from "@/lib/validations/vote";
 import { NextRequest, NextResponse } from "next/server";
 
-/** 투표 세션 상태 조회 */
+/** 이벤트 설정 + 투표/좋아요 결과 조회 */
 export async function GET() {
   try {
     const isAdmin = await verifyAdminSession();
@@ -14,11 +14,11 @@ export async function GET() {
       );
     }
 
-    const session = await prisma.voteSession.findFirst({
+    const setting = await prisma.eventSetting.findFirst({
       orderBy: { createdAt: "desc" },
     });
 
-    // 투표 결과 집계
+    // 투표 + 좋아요 결과 집계
     const results = await prisma.project.findMany({
       orderBy: { createdAt: "asc" },
       select: {
@@ -35,23 +35,22 @@ export async function GET() {
           },
         },
         _count: {
-          select: { votes: true },
+          select: { votes: true, likes: true },
         },
       },
     });
 
     const totalVotes = await prisma.vote.count();
+    const totalLikes = await prisma.like.count();
 
     return NextResponse.json({
       success: true,
       data: {
-        session: session
+        setting: setting
           ? {
-              id: session.id,
-              isActive: session.isActive,
-              maxVotes: session.maxVotes,
-              startedAt: session.startedAt?.toISOString() ?? null,
-              endedAt: session.endedAt?.toISOString() ?? null,
+              id: setting.id,
+              maxVotes: setting.maxVotes,
+              presentingProjectId: setting.presentingProjectId,
             }
           : null,
         results: results.map((p) => ({
@@ -59,12 +58,14 @@ export async function GET() {
           title: p.title,
           teamName: p.team.teamName || p.team.members[0]?.name || "",
           voteCount: p._count.votes,
+          likeCount: p._count.likes,
         })),
         totalVotes,
+        totalLikes,
       },
     });
   } catch (error) {
-    console.error("Vote session fetch error:", error);
+    console.error("Event setting fetch error:", error);
     return NextResponse.json(
       { success: false, message: "서버 오류가 발생했습니다." },
       { status: 500 },
@@ -72,7 +73,7 @@ export async function GET() {
   }
 }
 
-/** 투표 세션 시작/종료 */
+/** 이벤트 설정 변경 */
 export async function POST(request: NextRequest) {
   try {
     const isAdmin = await verifyAdminSession();
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const result = voteSessionActionSchema.safeParse(body);
+    const result = eventSettingSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
@@ -93,55 +94,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { action, maxVotes } = result.data;
+    const { maxVotes, presentingProjectId } = result.data;
 
-    if (action === "start") {
-      // 기존 활성 세션이 있으면 비활성화
-      await prisma.voteSession.updateMany({
-        where: { isActive: true },
-        data: { isActive: false, endedAt: new Date() },
-      });
-
-      // 새 세션 생성
-      const session = await prisma.voteSession.create({
-        data: {
-          isActive: true,
-          maxVotes: maxVotes ?? 5,
-          startedAt: new Date(),
-        },
-      });
-
-      return NextResponse.json({
-        success: true,
-        message: "투표가 시작되었습니다.",
-        data: {
-          id: session.id,
-          isActive: session.isActive,
-          maxVotes: session.maxVotes,
-          startedAt: session.startedAt?.toISOString() ?? null,
-        },
-      });
-    }
-
-    // stop
-    const updated = await prisma.voteSession.updateMany({
-      where: { isActive: true },
-      data: { isActive: false, endedAt: new Date() },
+    // 기존 설정 조회
+    const existing = await prisma.eventSetting.findFirst({
+      orderBy: { createdAt: "desc" },
     });
 
-    if (updated.count === 0) {
-      return NextResponse.json(
-        { success: false, message: "활성화된 투표 세션이 없습니다." },
-        { status: 404 },
-      );
+    const data: { maxVotes?: number; presentingProjectId?: string | null } = {};
+    if (maxVotes !== undefined) data.maxVotes = maxVotes;
+    if (presentingProjectId !== undefined)
+      data.presentingProjectId = presentingProjectId;
+
+    let setting;
+    if (existing) {
+      setting = await prisma.eventSetting.update({
+        where: { id: existing.id },
+        data,
+      });
+    } else {
+      setting = await prisma.eventSetting.create({
+        data: {
+          maxVotes: maxVotes ?? 5,
+          presentingProjectId: presentingProjectId ?? null,
+        },
+      });
     }
 
     return NextResponse.json({
       success: true,
-      message: "투표가 종료되었습니다.",
+      message: "설정이 변경되었습니다.",
+      data: {
+        id: setting.id,
+        maxVotes: setting.maxVotes,
+        presentingProjectId: setting.presentingProjectId,
+      },
     });
   } catch (error) {
-    console.error("Vote session action error:", error);
+    console.error("Event setting action error:", error);
     return NextResponse.json(
       { success: false, message: "서버 오류가 발생했습니다." },
       { status: 500 },

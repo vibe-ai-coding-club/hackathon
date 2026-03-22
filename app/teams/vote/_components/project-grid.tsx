@@ -9,6 +9,7 @@ type ProjectData = {
   teamName: string;
   teamId: string;
   voteCount: number;
+  likeCount: number;
   githubUrl: string;
   demoUrl: string | null;
   imageUrl: string | null;
@@ -18,21 +19,27 @@ type ProjectData = {
 type ProjectGridProps = {
   projects: ProjectData[];
   votedProjectIds: Set<string>;
+  likedProjectIds: Set<string>;
   myTeamId: string;
-  isSessionActive: boolean;
   onVote: (projectId: string) => void;
   onCancel: (projectId: string) => void;
+  onLike: (projectId: string) => void;
+  onUnlike: (projectId: string) => void;
   loadingProjectId: string | null;
+  likingProjectId: string | null;
 };
 
 export const ProjectGrid = ({
   projects,
   votedProjectIds,
+  likedProjectIds,
   myTeamId,
-  isSessionActive,
   onVote,
   onCancel,
+  onLike,
+  onUnlike,
   loadingProjectId,
+  likingProjectId,
 }: ProjectGridProps) => {
   if (projects.length === 0) {
     return (
@@ -52,10 +59,13 @@ export const ProjectGrid = ({
           project={project}
           isMyTeam={myTeamId === project.teamId}
           isVoted={votedProjectIds.has(project.id)}
-          isSessionActive={isSessionActive}
+          isLiked={likedProjectIds.has(project.id)}
           onVote={onVote}
           onCancel={onCancel}
-          loading={loadingProjectId === project.id}
+          onLike={onLike}
+          onUnlike={onUnlike}
+          voteLoading={loadingProjectId === project.id}
+          likeLoading={likingProjectId === project.id}
         />
       ))}
     </div>

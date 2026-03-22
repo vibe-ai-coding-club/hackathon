@@ -93,6 +93,7 @@ model Member {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   votes Vote[]
+  likes Like[]
 
   @@map("members")
 }
@@ -117,7 +118,9 @@ model Project {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  votes Vote[]
+  votes         Vote[]
+  likes         Like[]
+  eventSettings EventSetting[]
 
   @@map("projects")
 }
@@ -147,16 +150,29 @@ model RegistrationSetting {
   @@map("registration_settings")
 }
 
-model VoteSession {
-  id       String  @id @default(cuid())
-  isActive Boolean @default(false) @map("is_active")
-  maxVotes Int     @default(5) @map("max_votes")
+model Like {
+  id       String @id @default(cuid())
+  memberId String @map("member_id")
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-  startedAt DateTime? @map("started_at")
-  endedAt   DateTime? @map("ended_at")
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([memberId, projectId])
+  @@map("likes")
+}
+
+model EventSetting {
+  id       String @id @default(cuid())
+  maxVotes Int    @default(5) @map("max_votes")
+
+  presentingProjectId String?  @map("presenting_project_id")
+  presentingProject   Project? @relation(fields: [presentingProjectId], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("vote_sessions")
+  @@map("event_settings")
 }
