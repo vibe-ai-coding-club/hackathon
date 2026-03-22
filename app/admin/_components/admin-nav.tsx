@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/admin", label: "참가 신청" },
   { href: "/admin/projects", label: "프로젝트 현황" },
-  { href: "/admin/votes", label: "투표 관리" },
+  { href: "/admin/vote", label: "투표 관리" },
 ];
 
 export const AdminNav = () => {
