@@ -27,6 +27,7 @@ type ProjectGridProps = {
   onUnlike: (projectId: string) => void;
   loadingProjectId: string | null;
   likingProjectId: string | null;
+  isReadOnly?: boolean;
 };
 
 export const ProjectGrid = ({
@@ -40,6 +41,7 @@ export const ProjectGrid = ({
   onUnlike,
   loadingProjectId,
   likingProjectId,
+  isReadOnly,
 }: ProjectGridProps) => {
   if (projects.length === 0) {
     return (
@@ -66,6 +68,7 @@ export const ProjectGrid = ({
           onUnlike={onUnlike}
           voteLoading={loadingProjectId === project.id}
           likeLoading={likingProjectId === project.id}
+          isReadOnly={isReadOnly}
         />
       ))}
     </div>

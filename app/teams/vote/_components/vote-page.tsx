@@ -25,10 +25,12 @@ type VoterData = {
 };
 
 type Props = {
-  voter: VoterData;
+  voter: VoterData | null;
 };
 
 export const VotePage = ({ voter }: Props) => {
+  const isReadOnly = !voter;
+
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [maxVotes, setMaxVotes] = useState(5);
   const [presentingProjectId, setPresentingProjectId] = useState<string | null>(
@@ -64,6 +66,7 @@ export const VotePage = ({ voter }: Props) => {
 
   // 내 투표 현황 로드
   const fetchMyVotes = useCallback(async () => {
+    if (!voter) return;
     try {
       const res = await fetch(`/api/vote?memberId=${voter.memberId}`);
       const json = await res.json();
@@ -73,10 +76,11 @@ export const VotePage = ({ voter }: Props) => {
     } catch {
       // silent
     }
-  }, [voter.memberId]);
+  }, [voter]);
 
   // 내 좋아요 현황 로드
   const fetchMyLikes = useCallback(async () => {
+    if (!voter) return;
     try {
       const res = await fetch(`/api/like?memberId=${voter.memberId}`);
       const json = await res.json();
@@ -86,7 +90,7 @@ export const VotePage = ({ voter }: Props) => {
     } catch {
       // silent
     }
-  }, [voter.memberId]);
+  }, [voter]);
 
   // 초기 로드
   useEffect(() => {
@@ -103,6 +107,7 @@ export const VotePage = ({ voter }: Props) => {
 
   // 투표 실행
   const handleVote = async (projectId: string) => {
+    if (!voter) return;
     setLoadingProjectId(projectId);
     try {
       const res = await fetch("/api/vote", {
@@ -131,6 +136,7 @@ export const VotePage = ({ voter }: Props) => {
 
   // 투표 취소
   const handleCancel = async (projectId: string) => {
+    if (!voter) return;
     setLoadingProjectId(projectId);
     try {
       const res = await fetch("/api/vote", {
@@ -163,6 +169,7 @@ export const VotePage = ({ voter }: Props) => {
 
   // 좋아요
   const handleLike = async (projectId: string) => {
+    if (!voter) return;
     setLikingProjectId(projectId);
     try {
       const res = await fetch("/api/like", {
@@ -191,6 +198,7 @@ export const VotePage = ({ voter }: Props) => {
 
   // 좋아요 취소
   const handleUnlike = async (projectId: string) => {
+    if (!voter) return;
     setLikingProjectId(projectId);
     try {
       const res = await fetch("/api/like", {
@@ -249,13 +257,19 @@ export const VotePage = ({ voter }: Props) => {
 
       {/* 상태 바 */}
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border p-4">
-        <span className="typo-body3 text-muted-foreground">{voter.name}님</span>
-        <div className="h-4 w-px bg-border" />
         <span className="typo-body3 text-muted-foreground">
-          남은 투표:{" "}
-          <strong className="text-foreground">{remainingVotes}</strong>/
-          {maxVotes}
+          {isReadOnly ? "관리자 (읽기 전용)" : `${voter.name}님`}
         </span>
+        {!isReadOnly && (
+          <>
+            <div className="h-4 w-px bg-border" />
+            <span className="typo-body3 text-muted-foreground">
+              남은 투표:{" "}
+              <strong className="text-foreground">{remainingVotes}</strong>/
+              {maxVotes}
+            </span>
+          </>
+        )}
       </div>
 
       {error && (
@@ -268,7 +282,7 @@ export const VotePage = ({ voter }: Props) => {
       {presentingProject && (
         <PresentingProject
           project={presentingProject}
-          isMyTeam={voter.teamId === presentingProject.teamId}
+          isMyTeam={false}
           isVoted={votedProjectIds.has(presentingProject.id)}
           isLiked={likedProjectIds.has(presentingProject.id)}
           onVote={handleVote}
@@ -277,6 +291,7 @@ export const VotePage = ({ voter }: Props) => {
           onUnlike={handleUnlike}
           voteLoading={loadingProjectId === presentingProject.id}
           likeLoading={likingProjectId === presentingProject.id}
+          isReadOnly={isReadOnly}
         />
       )}
 
@@ -285,13 +300,14 @@ export const VotePage = ({ voter }: Props) => {
         projects={otherProjects}
         votedProjectIds={votedProjectIds}
         likedProjectIds={likedProjectIds}
-        myTeamId={voter.teamId}
+        myTeamId={voter?.teamId ?? ""}
         onVote={handleVote}
         onCancel={handleCancel}
         onLike={handleLike}
         onUnlike={handleUnlike}
         loadingProjectId={loadingProjectId}
         likingProjectId={likingProjectId}
+        isReadOnly={isReadOnly}
       />
     </div>
   );

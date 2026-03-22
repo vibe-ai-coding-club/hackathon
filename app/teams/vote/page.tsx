@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { auth } from "@/lib/auth";
+import { auth, ADMIN_EMAIL } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { VotePage } from "./_components/vote-page";
 
@@ -15,7 +15,13 @@ const VotePageRoute = async () => {
     redirect("/teams/login");
   }
 
+  const isAdmin = session.user.email === ADMIN_EMAIL;
   const { memberId, teamId, name } = session.user;
+
+  // 관리자: 읽기 전용으로 접근
+  if (isAdmin) {
+    return <VotePage voter={null} />;
+  }
 
   if (!memberId || !teamId || !name) {
     redirect("/teams/login");
