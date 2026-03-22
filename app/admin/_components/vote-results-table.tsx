@@ -5,16 +5,19 @@ type VoteResult = {
   title: string;
   teamName: string;
   voteCount: number;
+  likeCount: number;
 };
 
 type VoteResultsTableProps = {
   results: VoteResult[];
   totalVotes: number;
+  totalLikes: number;
 };
 
 export const VoteResultsTable = ({
   results,
   totalVotes,
+  totalLikes,
 }: VoteResultsTableProps) => {
   const sorted = [...results].sort((a, b) => b.voteCount - a.voteCount);
   const maxVoteCount = sorted[0]?.voteCount ?? 0;
@@ -22,10 +25,15 @@ export const VoteResultsTable = ({
   return (
     <div className="rounded-lg border border-border">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h2 className="typo-subtitle2">투표 결과</h2>
-        <span className="typo-caption1 text-muted-foreground">
-          총 {totalVotes}표
-        </span>
+        <h2 className="typo-subtitle2">투표 · 좋아요 결과</h2>
+        <div className="flex gap-3">
+          <span className="typo-caption1 text-muted-foreground">
+            총 {totalVotes}표
+          </span>
+          <span className="typo-caption1 text-muted-foreground">
+            총 {totalLikes}좋아요
+          </span>
+        </div>
       </div>
 
       {sorted.length === 0 ? (
@@ -80,6 +88,11 @@ export const VoteResultsTable = ({
               {/* 투표 수 */}
               <span className="typo-caption1 font-bold tabular-nums w-10 text-right">
                 {result.voteCount}
+              </span>
+
+              {/* 좋아요 수 */}
+              <span className="typo-caption2 tabular-nums w-12 text-right text-red-400">
+                ❤️ {result.likeCount}
               </span>
             </div>
           ))}

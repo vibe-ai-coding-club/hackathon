@@ -4,14 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { AdminNav } from "../_components/admin-nav";
 import { LogoutButton } from "../_components/logout-button";
 import { VoteResultsTable } from "../_components/vote-results-table";
-import { VoteSessionControl } from "../_components/vote-session-control";
+import { EventSettingControl } from "../_components/event-setting-control";
 
-type SessionData = {
+type SettingData = {
   id: string;
-  isActive: boolean;
   maxVotes: number;
-  startedAt: string | null;
-  endedAt: string | null;
+  presentingProjectId: string | null;
 } | null;
 
 type VoteResult = {
@@ -19,22 +17,25 @@ type VoteResult = {
   title: string;
   teamName: string;
   voteCount: number;
+  likeCount: number;
 };
 
 const AdminVotesPage = () => {
-  const [session, setSession] = useState<SessionData>(null);
+  const [setting, setSetting] = useState<SettingData>(null);
   const [results, setResults] = useState<VoteResult[]>([]);
   const [totalVotes, setTotalVotes] = useState(0);
+  const [totalLikes, setTotalLikes] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/vote-session");
+      const res = await fetch("/api/admin/event-setting");
       const json = await res.json();
       if (json.success) {
-        setSession(json.data.session);
+        setSetting(json.data.setting);
         setResults(json.data.results);
         setTotalVotes(json.data.totalVotes);
+        setTotalLikes(json.data.totalLikes);
       }
     } catch {
       // silent
@@ -47,11 +48,11 @@ const AdminVotesPage = () => {
     fetchData();
   }, [fetchData]);
 
+  // 5초 간격 자동 새로고침
   useEffect(() => {
-    if (!session?.isActive) return;
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-  }, [session?.isActive, fetchData]);
+  }, [fetchData]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-4">
@@ -70,8 +71,16 @@ const AdminVotesPage = () => {
           </div>
         ) : (
           <>
-            <VoteSessionControl session={session} onRefresh={fetchData} />
-            <VoteResultsTable results={results} totalVotes={totalVotes} />
+            <EventSettingControl
+              setting={setting}
+              projects={results}
+              onRefresh={fetchData}
+            />
+            <VoteResultsTable
+              results={results}
+              totalVotes={totalVotes}
+              totalLikes={totalLikes}
+            />
           </>
         )}
       </div>
