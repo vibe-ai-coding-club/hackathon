@@ -2,13 +2,11 @@
 
 import { signIn } from "next-auth/react";
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 const inputClass =
   "w-full rounded-lg bg-gray-50 px-4 py-3 typo-body3 outline-none transition-colors focus:ring-2 focus:ring-primary-400/40";
 
 const LoginPage = () => {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
   const [error, setError] = useState("");
@@ -44,8 +42,7 @@ const LoginPage = () => {
       if (result?.error) {
         setError("이메일 또는 전화번호가 일치하지 않습니다.");
       } else {
-        router.push("/teams");
-        router.refresh();
+        window.location.href = "/teams";
       }
     } catch {
       setError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
