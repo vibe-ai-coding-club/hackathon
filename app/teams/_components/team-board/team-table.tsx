@@ -20,7 +20,11 @@ const tdClass =
   "px-2.5 py-1.5 text-sm border-b border-r border-border last:border-r-0";
 const colSpanAll = 9;
 
-export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) => {
+export const TeamTable = ({
+  onShowAiPrompt,
+}: {
+  onShowAiPrompt: () => void;
+}) => {
   const {
     teams,
     filtered,
@@ -36,6 +40,8 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
     updateTeam,
     toggleRecruiting,
     toggleSeeking,
+    isInFullTeam,
+    setShowLeaveModal,
   } = useTeamBoard();
 
   return (
@@ -115,9 +121,7 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
               filtered.map((team) => {
                 const leader =
                   team.members.find((m) => m.isLeader) ?? team.members[0];
-                const others = team.members.filter(
-                  (m) => m.id !== leader?.id,
-                );
+                const others = team.members.filter((m) => m.id !== leader?.id);
                 const canEdit = isAdmin || team.isMyTeam;
 
                 return (
@@ -157,7 +161,9 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                         {canEdit && team.membersCount < team.maxMembers ? (
                           <button
                             type="button"
-                            onClick={() => toggleRecruiting(team.id, !team.recruiting)}
+                            onClick={() =>
+                              toggleRecruiting(team.id, !team.recruiting)
+                            }
                             className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium cursor-pointer transition-colors ${
                               team.recruiting
                                 ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
@@ -178,9 +184,7 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                       </div>
                     </td>
                     {/* 주제 */}
-                    <td
-                      className={`${tdClass} text-muted-foreground max-w-70`}
-                    >
+                    <td className={`${tdClass} text-muted-foreground max-w-70`}>
                       {canEdit ? (
                         <EditableCell
                           value={team.recruitmentNote ?? ""}
@@ -210,7 +214,9 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                           {(leader.id === myMemberId || isAdmin) && (
                             <button
                               type="button"
-                              onClick={() => toggleSeeking(!leader.seekingTeam, leader.id)}
+                              onClick={() =>
+                                toggleSeeking(!leader.seekingTeam, leader.id)
+                              }
                               className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
                                 leader.seekingTeam
                                   ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
@@ -227,10 +233,7 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                     </td>
                     {/* 팀원 2~4 */}
                     {[0, 1, 2].map((idx) => (
-                      <td
-                        key={idx}
-                        className={`${tdClass} whitespace-nowrap`}
-                      >
+                      <td key={idx} className={`${tdClass} whitespace-nowrap`}>
                         {others[idx] ? (
                           <div className="inline-flex items-center gap-1">
                             <span
@@ -245,7 +248,12 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
                             {(others[idx].id === myMemberId || isAdmin) && (
                               <button
                                 type="button"
-                                onClick={() => toggleSeeking(!others[idx].seekingTeam, others[idx].id)}
+                                onClick={() =>
+                                  toggleSeeking(
+                                    !others[idx].seekingTeam,
+                                    others[idx].id,
+                                  )
+                                }
                                 className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
                                   others[idx].seekingTeam
                                     ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
@@ -336,6 +344,26 @@ export const TeamTable = ({ onShowAiPrompt }: { onShowAiPrompt: () => void }) =>
               })
             )}
           </tbody>
+          {myTeam && isInFullTeam && !isAdmin && (
+            <tfoot>
+              <tr>
+                <td colSpan={colSpanAll} className="border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => setShowLeaveModal(true)}
+                    className="w-full px-4 py-3 text-sm text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer text-left"
+                  >
+                    <span className="font-medium text-foreground">
+                      새 팀으로 시작하기
+                    </span>
+                    <span className="ml-2 text-xs">
+                      현재 팀에서 나와 1인 팀으로 새로 시작합니다
+                    </span>
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          )}
           {filtered.length > 0 && (
             <tfoot>
               <tr className="bg-muted/50">
