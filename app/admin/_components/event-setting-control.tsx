@@ -22,9 +22,7 @@ export const EventSettingControl = ({
   onRefresh,
 }: EventSettingControlProps) => {
   const [maxVotes, setMaxVotes] = useState(setting?.maxVotes ?? 5);
-  const [presentingProjectId, setPresentingProjectId] = useState(
-    setting?.presentingProjectId ?? "",
-  );
+  const presentingProjectId = setting?.presentingProjectId ?? "";
   const [loading, setLoading] = useState(false);
 
   const handleSave = async (data: {
@@ -57,7 +55,6 @@ export const EventSettingControl = ({
   };
 
   const handlePresentingChange = (value: string) => {
-    setPresentingProjectId(value);
     handleSave({ presentingProjectId: value || null });
   };
 

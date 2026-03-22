@@ -21,6 +21,7 @@ type PresentingProjectProps = {
   onUnlike: (projectId: string) => void;
   voteLoading: boolean;
   likeLoading: boolean;
+  isReadOnly?: boolean;
 };
 
 export const PresentingProject = ({
@@ -34,6 +35,7 @@ export const PresentingProject = ({
   onUnlike,
   voteLoading,
   likeLoading,
+  isReadOnly,
 }: PresentingProjectProps) => {
   return (
     <div className="mb-8">
@@ -92,22 +94,31 @@ export const PresentingProject = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* 좋아요 */}
-            <button
-              onClick={() =>
-                isLiked ? onUnlike(project.id) : onLike(project.id)
-              }
-              disabled={likeLoading}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-2 typo-btn4 transition-colors cursor-pointer disabled:opacity-50 ${
-                isLiked
-                  ? "bg-red-50 text-red-500 border border-red-200"
-                  : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
-              }`}
-            >
-              <span className="text-lg">{isLiked ? "❤️" : "🤍"}</span>
-              <span className="tabular-nums font-bold">
-                {project.likeCount}
+            {isReadOnly ? (
+              <span className="flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-200 px-4 py-2 typo-btn4 text-gray-600">
+                <span className="text-lg">❤️</span>
+                <span className="tabular-nums font-bold">
+                  {project.likeCount}
+                </span>
               </span>
-            </button>
+            ) : (
+              <button
+                onClick={() =>
+                  isLiked ? onUnlike(project.id) : onLike(project.id)
+                }
+                disabled={likeLoading}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-2 typo-btn4 transition-colors cursor-pointer disabled:opacity-50 ${
+                  isLiked
+                    ? "bg-red-50 text-red-500 border border-red-200"
+                    : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
+                }`}
+              >
+                <span className="text-lg">{isLiked ? "❤️" : "🤍"}</span>
+                <span className="tabular-nums font-bold">
+                  {project.likeCount}
+                </span>
+              </button>
+            )}
 
             {/* 투표 수 */}
             <span className="typo-caption1 text-muted-foreground">
@@ -116,7 +127,7 @@ export const PresentingProject = ({
           </div>
 
           {/* 투표 버튼 */}
-          {!isMyTeam && (
+          {!isReadOnly && !isMyTeam && (
             <>
               {isVoted ? (
                 <button

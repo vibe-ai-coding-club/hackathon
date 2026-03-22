@@ -40,6 +40,11 @@ type TeamBoardContextValue = {
   updateTeam: (teamId: string, field: string, value: string) => void;
   toggleRecruiting: (teamId: string, value: boolean) => void;
   toggleSeeking: (value: boolean, memberId?: string) => void;
+  // leave team
+  showLeaveModal: boolean;
+  setShowLeaveModal: (v: boolean) => void;
+  handleLeaveTeam: () => void;
+  leaving: boolean;
   // project
   showProjectModal: boolean;
   setShowProjectModal: (v: boolean) => void;
@@ -55,11 +60,16 @@ const TeamBoardContext = createContext<TeamBoardContextValue | null>(null);
 
 export const useTeamBoard = () => {
   const ctx = useContext(TeamBoardContext);
-  if (!ctx) throw new Error("useTeamBoard must be used within TeamBoardProvider");
+  if (!ctx)
+    throw new Error("useTeamBoard must be used within TeamBoardProvider");
   return ctx;
 };
 
-export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) => {
+export const TeamBoardProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [myMemberId, setMyMemberId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -70,6 +80,8 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
   const [transferMode, setTransferMode] = useState<TransferMode>("transfer");
   const [transferring, setTransferring] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [recruitingOpen, setRecruitingOpen] = useState(true);
   const [lookingOpen, setLookingOpen] = useState(true);
 
@@ -95,7 +107,8 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
   const filtered = useMemo(() => {
     return teams
       .filter((t) => {
-        if (expFilter !== "ALL" && t.experienceLevel !== expFilter) return false;
+        if (expFilter !== "ALL" && t.experienceLevel !== expFilter)
+          return false;
         if (search.trim()) {
           const q = search.toLowerCase();
           if (
@@ -117,9 +130,7 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
   }, [teams, search, expFilter]);
 
   const recruitingTeams = useMemo(() => {
-    return teams.filter(
-      (t) => t.recruiting && t.membersCount < t.maxMembers,
-    );
+    return teams.filter((t) => t.recruiting && t.membersCount < t.maxMembers);
   }, [teams]);
 
   const lookingForTeam = useMemo(() => {
@@ -170,7 +181,11 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
     (team: Team, mode: TransferMode = "transfer") => {
       if (team.isMyTeam) return;
       if (mode === "transfer" && team.membersCount >= team.maxMembers) return;
-      if (mode === "recruit" && myTeam && myTeam.membersCount >= myTeam.maxMembers)
+      if (
+        mode === "recruit" &&
+        myTeam &&
+        myTeam.membersCount >= myTeam.maxMembers
+      )
         return;
       setTransferMode(mode);
       setTransferTarget(team);
@@ -276,7 +291,8 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
       );
       try {
         // 어드민이 다른 멤버를 토글할 때는 어드민 API 사용
-        const useAdminApi = isAdmin && targetMemberId && targetMemberId !== myMemberId;
+        const useAdminApi =
+          isAdmin && targetMemberId && targetMemberId !== myMemberId;
         const url = useAdminApi
           ? `/api/admin/members/${mid}/seeking`
           : "/api/teams/seeking";
@@ -303,6 +319,24 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
     },
     [myMemberId, isAdmin],
   );
+
+  const handleLeaveTeam = useCallback(async () => {
+    setLeaving(true);
+    try {
+      const res = await fetch("/api/teams/leave", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        window.location.reload();
+      } else {
+        alert(json.message);
+      }
+    } catch {
+      alert("서버 오류가 발생했습니다.");
+    } finally {
+      setLeaving(false);
+      setShowLeaveModal(false);
+    }
+  }, []);
 
   const handleProjectSaved = useCallback(
     (project: Project) => {
@@ -341,6 +375,10 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
       updateTeam,
       toggleRecruiting,
       toggleSeeking,
+      showLeaveModal,
+      setShowLeaveModal,
+      handleLeaveTeam,
+      leaving,
       showProjectModal,
       setShowProjectModal,
       handleProjectSaved,
@@ -373,6 +411,9 @@ export const TeamBoardProvider = ({ children }: { children: React.ReactNode }) =
       updateTeam,
       toggleRecruiting,
       toggleSeeking,
+      showLeaveModal,
+      handleLeaveTeam,
+      leaving,
       showProjectModal,
       handleProjectSaved,
       recruitingOpen,

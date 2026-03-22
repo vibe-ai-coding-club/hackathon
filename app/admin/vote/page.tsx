@@ -27,6 +27,27 @@ const AdminVotesPage = () => {
   const [totalLikes, setTotalLikes] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const handlePresenting = async (projectId: string | null) => {
+    try {
+      const res = await fetch("/api/admin/event-setting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ presentingProjectId: projectId }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSetting((prev) =>
+          prev ? { ...prev, presentingProjectId: projectId } : prev,
+        );
+        fetchData();
+      } else {
+        alert(json.message);
+      }
+    } catch {
+      alert("서버 오류가 발생했습니다.");
+    }
+  };
+
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/event-setting");
@@ -80,6 +101,8 @@ const AdminVotesPage = () => {
               results={results}
               totalVotes={totalVotes}
               totalLikes={totalLikes}
+              presentingProjectId={setting?.presentingProjectId ?? null}
+              onPresenting={handlePresenting}
             />
           </>
         )}

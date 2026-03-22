@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AiPromptModal } from "./ai-prompt-modal";
 import { TeamBoardProvider, useTeamBoard } from "./context";
+import { LeaveModal } from "./leave-modal";
 import { LookingSidebar } from "./looking-sidebar";
 import { ProjectModal } from "./project-modal";
 import { RecruitingSidebar } from "./recruiting-sidebar";
@@ -29,6 +30,7 @@ const TeamBoardInner = () => {
         <LookingSidebar />
       </div>
       <TransferModal />
+      <LeaveModal />
       {showProjectModal && <ProjectModal />}
       {showAiPrompt && <AiPromptModal onClose={() => setShowAiPrompt(false)} />}
     </div>
