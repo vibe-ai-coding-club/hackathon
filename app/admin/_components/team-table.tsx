@@ -398,6 +398,9 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     }
   };
 
+  // 새 팀 드롭 영역
+  const [dropTargetNewTeam, setDropTargetNewTeam] = useState(false);
+
   // 실제 이동 실행
   const executeTransfer = useCallback(
     async (
@@ -428,6 +431,31 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     [],
   );
 
+  // 새 팀 생성 + 멤버 이동
+  const executeNewTeamTransfer = useCallback(
+    async (memberId: string, deleteSourceTeam?: string) => {
+      try {
+        const res = await fetch(`/api/admin/members/${memberId}/transfer`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ createNewTeam: true }),
+        });
+        if (!res.ok) return;
+
+        if (deleteSourceTeam) {
+          await fetch(`/api/admin/teams/${deleteSourceTeam}`, {
+            method: "DELETE",
+          });
+        }
+
+        window.location.reload();
+      } catch (error) {
+        console.error("new team transfer error:", error);
+      }
+    },
+    [],
+  );
+
   // 드래그 시작
   const handleDragStart = (
     e: React.DragEvent,
@@ -451,10 +479,42 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
     setDropTargetTeamId(teamId);
+    setDropTargetNewTeam(false);
   };
 
   const handleDragLeave = () => {
     setDropTargetTeamId(null);
+  };
+
+  // 새 팀 드롭 영역 핸들러
+  const handleNewTeamDragOver = (e: React.DragEvent) => {
+    if (!dragData) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDropTargetNewTeam(true);
+    setDropTargetTeamId(null);
+  };
+
+  const handleNewTeamDragLeave = () => {
+    setDropTargetNewTeam(false);
+  };
+
+  const handleNewTeamDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDropTargetNewTeam(false);
+    if (!dragData) return;
+
+    const sourceTeam = teams.find((t) => t.id === dragData.sourceTeamId);
+    if (!sourceTeam) return;
+
+    // 이동 후 원래 팀이 비게 되는 경우 → 새 팀 생성이 무의미하므로 차단
+    if (sourceTeam.members.length === 1) {
+      setDragData(null);
+      return;
+    }
+
+    executeNewTeamTransfer(dragData.memberId);
+    setDragData(null);
   };
 
   // 드롭 실행
@@ -882,6 +942,34 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                   </Fragment>
                 );
               })
+            )}
+            {/* 새 팀 드롭 영역 */}
+            {dragData && (
+              <tr
+                className={`border-t-2 border-dashed transition-colors ${
+                  dropTargetNewTeam
+                    ? "border-accent bg-accent/10"
+                    : "border-border/50 bg-muted/5"
+                }`}
+                onDragOver={handleNewTeamDragOver}
+                onDragLeave={handleNewTeamDragLeave}
+                onDrop={handleNewTeamDrop}
+              >
+                <td
+                  className={`${tdClass} py-3 text-center`}
+                  colSpan={14}
+                >
+                  {dropTargetNewTeam ? (
+                    <span className="text-accent font-medium typo-caption1">
+                      새 팀을 만들고 여기로 이동
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground/50 typo-caption2">
+                      여기에 놓으면 새 팀 생성
+                    </span>
+                  )}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

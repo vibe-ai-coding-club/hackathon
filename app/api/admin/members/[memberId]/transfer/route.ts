@@ -18,9 +18,9 @@ export async function PATCH(
 
   const { memberId } = await params;
   const body = await request.json();
-  const { targetTeamId } = body;
+  const { targetTeamId, createNewTeam } = body;
 
-  if (!targetTeamId) {
+  if (!targetTeamId && !createNewTeam) {
     return NextResponse.json(
       { success: false, message: "대상 팀을 선택해주세요." },
       { status: 400 },
@@ -42,6 +42,71 @@ export async function PATCH(
       );
     }
 
+    const sourceTeamId = member.teamId;
+    const remainingMembers = member.team.members.filter(
+      (m) => m.id !== memberId,
+    );
+    const sourceTeamEmpty = remainingMembers.length === 0;
+
+    // 새 팀 생성 모드
+    if (createNewTeam) {
+      let newTeamId: string = "";
+
+      await prisma.$transaction(async (tx) => {
+        // 원래 팀에 리더가 없어지는 경우 → 승격
+        if (remainingMembers.length > 0) {
+          const hasLeaderLeft = member.isLeader;
+          const noLeaderRemaining = !remainingMembers.some((m) => m.isLeader);
+          if (hasLeaderLeft || noLeaderRemaining) {
+            const newLeader = remainingMembers[0];
+            await tx.member.update({
+              where: { id: newLeader.id },
+              data: { isLeader: true },
+            });
+          }
+        }
+
+        // 원래 팀: 1명 남으면 개인으로 변경
+        if (remainingMembers.length === 1) {
+          await tx.team.update({
+            where: { id: sourceTeamId },
+            data: { participationType: "INDIVIDUAL" },
+          });
+        }
+
+        // 새 팀 생성 (원래 팀의 환불 계좌 정보 복사)
+        const newTeam = await tx.team.create({
+          data: {
+            participationType: "INDIVIDUAL",
+            experienceLevel: member.team.experienceLevel,
+            status: member.team.status,
+            refundBank: member.refundBank ?? member.team.refundBank,
+            refundAccount: member.refundAccount ?? member.team.refundAccount,
+            refundAccountHolder:
+              member.refundAccountHolder ??
+              member.team.refundAccountHolder,
+            privacyConsent: true,
+            consentedAt: new Date(),
+          },
+        });
+        newTeamId = newTeam.id;
+
+        // 멤버를 새 팀의 리더로 이동
+        await tx.member.update({
+          where: { id: memberId },
+          data: { teamId: newTeam.id, isLeader: true },
+        });
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: "새 팀이 생성되고 멤버가 이동되었습니다.",
+        sourceTeamEmpty,
+        newTeamId,
+      });
+    }
+
+    // 기존 팀으로 이동 모드
     if (member.teamId === targetTeamId) {
       return NextResponse.json(
         { success: false, message: "같은 팀으로는 이동할 수 없습니다." },
@@ -62,12 +127,6 @@ export async function PATCH(
         { status: 400 },
       );
     }
-
-    const sourceTeamId = member.teamId;
-    const remainingMembers = member.team.members.filter(
-      (m) => m.id !== memberId,
-    );
-    const sourceTeamEmpty = remainingMembers.length === 0;
 
     await prisma.$transaction(async (tx) => {
       // 원래 팀에 리더가 없어지는 경우 → 승격
