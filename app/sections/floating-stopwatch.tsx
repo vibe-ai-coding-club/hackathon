@@ -2,29 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import { useRegistrationCountdown } from "@/app/_hooks/use-registration-countdown";
-import { pad } from "@/lib/registration-time";
-
 const BASE_BOTTOM = 50;
 const FOOTER_MARGIN_MOBILE = 20;
 const FOOTER_MARGIN_DESKTOP = 30;
 const FOOTER_TRIGGER = 20;
-
-const TimeBlock = ({ label, value }: { label: string; value: string }) => {
-  return (
-    <div className="flex items-center gap-[1px] text-center text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:gap-0.5 md:typo-h6 md:font-bold md:tracking-[-0.4px]">
-      <span>{value}</span>
-      <span>{label}</span>
-    </div>
-  );
-};
-
-const Colon = () => (
-  <div className="flex flex-col gap-[2px] md:h-3 md:w-1 md:justify-between md:gap-0">
-    <span className="size-0.5 rounded-full bg-primary-900 md:size-1" />
-    <span className="size-0.5 rounded-full bg-primary-900 md:size-1" />
-  </div>
-);
 
 const getVisibleHeight = (rect: DOMRect, viewportHeight: number) => {
   const visible = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
@@ -32,7 +13,6 @@ const getVisibleHeight = (rect: DOMRect, viewportHeight: number) => {
 };
 
 export const FloatingStopwatch = () => {
-  const { phase, timeLeft, label } = useRegistrationCountdown();
   const [isVisible, setIsVisible] = useState(false);
   const [bottomOffset, setBottomOffset] = useState(BASE_BOTTOM);
 
@@ -54,7 +34,9 @@ export const FloatingStopwatch = () => {
         window.innerHeight,
       );
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-      const footerMargin = isDesktop ? FOOTER_MARGIN_DESKTOP : FOOTER_MARGIN_MOBILE;
+      const footerMargin = isDesktop
+        ? FOOTER_MARGIN_DESKTOP
+        : FOOTER_MARGIN_MOBILE;
       const stickyBottom =
         footerVisibleHeight >= FOOTER_TRIGGER
           ? footerVisibleHeight + footerMargin
@@ -89,26 +71,9 @@ export const FloatingStopwatch = () => {
       aria-hidden={!isVisible}
     >
       <div className="flex items-center justify-center gap-2 overflow-hidden rounded-[32px] border border-primary-200 bg-transparent px-6 py-2.5 whitespace-nowrap backdrop-blur-[10px] md:gap-3.5 md:rounded-[44px] md:px-[34px] md:py-5">
-        <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:typo-h6 md:text-primary-900">
-          {phase === "closed" ? "" : label}
+        <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:typo-h6 md:font-bold">
+          D-Day!
         </p>
-        <div className="flex items-center justify-center gap-1 md:gap-2">
-          {phase !== "closed" ? (
-            <>
-              <TimeBlock value={pad(timeLeft.days)} label="일" />
-              <Colon />
-              <TimeBlock value={pad(timeLeft.hours)} label="시" />
-              <Colon />
-              <TimeBlock value={pad(timeLeft.minutes)} label="분" />
-              <Colon />
-              <TimeBlock value={pad(timeLeft.seconds)} label="초" />
-            </>
-          ) : (
-            <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:typo-h6 md:font-bold">
-              신청이 마감되었어요
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );
