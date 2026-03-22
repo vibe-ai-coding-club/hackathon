@@ -7,26 +7,33 @@ type ProjectCardProps = {
     description: string;
     teamName: string;
     voteCount: number;
+    likeCount: number;
     githubUrl: string;
     demoUrl: string | null;
     linkUrl: string | null;
   };
   isMyTeam: boolean;
   isVoted: boolean;
-  isSessionActive: boolean;
+  isLiked: boolean;
   onVote: (projectId: string) => void;
   onCancel: (projectId: string) => void;
-  loading: boolean;
+  onLike: (projectId: string) => void;
+  onUnlike: (projectId: string) => void;
+  voteLoading: boolean;
+  likeLoading: boolean;
 };
 
 export const ProjectCard = ({
   project,
   isMyTeam,
   isVoted,
-  isSessionActive,
+  isLiked,
   onVote,
   onCancel,
-  loading,
+  onLike,
+  onUnlike,
+  voteLoading,
+  likeLoading,
 }: ProjectCardProps) => {
   return (
     <div
@@ -97,29 +104,49 @@ export const ProjectCard = ({
         </a>
       </div>
 
-      {/* 투표 버튼 + 투표 수 */}
+      {/* 좋아요 + 투표 */}
       <div className="flex items-center justify-between">
-        <span className="typo-caption1 text-muted-foreground">
-          {project.voteCount}표
-        </span>
+        <div className="flex items-center gap-3">
+          {/* 좋아요 */}
+          <button
+            onClick={() =>
+              isLiked ? onUnlike(project.id) : onLike(project.id)
+            }
+            disabled={likeLoading}
+            className={`flex items-center gap-1 rounded-full px-3 py-1.5 typo-caption1 transition-colors cursor-pointer disabled:opacity-50 ${
+              isLiked
+                ? "bg-red-50 text-red-500 border border-red-200"
+                : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
+            }`}
+          >
+            <span>{isLiked ? "❤️" : "🤍"}</span>
+            <span className="tabular-nums font-bold">{project.likeCount}</span>
+          </button>
 
-        {isSessionActive && !isMyTeam && (
+          {/* 투표 수 */}
+          <span className="typo-caption1 text-muted-foreground">
+            {project.voteCount}표
+          </span>
+        </div>
+
+        {/* 투표 버튼 */}
+        {!isMyTeam && (
           <>
             {isVoted ? (
               <button
                 onClick={() => onCancel(project.id)}
-                disabled={loading}
+                disabled={voteLoading}
                 className="rounded-lg border border-primary-400 px-4 py-2 typo-btn4 text-primary-400 hover:bg-primary-025 disabled:opacity-50 transition-colors cursor-pointer"
               >
-                {loading ? "처리 중..." : "투표 취소"}
+                {voteLoading ? "처리 중..." : "투표 취소"}
               </button>
             ) : (
               <button
                 onClick={() => onVote(project.id)}
-                disabled={loading}
+                disabled={voteLoading}
                 className="rounded-lg bg-primary-400 px-4 py-2 typo-btn4 text-white hover:bg-primary-500 disabled:opacity-50 transition-colors cursor-pointer"
               >
-                {loading ? "처리 중..." : "투표하기"}
+                {voteLoading ? "처리 중..." : "투표하기"}
               </button>
             )}
           </>
