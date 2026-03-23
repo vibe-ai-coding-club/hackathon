@@ -11,7 +11,6 @@ export const RecruitingSidebar = () => {
     isAdmin,
     recruitingOpen,
     setRecruitingOpen,
-    handleTransferClick,
     updateTeam,
   } = useTeamBoard();
 
@@ -20,9 +19,9 @@ export const RecruitingSidebar = () => {
       <div className="flex items-center justify-between px-0.5">
         <div className="flex items-center gap-1">
           <span className="text-[11px] text-accent/60">
-            카드를 클릭하면 해당 팀에 합류합니다
+            디스코드에서 팀장에게 문의하세요
           </span>
-          <Tooltip text="팀원을 모집 중인 팀 목록입니다. 카드를 클릭하면 해당 팀에 합류할 수 있으며, 확인 후 현재 팀에서 나가고 선택한 팀으로 이동합니다. 내 팀의 주제를 클릭하여 수정할 수 있습니다." />
+          <Tooltip text="팀원을 모집 중인 팀 목록입니다. 합류를 원하시면 디스코드에서 팀장에게 직접 문의해주세요." />
         </div>
       </div>
       <div className="rounded-lg border border-accent/30 bg-accent/5 overflow-hidden">
@@ -57,75 +56,59 @@ export const RecruitingSidebar = () => {
               </p>
             ) : (
               <div className="space-y-2">
-                {recruitingTeams.map((team) => {
-                  const canJoin =
-                    !team.isMyTeam && team.membersCount < team.maxMembers;
-                  return (
-                    <div
-                      key={team.id}
-                      role={canJoin ? "button" : undefined}
-                      tabIndex={canJoin ? 0 : undefined}
-                      onClick={() => canJoin && handleTransferClick(team)}
-                      onKeyDown={(e) => {
-                        if (canJoin && (e.key === "Enter" || e.key === " "))
-                          handleTransferClick(team);
-                      }}
-                      className={`w-full rounded-md border p-2.5 text-left transition-colors ${
-                        team.isMyTeam
-                          ? "border-accent/30 bg-accent/5"
-                          : canJoin
-                            ? "border-border bg-background hover:border-accent/40 hover:bg-accent/5 cursor-pointer"
-                            : "border-border bg-muted/30 opacity-50"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <span className="text-sm font-medium truncate">
-                          {team.teamName || team.leaderName}
-                        </span>
-                        <span
-                          className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${
-                            experienceLevelStyle[team.experienceLevel] ??
-                            "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {experienceLevelLabel[team.experienceLevel]}
-                        </span>
-                      </div>
-                      {isAdmin || team.isMyTeam ? (
-                        <div
-                          className="mb-1"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <EditableCell
-                            value={team.recruitmentNote ?? ""}
-                            placeholder="주제 입력"
-                            onSave={(v) =>
-                              updateTeam(team.id, "recruitmentNote", v)
-                            }
-                            className="w-full text-[11px] text-muted-foreground"
-                          />
-                        </div>
-                      ) : team.recruitmentNote ? (
-                        <p className="text-[11px] text-muted-foreground line-clamp-2 mb-1">
-                          {team.recruitmentNote}
-                        </p>
-                      ) : null}
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-muted-foreground">
-                          {team.leaderName}
-                        </span>
-                        <span className="text-[11px] font-medium">
-                          {team.membersCount}/{team.maxMembers}명
-                        </span>
-                      </div>
-                      {team.isMyTeam && (
-                        <span className="mt-1 inline-block rounded-full bg-accent/10 px-1.5 py-px text-[10px] font-medium text-accent">
-                          내 팀
-                        </span>
-                      )}
+                {recruitingTeams.map((team) => (
+                  <div
+                    key={team.id}
+                    className={`w-full rounded-md border p-2.5 text-left ${
+                      team.isMyTeam
+                        ? "border-accent/30 bg-accent/5"
+                        : "border-border bg-background"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <span className="text-sm font-medium truncate">
+                        {team.teamName || team.leaderName}
+                      </span>
+                      <span
+                        className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium ${
+                          experienceLevelStyle[team.experienceLevel] ??
+                          "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {experienceLevelLabel[team.experienceLevel]}
+                      </span>
                     </div>
-                  );
-                })}
+                    {isAdmin || team.isMyTeam ? (
+                      <div className="mb-1">
+                        <EditableCell
+                          value={team.recruitmentNote ?? ""}
+                          placeholder="주제 입력"
+                          onSave={(v) =>
+                            updateTeam(team.id, "recruitmentNote", v)
+                          }
+                          className="w-full text-[11px] text-muted-foreground"
+                        />
+                      </div>
+                    ) : team.recruitmentNote ? (
+                      <p className="text-[11px] text-muted-foreground line-clamp-2 mb-1">
+                        {team.recruitmentNote}
+                      </p>
+                    ) : null}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-muted-foreground">
+                        {team.leaderName}
+                      </span>
+                      <span className="text-[11px] font-medium">
+                        {team.membersCount}/{team.maxMembers}명
+                      </span>
+                    </div>
+                    {team.isMyTeam && (
+                      <span className="mt-1 inline-block rounded-full bg-accent/10 px-1.5 py-px text-[10px] font-medium text-accent">
+                        내 팀
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
