@@ -35,12 +35,19 @@ export const EditableCell = ({
           setDraft(value);
           setEditing(true);
         }}
-        className={`text-left cursor-text hover:bg-accent/5 rounded px-1 -mx-1 transition-colors ${className ?? ""}`}
+        className={`inline-flex items-center gap-1 text-left cursor-text hover:bg-accent/5 rounded px-1 -mx-1 transition-colors group ${className ?? ""}`}
         title="클릭하여 수정"
       >
         {value || (
           <span className="text-muted-foreground/40 italic">{placeholder}</span>
         )}
+        <svg
+          className="size-3 shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+        </svg>
       </button>
     );
   }
