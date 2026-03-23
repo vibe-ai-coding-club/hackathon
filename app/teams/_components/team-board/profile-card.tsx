@@ -70,22 +70,28 @@ export const ProfileCard = () => {
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">소속 팀 상태:</span>
           {isLeader && myTeam.membersCount < myTeam.maxMembers ? (
-            <button
-              type="button"
-              onClick={() => toggleRecruiting(myTeam.id, !myTeam.recruiting)}
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium cursor-pointer transition-colors ${
+            <select
+              value={myTeam.recruiting ? "recruiting" : "confirmed"}
+              onChange={(e) =>
+                toggleRecruiting(myTeam.id, e.target.value === "recruiting")
+              }
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium cursor-pointer appearance-none bg-no-repeat bg-[right_0.4rem_center] bg-[length:12px] pr-5 ${
                 myTeam.recruiting
-                  ? "bg-green-100 text-green-700 hover:bg-green-200"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  ? "bg-pink-100 text-pink-700"
+                  : "bg-gray-100 text-gray-500"
               }`}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E")`,
+              }}
             >
-              {myTeam.recruiting ? "팀원 모집중" : "팀원 확정"}
-            </button>
+              <option value="recruiting">팀원 모집중</option>
+              <option value="confirmed">팀원 확정</option>
+            </select>
           ) : (
             <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 myTeam.recruiting
-                  ? "bg-green-100 text-green-700"
+                  ? "bg-pink-100 text-pink-700"
                   : "bg-gray-100 text-gray-500"
               }`}
             >
@@ -97,17 +103,21 @@ export const ProfileCard = () => {
         {/* 내 상태 */}
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">내 상태:</span>
-          <button
-            type="button"
-            onClick={() => toggleSeeking(!myMember?.seekingTeam)}
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium cursor-pointer transition-colors ${
+          <select
+            value={myMember?.seekingTeam ? "seeking" : "confirmed"}
+            onChange={(e) => toggleSeeking(e.target.value === "seeking")}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium cursor-pointer appearance-none bg-no-repeat bg-[right_0.4rem_center] bg-[length:12px] pr-5 ${
               myMember?.seekingTeam
-                ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                ? "bg-blue-100 text-blue-700"
+                : "bg-gray-100 text-gray-500"
             }`}
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E")`,
+            }}
           >
-            {myMember?.seekingTeam ? "팀 찾는중" : "팀 확정"}
-          </button>
+            <option value="seeking">팀 찾는중</option>
+            <option value="confirmed">팀 확정</option>
+          </select>
         </div>
       </div>
     </div>
