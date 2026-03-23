@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { Project, SeekingMember, Team } from "./types";
+import type { MyProfile, Project, SeekingMember, Team } from "./types";
 
 type TransferMode = "transfer" | "recruit";
 
@@ -19,6 +19,7 @@ type TeamBoardContextValue = {
   lookingForTeam: SeekingMember[];
   totalMembers: number;
   myMemberId: string | null;
+  myProfile: MyProfile | null;
   isAdmin: boolean;
   myTeam: Team | undefined;
   isLeader: boolean;
@@ -45,6 +46,11 @@ type TeamBoardContextValue = {
   setShowLeaveModal: (v: boolean) => void;
   handleLeaveTeam: () => void;
   leaving: boolean;
+  // invite
+  showInviteModal: boolean;
+  setShowInviteModal: (v: boolean) => void;
+  handleInvite: (targetMemberId: string) => void;
+  inviting: boolean;
   // project
   showProjectModal: boolean;
   setShowProjectModal: (v: boolean) => void;
@@ -72,6 +78,7 @@ export const TeamBoardProvider = ({
 }) => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [myMemberId, setMyMemberId] = useState<string | null>(null);
+  const [myProfile, setMyProfile] = useState<MyProfile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -82,6 +89,8 @@ export const TeamBoardProvider = ({
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviting, setInviting] = useState(false);
   const [recruitingOpen, setRecruitingOpen] = useState(true);
   const [lookingOpen, setLookingOpen] = useState(true);
 
@@ -93,6 +102,7 @@ export const TeamBoardProvider = ({
         if (data.success) {
           setTeams(data.teams);
           setMyMemberId(data.myMemberId ?? null);
+          setMyProfile(data.myProfile ?? null);
           setIsAdmin(data.isAdmin ?? false);
         }
       } catch {
@@ -338,6 +348,28 @@ export const TeamBoardProvider = ({
     }
   }, []);
 
+  const handleInvite = useCallback(async (targetMemberId: string) => {
+    setInviting(true);
+    try {
+      const res = await fetch("/api/teams/recruit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetMemberId }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        window.location.reload();
+      } else {
+        alert(json.message);
+      }
+    } catch {
+      alert("서버 오류가 발생했습니다.");
+    } finally {
+      setInviting(false);
+      setShowInviteModal(false);
+    }
+  }, []);
+
   const handleProjectSaved = useCallback(
     (project: Project) => {
       if (!myTeam) return;
@@ -356,6 +388,7 @@ export const TeamBoardProvider = ({
       lookingForTeam,
       totalMembers,
       myMemberId,
+      myProfile,
       isAdmin,
       myTeam,
       isLeader,
@@ -379,6 +412,10 @@ export const TeamBoardProvider = ({
       setShowLeaveModal,
       handleLeaveTeam,
       leaving,
+      showInviteModal,
+      setShowInviteModal,
+      handleInvite,
+      inviting,
       showProjectModal,
       setShowProjectModal,
       handleProjectSaved,
@@ -394,6 +431,7 @@ export const TeamBoardProvider = ({
       lookingForTeam,
       totalMembers,
       myMemberId,
+      myProfile,
       isAdmin,
       myTeam,
       isLeader,
@@ -414,6 +452,9 @@ export const TeamBoardProvider = ({
       showLeaveModal,
       handleLeaveTeam,
       leaving,
+      showInviteModal,
+      handleInvite,
+      inviting,
       showProjectModal,
       handleProjectSaved,
       recruitingOpen,

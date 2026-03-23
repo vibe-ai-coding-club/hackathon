@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { AiPromptModal } from "./ai-prompt-modal";
 import { TeamBoardProvider, useTeamBoard } from "./context";
+import { InviteModal } from "./invite-modal";
 import { LeaveModal } from "./leave-modal";
 import { LookingSidebar } from "./looking-sidebar";
+import { ProfileCard } from "./profile-card";
 import { ProjectModal } from "./project-modal";
 import { RecruitingSidebar } from "./recruiting-sidebar";
 import { TeamTable } from "./team-table";
@@ -23,14 +25,18 @@ const TeamBoardInner = () => {
   }
 
   return (
-    <div className="flex gap-5 px-4 py-6 max-w-350 mx-auto">
-      <TeamTable onShowAiPrompt={() => setShowAiPrompt(true)} />
-      <div className="w-56 shrink-0 space-y-3">
-        <RecruitingSidebar />
-        <LookingSidebar />
+    <div className="px-4 py-6 max-w-350 mx-auto space-y-4">
+      <ProfileCard />
+      <div className="flex gap-5">
+        <TeamTable onShowAiPrompt={() => setShowAiPrompt(true)} />
+        <div className="w-56 shrink-0 space-y-3">
+          <RecruitingSidebar />
+          <LookingSidebar />
+        </div>
       </div>
       <TransferModal />
       <LeaveModal />
+      <InviteModal />
       {showProjectModal && <ProjectModal />}
       {showAiPrompt && <AiPromptModal onClose={() => setShowAiPrompt(false)} />}
     </div>
