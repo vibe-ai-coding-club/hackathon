@@ -38,8 +38,6 @@ export const TeamTable = ({
     setExpFilter,
     setShowProjectModal,
     updateTeam,
-    toggleRecruiting,
-    toggleSeeking,
     isInFullTeam,
     isLeader,
     setShowLeaveModal,
@@ -160,29 +158,12 @@ export const TeamTable = ({
                             내 팀
                           </span>
                         )}
-                        {canEdit && team.membersCount < team.maxMembers ? (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              toggleRecruiting(team.id, !team.recruiting)
-                            }
-                            className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium cursor-pointer transition-colors ${
-                              team.recruiting
-                                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                                : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                            }`}
-                          >
-                            {team.recruiting ? "모집중" : "모집 OFF"}
-                          </button>
-                        ) : (
-                          !team.isMyTeam &&
-                          team.recruiting &&
+                        {team.recruiting &&
                           team.membersCount < team.maxMembers && (
-                            <span className="shrink-0 rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-medium text-blue-600">
+                            <span className="shrink-0 rounded-full bg-pink-100 px-1.5 py-px text-[10px] font-medium text-pink-600">
                               모집중
                             </span>
-                          )
-                        )}
+                          )}
                       </div>
                     </td>
                     {/* 주제 */}
@@ -213,20 +194,10 @@ export const TeamTable = ({
                           >
                             {leader.name}
                           </span>
-                          {(leader.id === myMemberId || isAdmin) && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                toggleSeeking(!leader.seekingTeam, leader.id)
-                              }
-                              className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
-                                leader.seekingTeam
-                                  ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                                  : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                              }`}
-                            >
-                              {leader.seekingTeam ? "구직중" : "OFF"}
-                            </button>
+                          {leader.seekingTeam && (
+                            <span className="shrink-0 rounded-full bg-blue-100 px-1.5 py-px text-[9px] font-medium text-blue-600">
+                              팀 찾는중
+                            </span>
                           )}
                         </div>
                       ) : (
@@ -258,23 +229,10 @@ export const TeamTable = ({
                               >
                                 {others[idx].name}
                               </span>
-                              {(others[idx].id === myMemberId || isAdmin) && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    toggleSeeking(
-                                      !others[idx].seekingTeam,
-                                      others[idx].id,
-                                    )
-                                  }
-                                  className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
-                                    others[idx].seekingTeam
-                                      ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                                      : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                                  }`}
-                                >
-                                  {others[idx].seekingTeam ? "구직중" : "OFF"}
-                                </button>
+                              {others[idx].seekingTeam && (
+                                <span className="shrink-0 rounded-full bg-blue-100 px-1.5 py-px text-[9px] font-medium text-blue-600">
+                                  팀 찾는중
+                                </span>
                               )}
                             </div>
                           ) : showAddButton ? (
