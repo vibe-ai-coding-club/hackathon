@@ -5,10 +5,9 @@ import { AiPromptModal } from "./ai-prompt-modal";
 import { TeamBoardProvider, useTeamBoard } from "./context";
 import { InviteModal } from "./invite-modal";
 import { LeaveModal } from "./leave-modal";
-import { LookingSidebar } from "./looking-sidebar";
 import { ProfileCard } from "./profile-card";
 import { ProjectModal } from "./project-modal";
-import { RecruitingSidebar } from "./recruiting-sidebar";
+import { TeamBuildingSidebar } from "./team-building-sidebar";
 import { TeamTable } from "./team-table";
 import { TransferModal } from "./transfer-modal";
 
@@ -29,9 +28,8 @@ const TeamBoardInner = () => {
       <ProfileCard />
       <div className="flex gap-5">
         <TeamTable onShowAiPrompt={() => setShowAiPrompt(true)} />
-        <div className="w-56 shrink-0 space-y-3">
-          <RecruitingSidebar />
-          <LookingSidebar />
+        <div className="w-56 shrink-0">
+          <TeamBuildingSidebar />
         </div>
       </div>
       <TransferModal />
