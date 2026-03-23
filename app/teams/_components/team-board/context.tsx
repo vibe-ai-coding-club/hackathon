@@ -131,12 +131,7 @@ export const TeamBoardProvider = ({
         }
         return true;
       })
-      .sort((a, b) => {
-        if (a.isMyTeam !== b.isMyTeam) return a.isMyTeam ? -1 : 1;
-        const aFull = a.membersCount >= a.maxMembers ? 1 : 0;
-        const bFull = b.membersCount >= b.maxMembers ? 1 : 0;
-        return aFull - bFull;
-      });
+;
   }, [teams, search, expFilter]);
 
   const recruitingTeams = useMemo(() => {
