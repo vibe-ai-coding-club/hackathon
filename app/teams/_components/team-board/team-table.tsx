@@ -41,7 +41,9 @@ export const TeamTable = ({
     toggleRecruiting,
     toggleSeeking,
     isInFullTeam,
+    isLeader,
     setShowLeaveModal,
+    setShowInviteModal,
   } = useTeamBoard();
 
   return (
@@ -232,43 +234,70 @@ export const TeamTable = ({
                       )}
                     </td>
                     {/* 팀원 2~4 */}
-                    {[0, 1, 2].map((idx) => (
-                      <td key={idx} className={`${tdClass} whitespace-nowrap`}>
-                        {others[idx] ? (
-                          <div className="inline-flex items-center gap-1">
-                            <span
-                              className={
-                                others[idx].id === myMemberId
-                                  ? "font-medium text-accent"
-                                  : ""
-                              }
-                            >
-                              {others[idx].name}
-                            </span>
-                            {(others[idx].id === myMemberId || isAdmin) && (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  toggleSeeking(
-                                    !others[idx].seekingTeam,
-                                    others[idx].id,
-                                  )
+                    {[0, 1, 2].map((idx) => {
+                      const showAddButton =
+                        team.isMyTeam &&
+                        isLeader &&
+                        !others[idx] &&
+                        idx === others.length &&
+                        team.membersCount < team.maxMembers;
+
+                      return (
+                        <td
+                          key={idx}
+                          className={`${tdClass} whitespace-nowrap`}
+                        >
+                          {others[idx] ? (
+                            <div className="inline-flex items-center gap-1">
+                              <span
+                                className={
+                                  others[idx].id === myMemberId
+                                    ? "font-medium text-accent"
+                                    : ""
                                 }
-                                className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
-                                  others[idx].seekingTeam
-                                    ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                                    : "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                                }`}
                               >
-                                {others[idx].seekingTeam ? "구직중" : "OFF"}
-                              </button>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground/30">-</span>
-                        )}
-                      </td>
-                    ))}
+                                {others[idx].name}
+                              </span>
+                              {(others[idx].id === myMemberId || isAdmin) && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    toggleSeeking(
+                                      !others[idx].seekingTeam,
+                                      others[idx].id,
+                                    )
+                                  }
+                                  className={`shrink-0 rounded-full px-1.5 py-px text-[9px] font-medium cursor-pointer transition-colors ${
+                                    others[idx].seekingTeam
+                                      ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                                      : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  {others[idx].seekingTeam ? "구직중" : "OFF"}
+                                </button>
+                              )}
+                            </div>
+                          ) : showAddButton ? (
+                            <button
+                              type="button"
+                              onClick={() => setShowInviteModal(true)}
+                              className="inline-flex items-center gap-0.5 rounded-md border border-dashed border-accent/40 px-2 py-0.5 text-xs text-accent cursor-pointer transition-colors hover:bg-accent/5"
+                            >
+                              <svg
+                                className="size-3"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+                              </svg>
+                              팀원 추가
+                            </button>
+                          ) : (
+                            <span className="text-muted-foreground/30">-</span>
+                          )}
+                        </td>
+                      );
+                    })}
                     {/* 프로젝트 */}
                     <td className={`${tdClass} whitespace-nowrap`}>
                       {team.project ? (

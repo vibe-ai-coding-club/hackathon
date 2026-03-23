@@ -50,6 +50,24 @@ export async function GET() {
     orderBy: { createdAt: "asc" },
   });
 
+  // 현재 로그인 사용자의 프로필 정보 조회
+  let myProfile = null;
+  if (session.user.memberId) {
+    const me = await prisma.member.findUnique({
+      where: { id: session.user.memberId },
+      select: { name: true, email: true, phone: true },
+    });
+    if (me) {
+      const myTeamData = teams.find((t) => t.id === myTeamId);
+      myProfile = {
+        name: me.name,
+        email: me.email,
+        phone: me.phone,
+        experienceLevel: myTeamData?.experienceLevel ?? null,
+      };
+    }
+  }
+
   const result = teams.map((t, i) => ({
     id: t.id,
     order: i + 1,
@@ -76,6 +94,7 @@ export async function GET() {
     success: true,
     teams: result,
     myMemberId: session.user.memberId ?? null,
+    myProfile,
     isAdmin,
   });
 }

@@ -39,6 +39,13 @@ export type SeekingMember = {
   team: Team;
 };
 
+export type MyProfile = {
+  name: string;
+  email: string;
+  phone: string;
+  experienceLevel: string;
+};
+
 export const experienceLevelLabel: Record<string, string> = {
   BEGINNER: "입문",
   JUNIOR: "주니어",

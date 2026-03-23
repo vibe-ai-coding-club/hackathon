@@ -7,7 +7,7 @@ import { experienceLevelLabel, experienceLevelStyle } from "./types";
 export const LookingSidebar = () => {
   const {
     lookingForTeam,
-    isInFullTeam,
+    isLeader,
     myTeam,
     myMemberId,
     lookingOpen,
@@ -15,20 +15,23 @@ export const LookingSidebar = () => {
     handleTransferClick,
   } = useTeamBoard();
 
+  const canRecruit =
+    isLeader && !!myTeam && myTeam.membersCount < myTeam.maxMembers;
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between px-0.5">
         <div className="flex items-center gap-1">
           <span className="text-[11px] text-blue-400">
-            {isInFullTeam
+            {canRecruit
               ? "카드를 클릭하면 내 팀으로 데려옵니다"
-              : "카드를 클릭하면 함께 팀이 됩니다"}
+              : "팀을 찾고 있는 참가자 목록입니다"}
           </span>
           <Tooltip
             text={
-              isInFullTeam
+              canRecruit
                 ? "팀을 찾고 있는 참가자 목록입니다. 카드를 클릭하면 해당 참가자를 내 팀으로 데려올 수 있습니다."
-                : "팀을 찾고 있는 참가자 목록입니다. 카드를 클릭하면 해당 참가자의 팀에 합류하여 함께 팀이 됩니다."
+                : "팀을 찾고 있는 참가자 목록입니다. 팀 리더만 초대할 수 있습니다."
             }
           />
         </div>
@@ -67,26 +70,19 @@ export const LookingSidebar = () => {
               <div className="space-y-2">
                 {lookingForTeam.map(({ memberId, memberName, team }) => {
                   const isMe = memberId === myMemberId;
-                  const mode = isInFullTeam
-                    ? ("recruit" as const)
-                    : ("transfer" as const);
-                  const canJoin =
-                    !isMe &&
-                    !team.isMyTeam &&
-                    (mode === "recruit"
-                      ? !!myTeam && myTeam.membersCount < myTeam.maxMembers
-                      : team.membersCount < team.maxMembers);
+                  const canJoin = canRecruit && !isMe && !team.isMyTeam;
+
                   return (
                     <div
                       key={memberId}
                       role={canJoin ? "button" : undefined}
                       tabIndex={canJoin ? 0 : undefined}
                       onClick={() =>
-                        canJoin && handleTransferClick(team, mode)
+                        canJoin && handleTransferClick(team, "recruit")
                       }
                       onKeyDown={(e) => {
                         if (canJoin && (e.key === "Enter" || e.key === " "))
-                          handleTransferClick(team, mode);
+                          handleTransferClick(team, "recruit");
                       }}
                       className={`w-full rounded-md border p-2.5 text-left transition-colors ${
                         isMe
