@@ -6,7 +6,7 @@ const sponsors = [
   { name: "크라이 치즈 버거", src: "/images/sponsor-image-001.png" },
   { name: "나만의 네컷", src: "/images/sponsor-image-002.png" },
   { name: "골드 래빗", src: "/images/sponsor-image-003.png" },
-  { name: "바이브 코딩 클럽", src: "/images/sponsor-image-004.png" },
+  // { name: "바이브 코딩 클럽", src: "/images/sponsor-image-004.png" },
 ];
 
 export const SponsorSection = () => {
