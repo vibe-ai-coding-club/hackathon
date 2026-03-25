@@ -271,6 +271,18 @@ export const ProjectDetailModal = ({
           )}
         </section>
 
+        {/* 심사 결과 (promptFeedback) */}
+        {project.promptFeedback && (
+          <section className="space-y-2 border-t border-border pt-4">
+            <h3 className="typo-caption1 font-medium text-muted-foreground">
+              AI 심사 결과
+            </h3>
+            <pre className="overflow-y-auto max-h-60 rounded-md bg-muted p-3 text-xs leading-relaxed whitespace-pre-wrap wrap-break-word font-mono text-foreground/80">
+              {project.promptFeedback}
+            </pre>
+          </section>
+        )}
+
         {/* 프롬프트 결과 입력 */}
         <section className="space-y-2 border-t border-border pt-4">
           <h3 className="typo-caption1 font-medium text-muted-foreground">

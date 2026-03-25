@@ -15,6 +15,7 @@ export type SerializedProject = {
   imageUrl: string | null;
   linkUrl: string | null;
   promptResult: string | null;
+  promptFeedback: string | null;
   createdAt: string;
   updatedAt: string;
   team: {
