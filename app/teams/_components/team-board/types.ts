@@ -27,7 +27,7 @@ export type Team = {
   participationType: string;
   experienceLevel: string;
   members: Member[];
-  project: Project | null;
+  projects: Project[];
   membersCount: number;
   maxMembers: number;
   isMyTeam: boolean;
