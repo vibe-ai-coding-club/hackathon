@@ -3,17 +3,20 @@ import { MotionItem } from "@/app/_components/motion-section";
 import Image from "next/image";
 
 const sponsors = [
+  { name: "크라이 치즈 버거", src: "/images/sponsor-image-001.png" },
   { name: "나만의 네컷", src: "/images/sponsor-image-002.png" },
+  { name: "골드 래빗", src: "/images/sponsor-image-003.png" },
+  { name: "바이브 코딩 클럽", src: "/images/sponsor-image-004.png" },
 ];
 
 export const SponsorSection = () => {
   return (
-    <section id="sponsor" className="pb-20 md:pb-[220px]">
-      <div className="bg-gray-50 px-4 pt-10 pb-[60px] md:px-8 md:pt-[60px] md:pb-[90px]">
-        <div className="mx-auto max-w-[1280px]">
+    <section id="sponsor" className="pb-20 md:pb-55">
+      <div className="bg-gray-50 px-4 pt-10 pb-15 md:px-8 md:pt-15 md:pb-22.5">
+        <div className="mx-auto max-w-7xl">
           <MotionItem>
             <div className="flex w-full flex-col items-center justify-center gap-2 md:gap-3">
-              <h2 className="typo-h5 max-w-[928px] text-center text-gray-900 md:typo-h3">
+              <h2 className="typo-h5 max-w-232 text-center text-gray-900 md:typo-h3">
                 후원사
               </h2>
             </div>
@@ -23,7 +26,7 @@ export const SponsorSection = () => {
             </p>
           </MotionItem>
 
-          <div className="mt-[26px] flex flex-wrap items-center justify-center gap-3 md:mt-[52px] md:gap-5">
+          <div className="mt-6.5 flex flex-wrap items-center justify-center gap-3 md:mt-13 md:gap-5">
             {sponsors.map((sponsor, i) => (
               <MotionItem key={sponsor.name} delay={0.1 * (i + 1)}>
                 <Image
@@ -40,12 +43,12 @@ export const SponsorSection = () => {
       </div>
 
       <MotionItem delay={0.3}>
-        <div className="mt-[26px] flex justify-center md:mt-[52px]">
+        <div className="mt-6.5 flex justify-center md:mt-13">
           <a href="mailto:vibecodingclub.team@gmail.com?subject=[후원 문의] 띨깍톤 2026">
             <Button
               color="gray"
               size="small"
-              className="md:h-[66px] md:rounded-[16px] md:px-8 md:text-[24px] md:leading-[34px] md:font-bold md:tracking-[-0.4px]"
+              className="md:h-16.5 md:rounded-2xl md:px-8 md:text-[24px] md:leading-8.5 md:font-bold md:tracking-[-0.4px]"
             >
               후원 문의하기
             </Button>
