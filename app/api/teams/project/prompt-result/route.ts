@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { promptResult } = body;
+  const { projectId, promptResult } = body;
 
   if (!promptResult?.trim()) {
     return NextResponse.json(
@@ -29,7 +29,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const project = await prisma.project.findFirst({ where: { teamId } });
+  // projectId가 있으면 해당 프로젝트, 없으면 첫 번째 프로젝트
+  let project;
+  if (projectId) {
+    project = await prisma.project.findFirst({
+      where: { id: projectId, teamId },
+    });
+  } else {
+    project = await prisma.project.findFirst({
+      where: { teamId },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
   if (!project) {
     return NextResponse.json(
       { success: false, message: "프로젝트를 먼저 등록해주세요." },

@@ -37,6 +37,7 @@ export const TeamTable = ({
     expFilter,
     setExpFilter,
     setShowProjectModal,
+    setEditingProject,
     updateTeam,
     isInFullTeam,
     isLeader,
@@ -79,10 +80,13 @@ export const TeamTable = ({
           {myTeam && (
             <button
               type="button"
-              onClick={() => setShowProjectModal(true)}
+              onClick={() => {
+                setEditingProject(null);
+                setShowProjectModal(true);
+              }}
               className="rounded-md bg-accent px-3 py-1 text-xs text-white cursor-pointer transition-colors hover:bg-accent-hover"
             >
-              {myTeam?.project ? "프로젝트 수정" : "프로젝트 등록"}
+              프로젝트 추가
             </button>
           )}
         </div>
@@ -257,70 +261,95 @@ export const TeamTable = ({
                       );
                     })}
                     {/* 프로젝트 */}
-                    <td className={`${tdClass} whitespace-nowrap`}>
-                      {team.project ? (
-                        <span
-                          className="text-muted-foreground"
-                          title={team.project.description ?? undefined}
-                        >
-                          {team.project.title}
-                        </span>
+                    <td className={`${tdClass}`}>
+                      {team.projects.length > 0 ? (
+                        <div className="space-y-1">
+                          {team.projects.map((proj) => (
+                            <div key={proj.id} className="flex items-center gap-1">
+                              <span
+                                className="text-muted-foreground truncate max-w-32"
+                                title={proj.description ?? proj.title}
+                              >
+                                {proj.title}
+                              </span>
+                              {team.isMyTeam && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingProject(proj);
+                                    setShowProjectModal(true);
+                                  }}
+                                  className="shrink-0 rounded px-1 py-0.5 text-[10px] text-accent cursor-pointer transition-colors hover:bg-accent/10"
+                                >
+                                  수정
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       ) : (
                         <span className="text-muted-foreground/30">-</span>
                       )}
                     </td>
                     {/* 링크 */}
-                    <td className={`${tdClass} whitespace-nowrap`}>
-                      {team.project ? (
-                        <div className="flex items-center gap-2">
-                          {team.project.githubUrl && (
-                            <a
-                              href={team.project.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
-                              title="GitHub"
-                            >
-                              <LinkIcon />
-                              GitHub
-                            </a>
-                          )}
-                          {team.project.demoUrl && (
-                            <a
-                              href={team.project.demoUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
-                              title="배포"
-                            >
-                              <LinkIcon />
-                              배포
-                            </a>
-                          )}
-                          {team.project.videoUrl && (
-                            <a
-                              href={team.project.videoUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
-                              title="영상"
-                            >
-                              <LinkIcon />
-                              영상
-                            </a>
-                          )}
-                          {team.project.linkUrl && (
-                            <a
-                              href={team.project.linkUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
-                              title="추가 링크"
-                            >
-                              <LinkIcon />
-                              기타
-                            </a>
-                          )}
+                    <td className={`${tdClass}`}>
+                      {team.projects.length > 0 ? (
+                        <div className="space-y-1">
+                          {team.projects.map((proj) => (
+                            <div key={proj.id} className="flex items-center gap-2">
+                              {proj.githubUrl && (
+                                <a
+                                  href={proj.githubUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
+                                  title="GitHub"
+                                >
+                                  <LinkIcon />
+                                  GitHub
+                                </a>
+                              )}
+                              {proj.demoUrl && (
+                                <a
+                                  href={proj.demoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
+                                  title="배포"
+                                >
+                                  <LinkIcon />
+                                  배포
+                                </a>
+                              )}
+                              {proj.videoUrl && (
+                                <a
+                                  href={proj.videoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
+                                  title="영상"
+                                >
+                                  <LinkIcon />
+                                  영상
+                                </a>
+                              )}
+                              {proj.linkUrl && (
+                                <a
+                                  href={proj.linkUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-accent transition-colors"
+                                  title="추가 링크"
+                                >
+                                  <LinkIcon />
+                                  기타
+                                </a>
+                              )}
+                              {!proj.githubUrl && !proj.demoUrl && !proj.videoUrl && !proj.linkUrl && (
+                                <span className="text-muted-foreground/30">-</span>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       ) : (
                         <span className="text-muted-foreground/30">-</span>

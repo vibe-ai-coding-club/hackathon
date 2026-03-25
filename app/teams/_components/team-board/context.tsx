@@ -54,7 +54,9 @@ type TeamBoardContextValue = {
   // project
   showProjectModal: boolean;
   setShowProjectModal: (v: boolean) => void;
-  handleProjectSaved: (project: Project) => void;
+  editingProject: Project | null;
+  setEditingProject: (p: Project | null) => void;
+  handleProjectSaved: (project: Project, isNew: boolean) => void;
   // accordion
   recruitingOpen: boolean;
   setRecruitingOpen: (v: boolean | ((prev: boolean) => boolean)) => void;
@@ -87,6 +89,7 @@ export const TeamBoardProvider = ({
   const [transferMode, setTransferMode] = useState<TransferMode>("transfer");
   const [transferring, setTransferring] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -366,10 +369,21 @@ export const TeamBoardProvider = ({
   }, []);
 
   const handleProjectSaved = useCallback(
-    (project: Project) => {
+    (project: Project, isNew: boolean) => {
       if (!myTeam) return;
       setTeams((prev) =>
-        prev.map((t) => (t.id === myTeam.id ? { ...t, project } : t)),
+        prev.map((t) => {
+          if (t.id !== myTeam.id) return t;
+          if (isNew) {
+            return { ...t, projects: [...t.projects, project] };
+          }
+          return {
+            ...t,
+            projects: t.projects.map((p) =>
+              p.id === project.id ? project : p,
+            ),
+          };
+        }),
       );
     },
     [myTeam],
@@ -413,6 +427,8 @@ export const TeamBoardProvider = ({
       inviting,
       showProjectModal,
       setShowProjectModal,
+      editingProject,
+      setEditingProject,
       handleProjectSaved,
       recruitingOpen,
       setRecruitingOpen,
@@ -451,6 +467,7 @@ export const TeamBoardProvider = ({
       handleInvite,
       inviting,
       showProjectModal,
+      editingProject,
       handleProjectSaved,
       recruitingOpen,
       lookingOpen,

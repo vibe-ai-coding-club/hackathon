@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { title, description, features, tools, githubUrl, demoUrl, videoUrl, linkUrl } = body;
+  const { projectId, title, description, features, tools, githubUrl, demoUrl, videoUrl, linkUrl } = body;
 
   if (!title?.trim()) {
     return NextResponse.json(
@@ -40,14 +40,30 @@ export async function POST(req: NextRequest) {
     linkUrl: linkUrl?.trim() || null,
   };
 
-  // 기존 프로젝트가 있으면 업데이트, 없으면 생성
-  const existing = await prisma.project.findFirst({ where: { teamId } });
-
-  if (existing) {
-    await prisma.project.update({ where: { id: existing.id }, data });
-  } else {
-    await prisma.project.create({ data: { teamId, ...data } });
+  if (projectId) {
+    // 수정: 해당 프로젝트가 내 팀 소속인지 확인
+    const existing = await prisma.project.findFirst({
+      where: { id: projectId, teamId },
+    });
+    if (!existing) {
+      return NextResponse.json(
+        { success: false, message: "프로젝트를 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    }
+    const updated = await prisma.project.update({
+      where: { id: projectId },
+      data,
+      select: { id: true },
+    });
+    return NextResponse.json({ success: true, projectId: updated.id });
   }
 
-  return NextResponse.json({ success: true });
+  // 신규 생성
+  const created = await prisma.project.create({
+    data: { teamId, ...data },
+    select: { id: true },
+  });
+
+  return NextResponse.json({ success: true, projectId: created.id });
 }
