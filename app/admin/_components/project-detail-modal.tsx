@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { EVALUATION_PROMPT } from "@/lib/prompts";
 import type { SerializedProject } from "./project-table";
 
 type ProjectDetailModalProps = {
@@ -8,10 +9,36 @@ type ProjectDetailModalProps = {
   onClose: () => void;
 };
 
+function fillEvaluationPrompt(project: SerializedProject) {
+  const placeholders: Record<string, string> = {
+    "{{title}}": project.title,
+    "{{description}}": project.description || "",
+    "{{features}}": project.features || "",
+    "{{tools}}": project.tools || "",
+    "{{githubUrl}}": project.githubUrl || "",
+    "{{demoUrl}}": project.demoUrl || "",
+    "{{videoUrl}}": project.videoUrl || "",
+    "{{linkUrl}}": project.linkUrl || "",
+  };
+  let result = EVALUATION_PROMPT;
+  for (const [key, value] of Object.entries(placeholders)) {
+    result = result.replace(key, value);
+  }
+  return result;
+}
+
 export const ProjectDetailModal = ({
   project,
   onClose,
 }: ProjectDetailModalProps) => {
+  const [promptResult, setPromptResult] = useState(
+    project.promptResult ?? "",
+  );
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [showEvalPrompt, setShowEvalPrompt] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -19,6 +46,40 @@ export const ProjectDetailModal = ({
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
+
+  const handleSavePromptResult = async () => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      const res = await fetch(`/api/admin/projects/${project.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ promptResult }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCopyEvalPrompt = async () => {
+    const prompt = fillEvaluationPrompt(project);
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = prompt;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    setCopiedPrompt(true);
+    setTimeout(() => setCopiedPrompt(false), 2000);
+  };
 
   return (
     <div
@@ -173,6 +234,69 @@ export const ProjectDetailModal = ({
               minute: "2-digit",
             })}
           </p>
+        </section>
+
+        {/* 심사 프롬프트 */}
+        <section className="space-y-2 border-t border-border pt-4">
+          <div className="flex items-center justify-between">
+            <h3 className="typo-caption1 font-medium text-muted-foreground">
+              심사 프롬프트
+            </h3>
+            <div className="flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => setShowEvalPrompt((v) => !v)}
+                className="rounded-md border border-border px-2.5 py-1 text-xs cursor-pointer transition-colors hover:bg-muted"
+              >
+                {showEvalPrompt ? "프롬프트 닫기" : "프롬프트 보기"}
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyEvalPrompt}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                  copiedPrompt
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-accent text-white hover:bg-accent-hover"
+                }`}
+              >
+                {copiedPrompt ? "복사됨!" : "프롬프트 복사"}
+              </button>
+            </div>
+          </div>
+
+          {showEvalPrompt && (
+            <pre className="overflow-y-auto max-h-60 rounded-md bg-muted p-3 text-xs leading-relaxed whitespace-pre-wrap wrap-break-word font-mono text-foreground/80">
+              {fillEvaluationPrompt(project)}
+            </pre>
+          )}
+        </section>
+
+        {/* 프롬프트 결과 입력 */}
+        <section className="space-y-2 border-t border-border pt-4">
+          <h3 className="typo-caption1 font-medium text-muted-foreground">
+            프롬프트 결과
+          </h3>
+          <textarea
+            value={promptResult}
+            onChange={(e) => setPromptResult(e.target.value)}
+            placeholder="AI 심사 프롬프트 결과를 붙여넣으세요..."
+            rows={6}
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-xs leading-relaxed outline-none focus:border-accent transition-colors resize-y"
+          />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleSavePromptResult}
+              disabled={saving}
+              className={`rounded-md px-4 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
+                saved
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-accent text-white hover:bg-accent-hover disabled:opacity-50"
+              }`}
+            >
+              {saving ? "저장 중..." : saved ? "저장됨!" : "결과 저장"}
+            </button>
+          </div>
         </section>
       </div>
     </div>
