@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useTeamBoard } from "./context";
 
 export const ProjectModal = () => {
-  const { myTeam, setShowProjectModal, handleProjectSaved } = useTeamBoard();
-  const project = myTeam?.project ?? null;
+  const { editingProject, setShowProjectModal, setEditingProject, handleProjectSaved } = useTeamBoard();
+  const project = editingProject;
 
   const [title, setTitle] = useState(project?.title ?? "");
   const [description, setDescription] = useState(project?.description ?? "");
@@ -18,7 +18,12 @@ export const ProjectModal = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const onClose = () => setShowProjectModal(false);
+  const isEdit = !!project;
+
+  const onClose = () => {
+    setEditingProject(null);
+    setShowProjectModal(false);
+  };
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -31,21 +36,34 @@ export const ProjectModal = () => {
       const res = await fetch("/api/teams/project", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, features, tools, githubUrl, demoUrl, videoUrl, linkUrl }),
+        body: JSON.stringify({
+          projectId: project?.id ?? undefined,
+          title,
+          description,
+          features,
+          tools,
+          githubUrl,
+          demoUrl,
+          videoUrl,
+          linkUrl,
+        }),
       });
       const json = await res.json();
       if (json.success) {
-        handleProjectSaved({
-          id: project?.id ?? "",
-          title: title.trim(),
-          description: description.trim() || null,
-          features: features.trim() || null,
-          tools: tools.trim() || null,
-          githubUrl: githubUrl.trim() || null,
-          demoUrl: demoUrl.trim() || null,
-          videoUrl: videoUrl.trim() || null,
-          linkUrl: linkUrl.trim() || null,
-        });
+        handleProjectSaved(
+          {
+            id: json.projectId ?? project?.id ?? "",
+            title: title.trim(),
+            description: description.trim() || null,
+            features: features.trim() || null,
+            tools: tools.trim() || null,
+            githubUrl: githubUrl.trim() || null,
+            demoUrl: demoUrl.trim() || null,
+            videoUrl: videoUrl.trim() || null,
+            linkUrl: linkUrl.trim() || null,
+          },
+          !isEdit,
+        );
         onClose();
       } else {
         setError(json.message);
@@ -70,7 +88,7 @@ export const ProjectModal = () => {
     >
       <div className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-lg border border-border bg-background p-5 space-y-4">
         <h3 className="typo-subtitle1">
-          {project ? "프로젝트 수정" : "프로젝트 등록"}
+          {isEdit ? "프로젝트 수정" : "프로젝트 등록"}
         </h3>
 
         <div>
@@ -173,7 +191,7 @@ export const ProjectModal = () => {
             disabled={saving}
             className="rounded-md bg-accent px-4 py-2 text-sm text-white cursor-pointer transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
-            {saving ? "저장 중..." : project ? "수정" : "등록"}
+            {saving ? "저장 중..." : isEdit ? "수정" : "등록"}
           </button>
         </div>
       </div>

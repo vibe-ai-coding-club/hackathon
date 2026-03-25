@@ -30,13 +30,18 @@ function fillPrompt(
 
 export const AiPromptModal = ({ onClose }: { onClose: () => void }) => {
   const { myTeam } = useTeamBoard();
+  const projects = myTeam?.projects ?? [];
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(
+    projects[0]?.id ?? "",
+  );
   const [view, setView] = useState<PromptView>("prompt");
   const [copied, setCopied] = useState(false);
   const [promptResult, setPromptResult] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const prompt = fillPrompt(PARTICIPANT_PROMPT, myTeam?.project ?? null);
+  const selectedProject = projects.find((p) => p.id === selectedProjectId) ?? null;
+  const prompt = fillPrompt(PARTICIPANT_PROMPT, selectedProject);
 
   const handleCopy = async () => {
     try {
@@ -60,7 +65,10 @@ export const AiPromptModal = ({ onClose }: { onClose: () => void }) => {
       const res = await fetch("/api/teams/project/prompt-result", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ promptResult }),
+        body: JSON.stringify({
+          projectId: selectedProjectId || undefined,
+          promptResult,
+        }),
       });
       const json = await res.json();
       if (json.success) {
@@ -100,6 +108,28 @@ export const AiPromptModal = ({ onClose }: { onClose: () => void }) => {
           )}
         </div>
 
+        {/* 프로젝트 선택 (2개 이상일 때) */}
+        {projects.length > 1 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground shrink-0">프로젝트:</span>
+            <select
+              value={selectedProjectId}
+              onChange={(e) => {
+                setSelectedProjectId(e.target.value);
+                setSubmitted(false);
+                setPromptResult("");
+              }}
+              className="flex-1 rounded-md border border-border bg-background px-2 py-1 text-sm cursor-pointer"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* 탭 */}
         <div className="flex gap-1 rounded-md bg-muted p-1">
           <button
@@ -116,7 +146,7 @@ export const AiPromptModal = ({ onClose }: { onClose: () => void }) => {
           <button
             type="button"
             onClick={() => setView("submit")}
-            disabled={!myTeam?.project}
+            disabled={projects.length === 0}
             className={`flex-1 rounded px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
               view === "submit"
                 ? "bg-background text-foreground shadow-sm"
@@ -133,7 +163,7 @@ export const AiPromptModal = ({ onClose }: { onClose: () => void }) => {
               아래 프롬프트를 복사해서 AI에 붙여넣은 뒤, 결과를 &quot;결과 제출&quot; 탭에서 제출하세요.
             </p>
 
-            {!myTeam?.project && (
+            {projects.length === 0 && (
               <p className="text-xs text-amber-600 bg-amber-50 rounded-md px-3 py-2">
                 프로젝트를 먼저 등록하면 프로젝트 정보가 자동으로 채워집니다.
               </p>
