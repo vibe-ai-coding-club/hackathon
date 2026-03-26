@@ -296,7 +296,7 @@ export const TeamTable = ({
                       {team.projects.length > 0 ? (
                         <div className="space-y-1">
                           {team.projects.map((proj) => (
-                            <div key={proj.id} className="flex items-center gap-2">
+                            <div key={proj.id} className="flex items-center gap-2 whitespace-nowrap">
                               {proj.githubUrl && (
                                 <a
                                   href={proj.githubUrl}
