@@ -6,38 +6,63 @@ const sponsors = [
   { name: "크라이 치즈 버거", src: "/images/sponsor-image-001.png" },
   { name: "나만의 네컷", src: "/images/sponsor-image-002.png" },
   { name: "골드 래빗", src: "/images/sponsor-image-003.png" },
-  // { name: "바이브 코딩 클럽", src: "/images/sponsor-image-004.png" },
 ];
 
 export const SponsorSection = () => {
   return (
     <section id="sponsor" className="pb-20 md:pb-55">
       <div className="bg-gray-50 px-4 pt-10 pb-15 md:px-8 md:pt-15 md:pb-22.5">
-        <div className="mx-auto max-w-7xl">
-          <MotionItem>
-            <div className="flex w-full flex-col items-center justify-center gap-2 md:gap-3">
-              <h2 className="typo-h5 max-w-232 text-center text-gray-900 md:typo-h3">
-                후원사
-              </h2>
-            </div>
-            <p className="mx-auto mt-4 text-center typo-subtitle3 text-gray-800 md:mt-6 md:typo-h6">
-              대관, 장비 대여, 참여자 식사 등 더 좋은 해커톤 경험을 위해 후원을
-              받고 있어요
-            </p>
-          </MotionItem>
+        <div className="mx-auto max-w-7xl space-y-12 md:space-y-20">
+          {/* 주관 */}
+          <div>
+            <MotionItem>
+              <div className="flex w-full flex-col items-center justify-center gap-2 md:gap-3">
+                <h2 className="typo-h5 max-w-232 text-center text-gray-900 md:typo-h3">
+                  주관
+                </h2>
+              </div>
+            </MotionItem>
 
-          <div className="mt-6.5 flex flex-wrap items-center justify-center gap-3 md:mt-13 md:gap-5">
-            {sponsors.map((sponsor, i) => (
-              <MotionItem key={sponsor.name} delay={0.1 * (i + 1)}>
+            <div className="mt-6.5 flex flex-wrap items-center justify-center gap-3 md:mt-13 md:gap-5">
+              <MotionItem delay={0.1}>
                 <Image
-                  src={sponsor.src}
-                  alt={sponsor.name}
+                  src="/images/sponsor-image-004.png"
+                  alt="바이브 코딩 클럽"
                   width={300}
                   height={200}
                   className="object-contain"
                 />
               </MotionItem>
-            ))}
+            </div>
+          </div>
+
+          {/* 후원사 */}
+          <div>
+            <MotionItem>
+              <div className="flex w-full flex-col items-center justify-center gap-2 md:gap-3">
+                <h2 className="typo-h5 max-w-232 text-center text-gray-900 md:typo-h3">
+                  후원사
+                </h2>
+              </div>
+              <p className="mx-auto mt-4 text-center typo-subtitle3 text-gray-800 md:mt-6 md:typo-h6">
+                대관, 장비 대여, 참여자 식사 등 더 좋은 해커톤 경험을 위해 후원을
+                받고 있어요
+              </p>
+            </MotionItem>
+
+            <div className="mt-6.5 flex flex-wrap items-center justify-center gap-3 md:mt-13 md:gap-5">
+              {sponsors.map((sponsor, i) => (
+                <MotionItem key={sponsor.name} delay={0.1 * (i + 1)}>
+                  <Image
+                    src={sponsor.src}
+                    alt={sponsor.name}
+                    width={300}
+                    height={200}
+                    className="object-contain"
+                  />
+                </MotionItem>
+              ))}
+            </div>
           </div>
         </div>
       </div>
