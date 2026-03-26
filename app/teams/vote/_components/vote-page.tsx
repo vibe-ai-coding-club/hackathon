@@ -100,10 +100,15 @@ export const VotePage = ({ voter }: Props) => {
   }, [fetchProjects, fetchMyVotes, fetchMyLikes]);
 
   // 3초 폴링 — 좋아요 수 + 발표 중 프로젝트 실시간 갱신
+  // 좋아요/투표 처리 중에는 폴링 스킵 (낙관적 업데이트 덮어쓰기 방지)
   useEffect(() => {
-    const interval = setInterval(fetchProjects, 3000);
+    const interval = setInterval(() => {
+      if (!likingProjectId && !loadingProjectId) {
+        fetchProjects();
+      }
+    }, 3000);
     return () => clearInterval(interval);
-  }, [fetchProjects]);
+  }, [fetchProjects, likingProjectId, loadingProjectId]);
 
   // 투표 실행
   const handleVote = async (projectId: string) => {
@@ -154,7 +159,7 @@ export const VotePage = ({ voter }: Props) => {
         });
         setProjects((prev) =>
           prev.map((p) =>
-            p.id === projectId ? { ...p, voteCount: p.voteCount - 1 } : p,
+            p.id === projectId ? { ...p, voteCount: Math.max(0, p.voteCount - 1) } : p,
           ),
         );
       } else {
@@ -216,7 +221,7 @@ export const VotePage = ({ voter }: Props) => {
         });
         setProjects((prev) =>
           prev.map((p) =>
-            p.id === projectId ? { ...p, likeCount: p.likeCount - 1 } : p,
+            p.id === projectId ? { ...p, likeCount: Math.max(0, p.likeCount - 1) } : p,
           ),
         );
       } else {
