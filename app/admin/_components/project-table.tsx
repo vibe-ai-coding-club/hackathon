@@ -85,6 +85,8 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
               <th className={thClass}>팀명</th>
               <th className={thClass}>GitHub</th>
               <th className={thClass}>데모</th>
+              <th className={thClass}>영상</th>
+              <th className={thClass}>기타</th>
               <th className={thClass}>등록일</th>
             </tr>
           </thead>
@@ -92,7 +94,7 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={9}
                   className="px-4 py-6 text-center text-muted-foreground typo-caption1"
                 >
                   {search
@@ -136,6 +138,36 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
                     {project.demoUrl ? (
                       <a
                         href={project.demoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-accent hover:underline"
+                      >
+                        링크
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </td>
+                  <td className={tdClass}>
+                    {project.videoUrl ? (
+                      <a
+                        href={project.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-accent hover:underline"
+                      >
+                        링크
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </td>
+                  <td className={tdClass}>
+                    {project.linkUrl ? (
+                      <a
+                        href={project.linkUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
