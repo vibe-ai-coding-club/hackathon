@@ -47,10 +47,10 @@ export default function Home() {
         <InfoSection />
       </MotionSection>
       <MotionSection>
-        <SponsorSection />
+        <OrganizerSection />
       </MotionSection>
       <MotionSection>
-        <OrganizerSection />
+        <SponsorSection />
       </MotionSection>
       <FloatingStopwatch />
     </div>
