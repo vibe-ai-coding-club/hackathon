@@ -72,6 +72,19 @@ const statusStyle: Record<string, string> = {
   REFUNDED: "bg-red-100 text-red-700",
 };
 
+// 마스킹: 010-1234-5678 → 010-****-5678, 01012345678 → 010****5678
+const maskPhone = (phone: string) => {
+  if (phone.length <= 4) return phone;
+  const visible = 4;
+  return phone.slice(0, -visible).replace(/\d/g, "*") + phone.slice(-visible);
+};
+
+// 마스킹: 계좌번호 뒤 4자리만 표시
+const maskAccount = (account: string) => {
+  if (account.length <= 4) return account;
+  return "*".repeat(account.length - 4) + account.slice(-4);
+};
+
 const formatDate = (iso: string) => {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
@@ -787,13 +800,13 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       <td
                         className={`${tdClass} text-muted-foreground whitespace-nowrap`}
                       >
-                        {leader?.phone ?? ""}
+                        {leader?.phone ? maskPhone(leader.phone) : ""}
                       </td>
                       <td className={tdClass}>
                         {leader?.refundBank ? (
                           <div className="flex items-center gap-0.5 text-muted-foreground">
                             <span className="truncate max-w-45">
-                              {leader.refundBank} {leader.refundAccount} (
+                              {leader.refundBank} {maskAccount(leader.refundAccount ?? "")} (
                               {leader.refundAccountHolder})
                             </span>
                             <CopyButton
@@ -883,13 +896,13 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                         <td
                           className={`${tdClass} text-muted-foreground whitespace-nowrap`}
                         >
-                          {m.phone}
+                          {maskPhone(m.phone)}
                         </td>
                         <td className={tdClass}>
                           {m.refundBank ? (
                             <div className="flex items-center gap-0.5 text-muted-foreground">
                               <span className="truncate max-w-45">
-                                {m.refundBank} {m.refundAccount} (
+                                {m.refundBank} {maskAccount(m.refundAccount ?? "")} (
                                 {m.refundAccountHolder})
                               </span>
                               <CopyButton
