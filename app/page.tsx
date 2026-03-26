@@ -7,6 +7,7 @@ import { InfoSection } from "./sections/info-section";
 import { IntroSection } from "./sections/intro-section";
 import { PointSection } from "./sections/point-section";
 import { ScheduleSection } from "./sections/schedule-section";
+import { OrganizerSection } from "./sections/organizer-section";
 import { SponsorSection } from "./sections/sponsor-section";
 import { StopwatchSection } from "./sections/stopwatch-section";
 
@@ -47,6 +48,9 @@ export default function Home() {
       </MotionSection>
       <MotionSection>
         <SponsorSection />
+      </MotionSection>
+      <MotionSection>
+        <OrganizerSection />
       </MotionSection>
       <FloatingStopwatch />
     </div>
