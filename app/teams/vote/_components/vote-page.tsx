@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ProjectGrid } from "./project-grid";
 import { PresentingProject } from "./presenting-project";
+import { VoteChart } from "./vote-chart";
 
 type ProjectData = {
   id: string;
@@ -283,11 +284,19 @@ export const VotePage = ({ voter }: Props) => {
         </div>
       )}
 
+      {/* 실시간 현황 그래프 */}
+      {projects.length > 0 && (
+        <VoteChart
+          projects={projects}
+          allVotesUsed={!isReadOnly && remainingVotes <= 0}
+        />
+      )}
+
       {/* 발표 중 프로젝트 */}
       {presentingProject && (
         <PresentingProject
           project={presentingProject}
-          isMyTeam={false}
+          isMyTeam={voter?.teamId === presentingProject.teamId}
           isVoted={votedProjectIds.has(presentingProject.id)}
           isLiked={likedProjectIds.has(presentingProject.id)}
           onVote={handleVote}
