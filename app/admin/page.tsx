@@ -60,7 +60,7 @@ const AdminPage = async () => {
   }));
 
   return (
-    <div className="mx-auto max-w-[1600px] px-8 py-4">
+    <div className="mx-auto max-w-[1600px] px-4 py-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-4">
           <h1 className="typo-h6">딸깍톤 Admin</h1>
