@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { ConfirmModal } from "@/app/admin/_components/confirm-modal";
 import { useTeamBoard } from "./context";
 
 export const ProjectModal = () => {
-  const { editingProject, setShowProjectModal, setEditingProject, handleProjectSaved } = useTeamBoard();
+  const { editingProject, setShowProjectModal, setEditingProject, handleProjectSaved, handleProjectDeleted } = useTeamBoard();
   const project = editingProject;
 
   const [title, setTitle] = useState(project?.title ?? "");
@@ -16,6 +17,8 @@ export const ProjectModal = () => {
   const [videoUrl, setVideoUrl] = useState(project?.videoUrl ?? "");
   const [linkUrl, setLinkUrl] = useState(project?.linkUrl ?? "");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState("");
 
   const isEdit = !!project;
@@ -23,6 +26,31 @@ export const ProjectModal = () => {
   const onClose = () => {
     setEditingProject(null);
     setShowProjectModal(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!project) return;
+    setShowDeleteConfirm(false);
+    setDeleting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/teams/project", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: project.id }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        handleProjectDeleted(project.id);
+        onClose();
+      } else {
+        setError(json.message);
+      }
+    } catch {
+      setError("서버 오류가 발생했습니다.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -176,25 +204,51 @@ export const ProjectModal = () => {
 
         {error && <p className="text-xs text-red-500">{error}</p>}
 
-        <div className="flex justify-end gap-2 pt-1">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={saving}
-            className="rounded-md border border-border px-4 py-2 text-sm cursor-pointer transition-colors hover:bg-muted disabled:opacity-50"
-          >
-            취소
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={saving}
-            className="rounded-md bg-accent px-4 py-2 text-sm text-white cursor-pointer transition-colors hover:bg-accent-hover disabled:opacity-50"
-          >
-            {saving ? "저장 중..." : isEdit ? "수정" : "등록"}
-          </button>
+        <div className="flex justify-between items-center pt-1">
+          <div>
+            {isEdit && (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={deleting || saving}
+                className="rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-600 cursor-pointer transition-colors hover:bg-red-50 disabled:opacity-50"
+              >
+                {deleting ? "삭제 중..." : "삭제"}
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={saving || deleting}
+              className="rounded-md border border-border px-4 py-2 text-sm cursor-pointer transition-colors hover:bg-muted disabled:opacity-50"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={saving || deleting}
+              className="rounded-md bg-accent px-4 py-2 text-sm text-white cursor-pointer transition-colors hover:bg-accent-hover disabled:opacity-50"
+            >
+              {saving ? "저장 중..." : isEdit ? "수정" : "등록"}
+            </button>
+          </div>
         </div>
       </div>
+
+      {showDeleteConfirm && project && (
+        <ConfirmModal
+          title="프로젝트 삭제"
+          message={`"${project.title}" 프로젝트를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`}
+          confirmLabel="삭제"
+          cancelLabel="취소"
+          variant="danger"
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
     </div>
   );
 };

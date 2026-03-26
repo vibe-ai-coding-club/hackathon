@@ -57,6 +57,7 @@ type TeamBoardContextValue = {
   editingProject: Project | null;
   setEditingProject: (p: Project | null) => void;
   handleProjectSaved: (project: Project, isNew: boolean) => void;
+  handleProjectDeleted: (projectId: string) => void;
   // accordion
   recruitingOpen: boolean;
   setRecruitingOpen: (v: boolean | ((prev: boolean) => boolean)) => void;
@@ -389,6 +390,22 @@ export const TeamBoardProvider = ({
     [myTeam],
   );
 
+  const handleProjectDeleted = useCallback(
+    (projectId: string) => {
+      if (!myTeam) return;
+      setTeams((prev) =>
+        prev.map((t) => {
+          if (t.id !== myTeam.id) return t;
+          return {
+            ...t,
+            projects: t.projects.filter((p) => p.id !== projectId),
+          };
+        }),
+      );
+    },
+    [myTeam],
+  );
+
   const value = useMemo<TeamBoardContextValue>(
     () => ({
       teams,
@@ -430,6 +447,7 @@ export const TeamBoardProvider = ({
       editingProject,
       setEditingProject,
       handleProjectSaved,
+      handleProjectDeleted,
       recruitingOpen,
       setRecruitingOpen,
       lookingOpen,
@@ -469,6 +487,7 @@ export const TeamBoardProvider = ({
       showProjectModal,
       editingProject,
       handleProjectSaved,
+      handleProjectDeleted,
       recruitingOpen,
       lookingOpen,
     ],

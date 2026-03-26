@@ -67,3 +67,42 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true, projectId: created.id });
 }
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json(
+      { success: false, message: "인증이 필요합니다." },
+      { status: 401 },
+    );
+  }
+
+  const teamId = session.user.teamId;
+  if (!teamId) {
+    return NextResponse.json(
+      { success: false, message: "팀 정보가 없습니다." },
+      { status: 400 },
+    );
+  }
+
+  const { projectId } = await req.json();
+  if (!projectId) {
+    return NextResponse.json(
+      { success: false, message: "프로젝트 ID가 필요합니다." },
+      { status: 400 },
+    );
+  }
+
+  const existing = await prisma.project.findFirst({
+    where: { id: projectId, teamId },
+  });
+  if (!existing) {
+    return NextResponse.json(
+      { success: false, message: "프로젝트를 찾을 수 없습니다." },
+      { status: 404 },
+    );
+  }
+
+  await prisma.project.delete({ where: { id: projectId } });
+  return NextResponse.json({ success: true });
+}
