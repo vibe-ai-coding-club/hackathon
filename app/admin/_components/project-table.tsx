@@ -37,11 +37,16 @@ const thClass =
   "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
 const tdClass = "px-2.5 py-1.5 typo-caption1";
 
-export const ProjectTable = ({ projects }: ProjectTableProps) => {
+export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) => {
+  const [projects, setProjects] = useState(initialProjects);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [selectedProject, setSelectedProject] =
     useState<SerializedProject | null>(null);
+
+  const handleDelete = (projectId: string) => {
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+  };
 
   const filtered = useMemo(() => {
     if (!search.trim()) return projects;
@@ -76,18 +81,18 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full">
+        <table className="w-full table-fixed">
           <thead>
             <tr className="border-b border-border bg-muted">
-              <th className={thClass}>#</th>
+              <th className={`${thClass} w-10`}>#</th>
               <th className={thClass}>프로젝트명</th>
-              <th className={thClass}>대표자</th>
-              <th className={thClass}>팀명</th>
-              <th className={thClass}>GitHub</th>
-              <th className={thClass}>데모</th>
-              <th className={thClass}>영상</th>
-              <th className={thClass}>기타</th>
-              <th className={thClass}>등록일</th>
+              <th className={`${thClass} w-20`}>대표자</th>
+              <th className={`${thClass} w-28`}>팀명</th>
+              <th className={`${thClass} w-16`}>GitHub</th>
+              <th className={`${thClass} w-14`}>데모</th>
+              <th className={`${thClass} w-14`}>영상</th>
+              <th className={`${thClass} w-14`}>기타</th>
+              <th className={`${thClass} w-24`}>등록일</th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +117,7 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
                   <td className={`${tdClass} text-muted-foreground`}>
                     {page * PAGE_SIZE + i + 1}
                   </td>
-                  <td className={`${tdClass} font-medium`}>{project.title}</td>
+                  <td className={`${tdClass} font-medium truncate`}>{project.title}</td>
                   <td className={`${tdClass} text-muted-foreground`}>
                     {project.team.leaderName}
                   </td>
@@ -219,6 +224,7 @@ export const ProjectTable = ({ projects }: ProjectTableProps) => {
         <ProjectDetailModal
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
+          onDelete={handleDelete}
         />
       )}
     </div>

@@ -7,6 +7,7 @@ import type { SerializedProject } from "./project-table";
 type ProjectDetailModalProps = {
   project: SerializedProject;
   onClose: () => void;
+  onDelete: (projectId: string) => void;
 };
 
 function fillEvaluationPrompt(project: SerializedProject) {
@@ -30,6 +31,7 @@ function fillEvaluationPrompt(project: SerializedProject) {
 export const ProjectDetailModal = ({
   project,
   onClose,
+  onDelete,
 }: ProjectDetailModalProps) => {
   const [promptResult, setPromptResult] = useState(
     project.promptResult ?? "",
@@ -38,6 +40,7 @@ export const ProjectDetailModal = ({
   const [saved, setSaved] = useState(false);
   const [showEvalPrompt, setShowEvalPrompt] = useState(false);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -65,6 +68,27 @@ export const ProjectDetailModal = ({
     }
   };
 
+  const handleDelete = async () => {
+    if (!confirm(`"${project.title}" 프로젝트를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/projects/${project.id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        onDelete(project.id);
+        onClose();
+      } else {
+        const json = await res.json();
+        alert(json.message || "삭제에 실패했습니다.");
+      }
+    } catch {
+      alert("서버 오류가 발생했습니다.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const handleCopyEvalPrompt = async () => {
     const prompt = fillEvaluationPrompt(project);
     try {
@@ -88,8 +112,8 @@ export const ProjectDetailModal = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-lg border border-border bg-background p-5 space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-lg border border-border bg-background">
+        <div className="flex items-center justify-between p-5 pb-0">
           <h2 className="typo-subtitle2">프로젝트 상세</h2>
           <button
             onClick={onClose}
@@ -100,6 +124,7 @@ export const ProjectDetailModal = ({
           </button>
         </div>
 
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
         {/* 프로젝트 정보 */}
         <section className="space-y-2">
           <h3 className="typo-caption1 font-medium text-muted-foreground">
@@ -310,6 +335,19 @@ export const ProjectDetailModal = ({
             </button>
           </div>
         </section>
+        </div>
+
+        {/* 삭제 */}
+        <div className="border-t border-border px-5 py-3">
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-600 cursor-pointer transition-colors hover:bg-red-50 disabled:opacity-50"
+          >
+            {deleting ? "삭제 중..." : "프로젝트 삭제"}
+          </button>
+        </div>
       </div>
     </div>
   );
