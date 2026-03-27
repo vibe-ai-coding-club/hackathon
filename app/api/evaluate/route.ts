@@ -15,6 +15,7 @@ function buildProjectResponse(project: {
   linkUrl: string | null;
   promptResult: string | null;
   promptFeedback: string | null;
+  catFeedback: string | null;
   team: {
     id: string;
     teamName: string | null;
@@ -51,6 +52,7 @@ function buildProjectResponse(project: {
     linkUrl: project.linkUrl,
     promptResult: project.promptResult,
     promptFeedback: project.promptFeedback,
+    catFeedback: project.catFeedback,
     team: {
       id: project.team.id,
       teamName: project.team.teamName,
@@ -237,26 +239,32 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/evaluate
- * 평가 결과(promptFeedback) DB 저장
+ * 평가 결과 DB 저장
+ * - promptFeedback: 기본 심사 결과 (100점)
+ * - catFeedback: 냥심사 통합 결과 (85점 + 15점)
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { projectId, promptFeedback } = body;
+  const { projectId, promptFeedback, catFeedback } = body;
 
-  if (!projectId || !promptFeedback) {
+  if (!projectId || (!promptFeedback && !catFeedback)) {
     return NextResponse.json(
       {
         success: false,
-        message: "projectId와 promptFeedback이 필요합니다.",
+        message: "projectId와 promptFeedback 또는 catFeedback이 필요합니다.",
       },
       { status: 400 },
     );
   }
 
   try {
+    const data: { promptFeedback?: string; catFeedback?: string } = {};
+    if (promptFeedback) data.promptFeedback = promptFeedback.trim();
+    if (catFeedback) data.catFeedback = catFeedback.trim();
+
     await prisma.project.update({
       where: { id: projectId },
-      data: { promptFeedback: promptFeedback.trim() },
+      data,
     });
 
     return NextResponse.json({ success: true });

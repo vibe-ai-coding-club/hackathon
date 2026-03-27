@@ -117,6 +117,7 @@ model Project {
 
   promptResult   String? @map("prompt_result") @db.Text
   promptFeedback String? @map("prompt_feedback") @db.Text
+  catFeedback    String? @map("cat_feedback") @db.Text
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
