@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { NavLinks } from "./_components/nav-links";
 
 const TeamsLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
@@ -19,20 +20,23 @@ const TeamsLayout = async ({ children }: { children: React.ReactNode }) => {
                   {session.user.name}님
                 </span>
               </div>
-              <form
-                action={async () => {
-                  "use server";
-                  const { signOut } = await import("@/lib/auth");
-                  await signOut({ redirectTo: "/teams/login" });
-                }}
-              >
-                <button
-                  type="submit"
-                  className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
+              <div className="flex items-center gap-2">
+                <NavLinks />
+                <form
+                  action={async () => {
+                    "use server";
+                    const { signOut } = await import("@/lib/auth");
+                    await signOut({ redirectTo: "/teams/login" });
+                  }}
                 >
-                  로그아웃
-                </button>
-              </form>
+                  <button
+                    type="submit"
+                    className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
+                  >
+                    로그아웃
+                  </button>
+                </form>
+              </div>
             </div>
           </header>
         )}
