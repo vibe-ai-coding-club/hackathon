@@ -238,10 +238,69 @@ export async function GET(request: NextRequest) {
 }
 
 /**
+ * 피드백 텍스트에서 총점을 파싱
+ * "**총점**: 72/100" 또는 "**총점** 72 / 100" 등의 패턴 매칭
+ */
+function parseScore(feedback: string): number | null {
+  // "총점" 키워드 뒤의 숫자/배점 패턴
+  const patterns = [
+    /총점[^\d]*(\d{1,3})\s*[/／]\s*\d{1,3}/,
+    /\*\*총점\*\*[^\d]*(\d{1,3})/,
+    /총점.*?(\d{1,3})\s*점/,
+  ];
+  for (const pattern of patterns) {
+    const match = feedback.match(pattern);
+    if (match) return parseInt(match[1], 10);
+  }
+  return null;
+}
+
+/**
+ * 냥심사 피드백에서 Part A(85점)와 Part B(15점) 점수를 파싱
+ */
+function parseCatScores(feedback: string): {
+  promptScore: number | null;
+  catScore: number | null;
+} {
+  let promptScore: number | null = null;
+  let catScore: number | null = null;
+
+  // Part A 소계
+  const partAPatterns = [
+    /Part\s*A[^\d]*소계[^\d]*(\d{1,3})\s*[/／]\s*85/,
+    /Part\s*A[^\d]*(\d{1,3})\s*[/／]\s*85/,
+    /기본 심사[^\d]*(\d{1,3})\s*[/／]\s*85/,
+  ];
+  for (const pattern of partAPatterns) {
+    const match = feedback.match(pattern);
+    if (match) {
+      promptScore = parseInt(match[1], 10);
+      break;
+    }
+  }
+
+  // Part B 소계
+  const partBPatterns = [
+    /Part\s*B[^\d]*소계[^\d]*(\d{1,3})\s*[/／]\s*15/,
+    /Part\s*B[^\d]*(\d{1,3})\s*[/／]\s*15/,
+    /고양이 심사[^\d]*(\d{1,3})\s*[/／]\s*15/,
+  ];
+  for (const pattern of partBPatterns) {
+    const match = feedback.match(pattern);
+    if (match) {
+      catScore = parseInt(match[1], 10);
+      break;
+    }
+  }
+
+  return { promptScore, catScore };
+}
+
+/**
  * POST /api/evaluate
  * 평가 결과 DB 저장
- * - promptFeedback: 기본 심사 결과 (100점)
- * - catFeedback: 냥심사 통합 결과 (85점 + 15점)
+ * - promptFeedback + promptScore: 기본 심사 결과 (100점)
+ * - catFeedback + promptScore + catScore: 냥심사 통합 결과 (85점 + 15점)
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -258,16 +317,32 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const data: { promptFeedback?: string; catFeedback?: string } = {};
-    if (promptFeedback) data.promptFeedback = promptFeedback.trim();
-    if (catFeedback) data.catFeedback = catFeedback.trim();
+    const data: {
+      promptFeedback?: string;
+      promptScore?: number;
+      catFeedback?: string;
+      catScore?: number;
+    } = {};
+
+    if (promptFeedback) {
+      data.promptFeedback = promptFeedback.trim();
+      const score = parseScore(promptFeedback);
+      if (score !== null) data.promptScore = score;
+    }
+
+    if (catFeedback) {
+      data.catFeedback = catFeedback.trim();
+      const { promptScore, catScore } = parseCatScores(catFeedback);
+      if (promptScore !== null) data.promptScore = promptScore;
+      if (catScore !== null) data.catScore = catScore;
+    }
 
     await prisma.project.update({
       where: { id: projectId },
       data,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, scores: { promptScore: data.promptScore, catScore: data.catScore } });
   } catch (error) {
     console.error("Evaluate save error:", error);
     return NextResponse.json(
