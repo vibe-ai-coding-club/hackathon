@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { EVALUATION_PROMPT } from "@/lib/prompts";
+import { EVALUATION_PROMPT, FULL_EVALUATION_PROMPT } from "@/lib/prompts";
 import { NextRequest, NextResponse } from "next/server";
 
 function buildProjectResponse(project: {
@@ -24,14 +24,19 @@ function buildProjectResponse(project: {
 }) {
   const leader = project.team.members[0];
 
-  const filledPrompt = EVALUATION_PROMPT.replace("{{title}}", project.title)
-    .replace("{{description}}", project.description ?? "없음")
-    .replace("{{features}}", project.features ?? "없음")
-    .replace("{{tools}}", project.tools ?? "없음")
-    .replace("{{githubUrl}}", project.githubUrl ?? "없음")
-    .replace("{{demoUrl}}", project.demoUrl ?? "없음")
-    .replace("{{videoUrl}}", project.videoUrl ?? "없음")
-    .replace("{{linkUrl}}", project.linkUrl ?? "없음");
+  const fillTemplate = (template: string) =>
+    template
+      .replace("{{title}}", project.title)
+      .replace("{{description}}", project.description ?? "없음")
+      .replace("{{features}}", project.features ?? "없음")
+      .replace("{{tools}}", project.tools ?? "없음")
+      .replace("{{githubUrl}}", project.githubUrl ?? "없음")
+      .replace("{{demoUrl}}", project.demoUrl ?? "없음")
+      .replace("{{videoUrl}}", project.videoUrl ?? "없음")
+      .replace("{{linkUrl}}", project.linkUrl ?? "없음");
+
+  const filledPrompt = fillTemplate(EVALUATION_PROMPT);
+  const filledFullPrompt = fillTemplate(FULL_EVALUATION_PROMPT);
 
   return {
     projectId: project.id,
@@ -54,6 +59,7 @@ function buildProjectResponse(project: {
       leaderEmail: leader?.email ?? "",
     },
     evaluationPrompt: filledPrompt,
+    fullEvaluationPrompt: filledFullPrompt,
   };
 }
 
