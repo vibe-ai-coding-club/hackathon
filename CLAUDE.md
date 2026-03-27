@@ -95,7 +95,7 @@ ttalkkakthon/
 
 ### 심사 요청
 
-`@삿 심사 {순번}` 또는 `@삿 심사 {팀이름}` 또는 `@삿 심사 {팀이름} {프로젝트순번}`
+`@ttalkkakthon 심사 {순번}` 또는 `@ttalkkakthon 심사 {팀이름}` 또는 `@ttalkkakthon 심사 {팀이름} {프로젝트순번}`
 
 1. `GET http://localhost:3000/api/evaluate?index={순번}` 또는 `?team={팀이름}` (프로젝트순번이 있으면 `&project={프로젝트순번}`)으로 프로젝트 데이터 조회
 2. 프로젝트가 여러 개면(`projectCount` 존재) 목록을 디스코드에 안내하고 선택 요청
@@ -106,15 +106,28 @@ ttalkkakthon/
 
 ### 심사 결과 조회
 
-`@삿 심사결과 {순번}` 또는 `@삿 심사결과 {팀이름}` 또는 `@삿 심사결과 {팀이름} {프로젝트순번}`
+`@ttalkkakthon 심사결과 {순번}` 또는 `@ttalkkakthon 심사결과 {팀이름}` 또는 `@ttalkkakthon 심사결과 {팀이름} {프로젝트순번}`
 
 1. `GET http://localhost:3000/api/evaluate?index={순번}` 또는 `?team={팀이름}` (프로젝트순번이 있으면 `&project={프로젝트순번}`)으로 조회
 2. 프로젝트가 여러 개면 목록을 디스코드에 안내하고 선택 요청
 3. 단일 프로젝트면 `promptFeedback` 값을 디스코드에 회신 (없으면 "아직 심사 결과 없음" 안내)
 
+### 냥심사 요청
+
+`@ttalkkakthon 냥심사 {순번}` 또는 `@ttalkkakthon 냥심사 {팀이름}` 또는 `@ttalkkakthon 냥심사 {팀이름} {프로젝트순번}`
+
+정상 심사(85점) + 고양이 나비의 예능 심사(15점) = 총 100점 통합 심사를 수행한다.
+
+1. `GET http://localhost:3000/api/evaluate?index={순번}` 또는 `?team={팀이름}` (프로젝트순번이 있으면 `&project={프로젝트순번}`)으로 프로젝트 데이터 조회
+2. 프로젝트가 여러 개면(`projectCount` 존재) 목록을 디스코드에 안내하고 선택 요청
+3. 단일 프로젝트면 응답의 `fullEvaluationPrompt`(통합 평가 프롬프트)를 기반으로 심사 수행
+4. 프로젝트의 GitHub/데모/영상 URL이 있으면 접근하여 실제 내용 확인
+5. 평가 결과를 `POST http://localhost:3000/api/evaluate`로 DB 저장 (`projectId` + `promptFeedback`)
+6. 디스코드에 심사 결과 회신 (Part A 정상 심사 → Part B 고양이 심사 → 최종 합산 순서)
+
 ### 프로젝트 분석
 
-`@삿 분석 {순번}` 또는 `@삿 분석 {팀이름}` 또는 `@삿 분석 {팀이름} {프로젝트순번}`
+`@ttalkkakthon 분석 {순번}` 또는 `@ttalkkakthon 분석 {팀이름}` 또는 `@ttalkkakthon 분석 {팀이름} {프로젝트순번}`
 
 공개 GitHub 레포를 등록한 프로젝트에 한해, `gh` CLI로 소스 코드에 직접 접근하여 분석을 수행한다.
 
