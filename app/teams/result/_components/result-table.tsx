@@ -120,7 +120,7 @@ export const ResultTable = ({
                 <td className="typo-body3 px-4 py-3 text-muted-foreground">
                   {promptRevealed ? acc.rank : "-"}
                 </td>
-                <td className="typo-body3 px-4 py-3">
+                <td className="typo-body3 px-4 py-3 whitespace-nowrap">
                   {project.team.teamName ?? "개인"}
                 </td>
                 <td className="typo-body3 px-4 py-3">
