@@ -111,7 +111,7 @@ export const TeamMembersSection = ({
               placeholder="example@email.com"
               description={emailDescription(
                 dupStatus.email,
-                "투표 시 사용됩니다",
+                "좋아요 시 사용됩니다",
               )}
               error={errors.email}
             />
@@ -181,7 +181,7 @@ export const TeamMembersSection = ({
                 placeholder="example@email.com"
                 description={emailDescription(
                   dupStatus[`members.${i}.email`],
-                  "투표 시 사용됩니다",
+                  "좋아요 시 사용됩니다",
                 )}
                 error={errors[`members.${i}.email`]}
               />

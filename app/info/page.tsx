@@ -102,10 +102,10 @@ export default function InfoPage() {
         <h2 className="mb-4 text-xl font-semibold">심사 기준</h2>
         <div className="rounded-lg border border-border p-4 text-sm space-y-2">
           <p>
-            심사는 <strong>현장 심사</strong>와 <strong>참가자 투표</strong>를
+            심사는 <strong>AI 심사</strong>와 <strong>참가자 좋아요</strong>를
             합산하여 진행됩니다.
           </p>
-          <p>비중: 참가자 투표 50% + 심사위원 50%</p>
+          <p>비중: 참가자 좋아요 50% + AI 심사 50%</p>
           <p className="text-muted-foreground">
             점수는 매우 주관적입니다. 발표력은 실력보다 뻔뻔함이 중요할 수
             있습니다.

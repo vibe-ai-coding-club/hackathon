@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 type VoteResult = {
   projectId: string;
   title: string;
@@ -9,8 +7,6 @@ type VoteResult = {
   voteCount: number;
   likeCount: number;
 };
-
-type SortKey = "vote" | "like";
 
 type VoteResultsTableProps = {
   results: VoteResult[];
@@ -27,54 +23,21 @@ export const VoteResultsTable = ({
   presentingProjectId,
   onPresenting,
 }: VoteResultsTableProps) => {
-  const [sortKey, setSortKey] = useState<SortKey>("vote");
-
-  const sorted = [...results].sort((a, b) =>
-    sortKey === "vote" ? b.voteCount - a.voteCount : b.likeCount - a.likeCount,
-  );
-  const maxCount =
-    sortKey === "vote"
-      ? (sorted[0]?.voteCount ?? 0)
-      : (sorted[0]?.likeCount ?? 0);
+  const sorted = [...results].sort((a, b) => b.likeCount - a.likeCount);
+  const maxCount = sorted[0]?.likeCount ?? 0;
 
   return (
     <div className="rounded-lg border border-border">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
-          <h2 className="typo-subtitle2">투표 · 좋아요 결과</h2>
-          <div className="flex rounded-md border border-border overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setSortKey("vote")}
-              className={`px-2 py-0.5 typo-caption2 cursor-pointer transition-colors ${
-                sortKey === "vote"
-                  ? "bg-primary-400 text-white"
-                  : "bg-background text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              투표순
-            </button>
-            <button
-              type="button"
-              onClick={() => setSortKey("like")}
-              className={`px-2 py-0.5 typo-caption2 cursor-pointer transition-colors ${
-                sortKey === "like"
-                  ? "bg-primary-400 text-white"
-                  : "bg-background text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              좋아요순
-            </button>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <span className="typo-caption1 text-muted-foreground">
-            총 {totalVotes}표
-          </span>
-          <span className="typo-caption1 text-muted-foreground">
-            총 {totalLikes}좋아요
+          <h2 className="typo-subtitle2">좋아요 결과</h2>
+          <span className="rounded-full bg-red-400 text-white px-2 py-0.5 typo-caption2">
+            좋아요순
           </span>
         </div>
+        <span className="typo-caption1 text-muted-foreground">
+          총 {totalLikes}좋아요
+        </span>
       </div>
 
       {sorted.length === 0 ? (
@@ -87,8 +50,7 @@ export const VoteResultsTable = ({
         <div className="divide-y divide-border">
           {sorted.map((result, index) => {
             const isPresenting = result.projectId === presentingProjectId;
-            const barValue =
-              sortKey === "vote" ? result.voteCount : result.likeCount;
+            const barValue = result.likeCount;
 
             return (
               <div
@@ -130,9 +92,7 @@ export const VoteResultsTable = ({
                 <div className="hidden sm:flex items-center gap-2 w-32">
                   <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${
-                        sortKey === "vote" ? "bg-primary-400" : "bg-red-400"
-                      }`}
+                      className="h-full rounded-full transition-all bg-red-400"
                       style={{
                         width:
                           maxCount > 0
@@ -142,11 +102,6 @@ export const VoteResultsTable = ({
                     />
                   </div>
                 </div>
-
-                {/* 투표 수 */}
-                <span className="typo-caption2 font-bold tabular-nums shrink-0 w-8 text-right">
-                  {result.voteCount}표
-                </span>
 
                 {/* 좋아요 수 */}
                 <span className="typo-caption2 tabular-nums shrink-0 w-10 text-right text-red-400">

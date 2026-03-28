@@ -90,63 +90,32 @@ export const PresentingProject = ({
           </a>
         </div>
 
-        {/* 액션 영역 */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {/* 좋아요 */}
-            {isReadOnly ? (
-              <span className="flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-200 px-4 py-2 typo-btn4 text-gray-600">
-                <span className="text-lg">❤️</span>
-                <span className="tabular-nums font-bold">
-                  {project.likeCount}
-                </span>
+        {/* 좋아요 */}
+        <div className="flex items-center">
+          {isReadOnly ? (
+            <span className="flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-200 px-4 py-2 typo-btn4 text-gray-600">
+              <span className="text-lg">❤️</span>
+              <span className="tabular-nums font-bold">
+                {project.likeCount}
               </span>
-            ) : (
-              <button
-                onClick={() =>
-                  isLiked ? onUnlike(project.id) : onLike(project.id)
-                }
-                disabled={likeLoading}
-                className={`flex items-center gap-1.5 rounded-full px-4 py-2 typo-btn4 transition-colors cursor-pointer disabled:opacity-50 ${
-                  isLiked
-                    ? "bg-red-50 text-red-500 border border-red-200"
-                    : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
-                }`}
-              >
-                <span className="text-lg">{isLiked ? "❤️" : "🤍"}</span>
-                <span className="tabular-nums font-bold">
-                  {project.likeCount}
-                </span>
-              </button>
-            )}
-
-            {/* 투표 수 */}
-            <span className="typo-caption1 text-muted-foreground">
-              {project.voteCount}표
             </span>
-          </div>
-
-          {/* 투표 버튼 */}
-          {!isReadOnly && !isMyTeam && (
-            <>
-              {isVoted ? (
-                <button
-                  onClick={() => onCancel(project.id)}
-                  disabled={voteLoading}
-                  className="rounded-lg border border-primary-400 px-4 py-2 typo-btn4 text-primary-400 hover:bg-primary-025 disabled:opacity-50 transition-colors cursor-pointer"
-                >
-                  {voteLoading ? "처리 중..." : "투표 취소"}
-                </button>
-              ) : (
-                <button
-                  onClick={() => onVote(project.id)}
-                  disabled={voteLoading}
-                  className="rounded-lg bg-primary-400 px-4 py-2 typo-btn4 text-white hover:bg-primary-500 disabled:opacity-50 transition-colors cursor-pointer"
-                >
-                  {voteLoading ? "처리 중..." : "투표하기"}
-                </button>
-              )}
-            </>
+          ) : (
+            <button
+              onClick={() =>
+                isLiked ? onUnlike(project.id) : onLike(project.id)
+              }
+              disabled={likeLoading}
+              className={`flex items-center gap-1.5 rounded-full px-4 py-2 typo-btn4 transition-colors cursor-pointer disabled:opacity-50 ${
+                isLiked
+                  ? "bg-red-50 text-red-500 border border-red-200"
+                  : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
+              }`}
+            >
+              <span className="text-lg">{isLiked ? "❤️" : "🤍"}</span>
+              <span className="tabular-nums font-bold">
+                {project.likeCount}
+              </span>
+            </button>
           )}
         </div>
       </div>

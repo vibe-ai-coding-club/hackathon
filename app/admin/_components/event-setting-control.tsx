@@ -63,28 +63,6 @@ export const EventSettingControl = ({
       <h2 className="typo-subtitle2 mb-3">이벤트 설정</h2>
 
       <div className="space-y-4">
-        {/* 최대 투표 수 설정 */}
-        <div className="flex items-center gap-2">
-          <label className="typo-caption1 text-muted-foreground">
-            1인당 최대 투표 수:
-          </label>
-          <input
-            type="number"
-            value={maxVotes}
-            onChange={(e) => setMaxVotes(Number(e.target.value))}
-            min={1}
-            max={20}
-            className="w-16 rounded-md border border-border bg-background px-2 py-1 typo-caption1 text-center"
-          />
-          <button
-            onClick={handleMaxVotesSave}
-            disabled={loading}
-            className="rounded-md bg-primary-400 px-3 py-1 typo-btn4 text-white hover:bg-primary-500 disabled:opacity-50 cursor-pointer transition-colors"
-          >
-            {loading ? "..." : "저장"}
-          </button>
-        </div>
-
         {/* 발표 중 프로젝트 선택 */}
         <div className="flex items-center gap-2">
           <label className="typo-caption1 text-muted-foreground">

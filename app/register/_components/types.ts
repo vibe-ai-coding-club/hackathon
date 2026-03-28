@@ -65,7 +65,7 @@ export type DuplicateStatus = "idle" | "checking" | "available" | "duplicate";
 
 export const emailDescription = (
   status: DuplicateStatus | undefined,
-  defaultText = "투표 인증 및 프로젝트 등록을 위해 수집하고 있어요",
+  defaultText = "좋아요 인증 및 프로젝트 등록을 위해 수집하고 있어요",
 ): string => {
   switch (status) {
     case "checking":

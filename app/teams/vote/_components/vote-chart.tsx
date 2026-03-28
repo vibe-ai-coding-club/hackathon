@@ -10,44 +10,22 @@ type ProjectStat = {
   likeCount: number;
 };
 
-type SortKey = "vote" | "like";
-
 type VoteChartProps = {
   projects: ProjectStat[];
   allVotesUsed: boolean;
 };
 
-export const VoteChart = ({ projects, allVotesUsed }: VoteChartProps) => {
-  const [open, setOpen] = useState(allVotesUsed);
-  const [userClosed, setUserClosed] = useState(false);
-
-  // 투표를 다 쓰면 자동 오픈 (유저가 수동으로 닫지 않았을 때)
-  useEffect(() => {
-    if (allVotesUsed && !userClosed) {
-      setOpen(true);
-    }
-  }, [allVotesUsed, userClosed]);
+export const VoteChart = ({ projects }: VoteChartProps) => {
+  const [open, setOpen] = useState(false);
 
   const handleToggle = () => {
-    setOpen((v) => {
-      if (!v === false) setUserClosed(true);
-      return !v;
-    });
+    setOpen((v) => !v);
   };
-  const [sortKey, setSortKey] = useState<SortKey>("vote");
 
-  const sorted = [...projects].sort((a, b) =>
-    sortKey === "vote"
-      ? b.voteCount - a.voteCount
-      : b.likeCount - a.likeCount,
-  );
+  const sorted = [...projects].sort((a, b) => b.likeCount - a.likeCount);
 
-  const maxValue =
-    sortKey === "vote"
-      ? (sorted[0]?.voteCount ?? 0)
-      : (sorted[0]?.likeCount ?? 0);
+  const maxValue = sorted[0]?.likeCount ?? 0;
 
-  const totalVotes = projects.reduce((s, p) => s + p.voteCount, 0);
   const totalLikes = projects.reduce((s, p) => s + p.likeCount, 0);
 
   return (
@@ -70,55 +48,30 @@ export const VoteChart = ({ projects, allVotesUsed }: VoteChartProps) => {
         </svg>
         실시간 현황
         <span className="text-muted-foreground/60">
-          {totalVotes}표 · {totalLikes}좋아요
+          {totalLikes}좋아요
         </span>
       </button>
 
       {open && (
         <div className="mt-3 rounded-xl border border-border p-4 space-y-3">
-          {/* 정렬 토글 */}
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setSortKey("vote")}
-              className={`rounded-full px-2.5 py-0.5 typo-caption2 cursor-pointer transition-colors ${
-                sortKey === "vote"
-                  ? "bg-primary-400 text-white"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              투표순
-            </button>
-            <button
-              type="button"
-              onClick={() => setSortKey("like")}
-              className={`rounded-full px-2.5 py-0.5 typo-caption2 cursor-pointer transition-colors ${
-                sortKey === "like"
-                  ? "bg-red-400 text-white"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              좋아요순
-            </button>
-          </div>
+          {/* 좋아요순 정렬 */}
+          <span className="rounded-full bg-red-400 text-white px-2.5 py-0.5 typo-caption2">
+            좋아요순
+          </span>
 
           {/* 바 차트 */}
           <div className="space-y-2">
             {sorted.map((p, i) => {
-              const value =
-                sortKey === "vote" ? p.voteCount : p.likeCount;
               const percent =
-                maxValue > 0 ? (value / maxValue) * 100 : 0;
+                maxValue > 0 ? (p.likeCount / maxValue) * 100 : 0;
 
               return (
                 <div key={p.id} className="flex items-center gap-2.5">
                   {/* 순위 */}
                   <span
                     className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full typo-caption2 font-bold ${
-                      i === 0 && value > 0
-                        ? sortKey === "vote"
-                          ? "bg-primary-400 text-white"
-                          : "bg-red-400 text-white"
+                      i === 0 && p.likeCount > 0
+                        ? "bg-red-400 text-white"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
@@ -138,24 +91,15 @@ export const VoteChart = ({ projects, allVotesUsed }: VoteChartProps) => {
                   {/* 바 */}
                   <div className="flex-1 h-4 rounded-full bg-muted overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        sortKey === "vote"
-                          ? "bg-primary-400"
-                          : "bg-red-400"
-                      }`}
+                      className="h-full rounded-full transition-all duration-500 bg-red-400"
                       style={{ width: `${percent}%` }}
                     />
                   </div>
 
-                  {/* 수치 */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="typo-caption2 font-bold tabular-nums w-6 text-right">
-                      {p.voteCount}
-                    </span>
-                    <span className="typo-caption2 tabular-nums text-red-400 w-6 text-right">
-                      {p.likeCount}
-                    </span>
-                  </div>
+                  {/* 좋아요 수 */}
+                  <span className="typo-caption2 tabular-nums text-red-400 w-6 text-right">
+                    {p.likeCount}
+                  </span>
                 </div>
               );
             })}

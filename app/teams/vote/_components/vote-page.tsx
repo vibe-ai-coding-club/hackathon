@@ -255,9 +255,9 @@ export const VotePage = ({ voter }: Props) => {
     <div className="mx-auto max-w-5xl px-4 pt-8 pb-20">
       {/* 헤더 */}
       <div className="mb-8">
-        <h1 className="typo-h4 mb-2">프로젝트 투표</h1>
+        <h1 className="typo-h4 mb-2">프로젝트 좋아요</h1>
         <p className="typo-body3 text-muted-foreground">
-          마음에 드는 프로젝트에 투표해주세요!
+          마음에 드는 프로젝트에 좋아요를 눌러주세요!
         </p>
       </div>
 
@@ -266,16 +266,6 @@ export const VotePage = ({ voter }: Props) => {
         <span className="typo-body3 text-muted-foreground">
           {isReadOnly ? "관리자 (읽기 전용)" : `${voter.name}님`}
         </span>
-        {!isReadOnly && (
-          <>
-            <div className="h-4 w-px bg-border" />
-            <span className="typo-body3 text-muted-foreground">
-              남은 투표:{" "}
-              <strong className="text-foreground">{remainingVotes}</strong>/
-              {maxVotes}
-            </span>
-          </>
-        )}
       </div>
 
       {error && (
