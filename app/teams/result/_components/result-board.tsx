@@ -26,7 +26,7 @@ export const ResultBoard = () => {
   const [projects, setProjects] = useState<ProjectResult[]>([]);
   const [totalLikers, setTotalLikers] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [sortKey, setSortKey] = useState<SortKey>("likeScore");
+  const [sortKey, setSortKey] = useState<SortKey>("totalScore");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selectedProject, setSelectedProject] = useState<ProjectResult | null>(
     null,
@@ -68,7 +68,14 @@ export const ResultBoard = () => {
     return p[key] ?? 0;
   };
 
+  const isRevealed = (p: ProjectResult) =>
+    revealedScores.has(`${p.id}:prompt`);
+
   const sorted = [...projects].sort((a, b) => {
+    const aRevealed = isRevealed(a);
+    const bRevealed = isRevealed(b);
+    // 비공개 팀은 하단 배치
+    if (aRevealed !== bRevealed) return aRevealed ? -1 : 1;
     const aVal = getScore(a, sortKey);
     const bVal = getScore(b, sortKey);
     return sortDir === "desc" ? bVal - aVal : aVal - bVal;
@@ -117,6 +124,16 @@ export const ResultBoard = () => {
         sortDir={sortDir}
         onSort={handleSort}
         onViewFeedback={handleViewFeedback}
+        onRevealAll={() => {
+          setRevealedScores((prev) => {
+            const next = new Set(prev);
+            for (const p of projects) {
+              if (p.promptFeedback) next.add(`${p.id}:prompt`);
+              if (p.catFeedback) next.add(`${p.id}:cat`);
+            }
+            return next;
+          });
+        }}
       />
 
       {selectedProject && (

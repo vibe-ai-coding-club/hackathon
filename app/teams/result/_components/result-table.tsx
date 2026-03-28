@@ -13,6 +13,7 @@ type Props = {
   sortDir: SortDir;
   onSort: (key: SortKey) => void;
   onViewFeedback: (project: ProjectResult, type: "prompt" | "cat") => void;
+  onRevealAll: () => void;
 };
 
 const SortIcon = ({ active, dir }: { active: boolean; dir: SortDir }) => (
@@ -29,9 +30,25 @@ export const ResultTable = ({
   sortDir,
   onSort,
   onViewFeedback,
+  onRevealAll,
 }: Props) => {
+  const allRevealed = projects.every((p) =>
+    revealedScores.has(`${p.id}:prompt`),
+  );
+
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
+      {!allRevealed && (
+        <div className="flex justify-end px-4 pt-2">
+          <button
+            type="button"
+            onClick={onRevealAll}
+            className="typo-caption2 text-muted-foreground/40 hover:text-muted-foreground transition-colors cursor-pointer"
+          >
+            모든 점수 공개
+          </button>
+        </div>
+      )}
       <table className="w-full text-left">
         <thead>
           <tr className="border-b border-border bg-muted">
@@ -87,17 +104,21 @@ export const ResultTable = ({
           </tr>
         </thead>
         <tbody>
-          {projects.map((project, index) => {
+          {projects.reduce<{ rank: number; elements: React.ReactNode[] }>(
+            (acc, project) => {
             const promptRevealed = revealedScores.has(`${project.id}:prompt`);
             const catRevealed = revealedScores.has(`${project.id}:cat`);
+            if (promptRevealed) acc.rank++;
 
-            return (
+            acc.elements.push(
               <tr
                 key={project.id}
-                className="border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors"
+                className={`border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors ${
+                  !promptRevealed ? "opacity-50" : ""
+                }`}
               >
                 <td className="typo-body3 px-4 py-3 text-muted-foreground">
-                  {index + 1}
+                  {promptRevealed ? acc.rank : "-"}
                 </td>
                 <td className="typo-body3 px-4 py-3">
                   {project.team.teamName ?? "개인"}
@@ -187,7 +208,9 @@ export const ResultTable = ({
                 </td>
               </tr>
             );
-          })}
+
+            return acc;
+          }, { rank: 0, elements: [] }).elements}
         </tbody>
       </table>
     </div>
