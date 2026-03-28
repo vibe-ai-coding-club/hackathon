@@ -800,7 +800,12 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                       <td
                         className={`${tdClass} text-muted-foreground whitespace-nowrap`}
                       >
-                        {leader?.phone ? maskPhone(leader.phone) : ""}
+                        {leader?.phone ? (
+                          <div className="flex items-center gap-0.5">
+                            <span>{maskPhone(leader.phone)}</span>
+                            <CopyButton text={leader.phone} label="전화번호" />
+                          </div>
+                        ) : ""}
                       </td>
                       <td className={tdClass}>
                         {leader?.refundBank ? (
@@ -896,7 +901,10 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
                         <td
                           className={`${tdClass} text-muted-foreground whitespace-nowrap`}
                         >
-                          {maskPhone(m.phone)}
+                          <div className="flex items-center gap-0.5">
+                            <span>{maskPhone(m.phone)}</span>
+                            <CopyButton text={m.phone} label="전화번호" />
+                          </div>
                         </td>
                         <td className={tdClass}>
                           {m.refundBank ? (
