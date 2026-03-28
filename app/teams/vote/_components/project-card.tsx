@@ -69,19 +69,19 @@ export const ProjectCard = ({
 
       {/* 링크 */}
       <div className="flex gap-2 mb-4">
-        {project.linkUrl && (
+        {project.demoUrl && (
           <a
-            href={project.linkUrl}
+            href={project.demoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="typo-caption1 text-primary-400 hover:underline"
           >
-            데모
+            배포
           </a>
         )}
-        {project.demoUrl && (
+        {project.linkUrl && (
           <a
-            href={project.demoUrl}
+            href={project.linkUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="typo-caption1 text-primary-400 hover:underline"
