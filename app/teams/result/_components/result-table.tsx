@@ -2,11 +2,13 @@
 
 import type { ProjectResult } from "./result-board";
 
-type SortKey = "promptScore" | "catScore" | "totalScore";
+type SortKey = "likeScore" | "promptScore" | "catScore" | "totalScore";
 type SortDir = "asc" | "desc";
 
 type Props = {
   projects: ProjectResult[];
+  totalLikers: number;
+  revealedScores: Set<string>;
   sortKey: SortKey;
   sortDir: SortDir;
   onSort: (key: SortKey) => void;
@@ -21,6 +23,8 @@ const SortIcon = ({ active, dir }: { active: boolean; dir: SortDir }) => (
 
 export const ResultTable = ({
   projects,
+  totalLikers,
+  revealedScores,
   sortKey,
   sortDir,
   onSort,
@@ -42,6 +46,16 @@ export const ResultTable = ({
             </th>
             <th
               className="typo-caption1 px-4 py-3 text-muted-foreground cursor-pointer select-none text-right hover:text-foreground transition-colors"
+              onClick={() => onSort("likeScore")}
+            >
+              좋아요
+              <SortIcon
+                active={sortKey === "likeScore"}
+                dir={sortDir}
+              />
+            </th>
+            <th
+              className="typo-caption1 px-4 py-3 text-muted-foreground cursor-pointer select-none text-right hover:text-foreground transition-colors"
               onClick={() => onSort("promptScore")}
             >
               기본 심사
@@ -49,13 +63,6 @@ export const ResultTable = ({
                 active={sortKey === "promptScore"}
                 dir={sortDir}
               />
-            </th>
-            <th
-              className="typo-caption1 px-4 py-3 text-muted-foreground cursor-pointer select-none text-right hover:text-foreground transition-colors"
-              onClick={() => onSort("catScore")}
-            >
-              냥심사
-              <SortIcon active={sortKey === "catScore"} dir={sortDir} />
             </th>
             <th
               className="typo-caption1 px-4 py-3 text-muted-foreground cursor-pointer select-none text-right hover:text-foreground transition-colors"
@@ -67,6 +74,13 @@ export const ResultTable = ({
                 dir={sortDir}
               />
             </th>
+            <th
+              className="typo-caption1 px-4 py-3 text-muted-foreground cursor-pointer select-none text-right hover:text-foreground transition-colors"
+              onClick={() => onSort("catScore")}
+            >
+              냥심사
+              <SortIcon active={sortKey === "catScore"} dir={sortDir} />
+            </th>
             <th className="typo-caption1 px-4 py-3 text-muted-foreground text-center">
               상세
             </th>
@@ -74,8 +88,8 @@ export const ResultTable = ({
         </thead>
         <tbody>
           {projects.map((project, index) => {
-            const total =
-              (project.promptScore ?? 0) + (project.catScore ?? 0);
+            const promptRevealed = revealedScores.has(`${project.id}:prompt`);
+            const catRevealed = revealedScores.has(`${project.id}:cat`);
 
             return (
               <tr
@@ -99,31 +113,52 @@ export const ResultTable = ({
                   </div>
                 </td>
                 <td className="typo-body3 px-4 py-3 text-right tabular-nums">
+                  <span className="font-medium text-red-400">
+                    {project.likeCount}
+                    <span className="text-muted-foreground">
+                      /{totalLikers || "-"}
+                    </span>
+                  </span>
+                </td>
+                <td className="typo-body3 px-4 py-3 text-right tabular-nums">
                   {project.promptScore !== null ? (
-                    <span className="font-medium">
-                      {project.promptScore}
+                    promptRevealed ? (
+                      <span className="font-medium">
+                        {project.promptScore}
+                        <span className="text-muted-foreground">/100</span>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">?</span>
+                    )
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </td>
+                <td className="typo-body3 px-4 py-3 text-right tabular-nums">
+                  {promptRevealed ? (
+                    <span className="font-semibold text-accent">
+                      {(
+                        (totalLikers > 0
+                          ? (project.likeCount / totalLikers) * 50
+                          : 0) +
+                        ((project.promptScore ?? 0) / 100) * 50
+                      ).toFixed(1)}
                       <span className="text-muted-foreground">/100</span>
                     </span>
                   ) : (
-                    <span className="text-muted-foreground">-</span>
+                    <span className="text-muted-foreground">?</span>
                   )}
                 </td>
                 <td className="typo-body3 px-4 py-3 text-right tabular-nums">
                   {project.catScore !== null ? (
-                    <span className="font-medium">
-                      {project.catScore}
-                      <span className="text-muted-foreground">/15</span>
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
-                </td>
-                <td className="typo-body3 px-4 py-3 text-right tabular-nums">
-                  {project.promptScore !== null ||
-                  project.catScore !== null ? (
-                    <span className="font-semibold text-accent">
-                      {total}
-                    </span>
+                    catRevealed ? (
+                      <span className="font-medium">
+                        {project.catScore}
+                        <span className="text-muted-foreground">/15</span>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">?</span>
+                    )
                   ) : (
                     <span className="text-muted-foreground">-</span>
                   )}

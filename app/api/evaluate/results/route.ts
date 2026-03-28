@@ -7,32 +7,57 @@ import { NextResponse } from "next/server";
  */
 export async function GET() {
   try {
-    const projects = await prisma.project.findMany({
-      where: {
-        OR: [
-          { promptFeedback: { not: null } },
-          { catFeedback: { not: null } },
-        ],
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        promptScore: true,
-        catScore: true,
-        promptFeedback: true,
-        catFeedback: true,
-        team: {
-          select: {
-            teamName: true,
-            participationType: true,
+    const [projects, totalLikers] = await Promise.all([
+      prisma.project.findMany({
+        where: {
+          OR: [
+            { promptFeedback: { not: null } },
+            { catFeedback: { not: null } },
+          ],
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          promptScore: true,
+          catScore: true,
+          promptFeedback: true,
+          catFeedback: true,
+          team: {
+            select: {
+              teamName: true,
+              participationType: true,
+            },
+          },
+          _count: {
+            select: { likes: true },
           },
         },
-      },
-      orderBy: { createdAt: "asc" },
-    });
+        orderBy: { createdAt: "asc" },
+      }),
+      // 1번이라도 좋아요를 누른 고유 계정 수
+      prisma.like
+        .findMany({ select: { memberId: true }, distinct: ["memberId"] })
+        .then((rows) => rows.length),
+    ]);
 
-    return NextResponse.json({ success: true, data: projects });
+    const data = projects.map((p) => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      promptScore: p.promptScore,
+      catScore: p.catScore,
+      promptFeedback: p.promptFeedback,
+      catFeedback: p.catFeedback,
+      team: p.team,
+      likeCount: p._count.likes,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      data,
+      totalLikers,
+    });
   } catch (error) {
     console.error("Results fetch error:", error);
     return NextResponse.json(
