@@ -13,6 +13,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // 팀원 변경 종료
+  return NextResponse.json(
+    { success: false, message: "팀원 변경이 종료되었습니다." },
+    { status: 403 },
+  );
+
+  /* 팀원 변경 기능 비활성화
   const { targetTeamId } = await request.json();
   if (!targetTeamId) {
     return NextResponse.json(
@@ -119,4 +126,5 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
+  */
 }

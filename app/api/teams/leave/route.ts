@@ -12,6 +12,13 @@ export async function POST() {
     );
   }
 
+  // 팀원 변경 종료
+  return NextResponse.json(
+    { success: false, message: "팀원 변경이 종료되었습니다." },
+    { status: 403 },
+  );
+
+  /* 팀원 변경 기능 비활성화
   const memberId = session.user.memberId;
 
   try {
@@ -98,4 +105,5 @@ export async function POST() {
       { status: 500 },
     );
   }
+  */
 }

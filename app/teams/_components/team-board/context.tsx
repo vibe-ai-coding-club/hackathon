@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type { MyProfile, Project, SeekingMember, Team } from "./types";
@@ -58,6 +59,9 @@ type TeamBoardContextValue = {
   setEditingProject: (p: Project | null) => void;
   handleProjectSaved: (project: Project, isNew: boolean) => void;
   handleProjectDeleted: (projectId: string) => void;
+  // toast
+  toast: { success: boolean; message: string } | null;
+  clearToast: () => void;
   // accordion
   recruitingOpen: boolean;
   setRecruitingOpen: (v: boolean | ((prev: boolean) => boolean)) => void;
@@ -97,6 +101,19 @@ export const TeamBoardProvider = ({
   const [inviting, setInviting] = useState(false);
   const [recruitingOpen, setRecruitingOpen] = useState(true);
   const [lookingOpen, setLookingOpen] = useState(true);
+  const [toast, setToast] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
+  const clearToast = useCallback(() => setToast(null), []);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const TEAM_CHANGE_CLOSED_MSG = "팀원 변경이 종료되었습니다.";
+  const showClosedToast = useCallback(() => {
+    setToast({ success: false, message: TEAM_CHANGE_CLOSED_MSG });
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 3000);
+  }, []);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -203,33 +220,9 @@ export const TeamBoardProvider = ({
   );
 
   const handleTransfer = useCallback(async () => {
-    if (!transferTarget) return;
-    setTransferring(true);
-    try {
-      const isRecruit = transferMode === "recruit";
-      const url = isRecruit ? "/api/teams/recruit" : "/api/teams/transfer";
-      const body = isRecruit
-        ? { targetMemberId: transferTarget.members[0]?.id }
-        : { targetTeamId: transferTarget.id };
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const json = await res.json();
-      if (json.success) {
-        window.location.reload();
-      } else {
-        alert(json.message);
-      }
-    } catch {
-      alert("서버 오류가 발생했습니다.");
-    } finally {
-      setTransferring(false);
-      setTransferTarget(null);
-    }
-  }, [transferTarget, transferMode]);
+    showClosedToast();
+    setTransferTarget(null);
+  }, [showClosedToast]);
 
   const cancelTransfer = useCallback(() => setTransferTarget(null), []);
 
@@ -330,44 +323,17 @@ export const TeamBoardProvider = ({
   );
 
   const handleLeaveTeam = useCallback(async () => {
-    setLeaving(true);
-    try {
-      const res = await fetch("/api/teams/leave", { method: "POST" });
-      const json = await res.json();
-      if (json.success) {
-        window.location.reload();
-      } else {
-        alert(json.message);
-      }
-    } catch {
-      alert("서버 오류가 발생했습니다.");
-    } finally {
-      setLeaving(false);
-      setShowLeaveModal(false);
-    }
-  }, []);
+    showClosedToast();
+    setShowLeaveModal(false);
+  }, [showClosedToast]);
 
-  const handleInvite = useCallback(async (targetMemberId: string) => {
-    setInviting(true);
-    try {
-      const res = await fetch("/api/teams/recruit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetMemberId }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        window.location.reload();
-      } else {
-        alert(json.message);
-      }
-    } catch {
-      alert("서버 오류가 발생했습니다.");
-    } finally {
-      setInviting(false);
+  const handleInvite = useCallback(
+    async (_targetMemberId: string) => {
+      showClosedToast();
       setShowInviteModal(false);
-    }
-  }, []);
+    },
+    [showClosedToast],
+  );
 
   const handleProjectSaved = useCallback(
     (project: Project, isNew: boolean) => {
@@ -448,6 +414,8 @@ export const TeamBoardProvider = ({
       setEditingProject,
       handleProjectSaved,
       handleProjectDeleted,
+      toast,
+      clearToast,
       recruitingOpen,
       setRecruitingOpen,
       lookingOpen,
@@ -488,6 +456,8 @@ export const TeamBoardProvider = ({
       editingProject,
       handleProjectSaved,
       handleProjectDeleted,
+      toast,
+      clearToast,
       recruitingOpen,
       lookingOpen,
     ],

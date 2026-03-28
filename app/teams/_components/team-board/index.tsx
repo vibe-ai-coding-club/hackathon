@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Toast } from "@/app/_components/toast";
 import { AiPromptModal } from "./ai-prompt-modal";
 import { TeamBoardProvider, useTeamBoard } from "./context";
 import { InviteModal } from "./invite-modal";
@@ -12,7 +13,7 @@ import { TeamTable } from "./team-table";
 import { TransferModal } from "./transfer-modal";
 
 const TeamBoardInner = () => {
-  const { loading, showProjectModal } = useTeamBoard();
+  const { loading, showProjectModal, toast, clearToast } = useTeamBoard();
   const [showAiPrompt, setShowAiPrompt] = useState(false);
 
   if (loading) {
@@ -37,6 +38,7 @@ const TeamBoardInner = () => {
       <InviteModal />
       {showProjectModal && <ProjectModal />}
       {showAiPrompt && <AiPromptModal onClose={() => setShowAiPrompt(false)} />}
+      <Toast toast={toast} onClose={clearToast} />
     </div>
   );
 };
