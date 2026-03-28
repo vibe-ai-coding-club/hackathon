@@ -16,6 +16,8 @@ export type SerializedProject = {
   linkUrl: string | null;
   promptResult: string | null;
   promptFeedback: string | null;
+  isFinals: boolean;
+  adminMemo: string | null;
   createdAt: string;
   updatedAt: string;
   team: {
@@ -46,6 +48,30 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
 
   const handleDelete = (projectId: string) => {
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
+  };
+
+  const handleToggleFinals = async (projectId: string, value: boolean) => {
+    setProjects((prev) =>
+      prev.map((p) => (p.id === projectId ? { ...p, isFinals: value } : p)),
+    );
+    await fetch(`/api/admin/projects/${projectId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isFinals: value }),
+    });
+  };
+
+  const handleMemoSave = async (projectId: string, memo: string) => {
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === projectId ? { ...p, adminMemo: memo || null } : p,
+      ),
+    );
+    await fetch(`/api/admin/projects/${projectId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adminMemo: memo }),
+    });
   };
 
   const filtered = useMemo(() => {
@@ -92,6 +118,8 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
               <th className={`${thClass} w-14`}>데모</th>
               <th className={`${thClass} w-14`}>영상</th>
               <th className={`${thClass} w-14`}>기타</th>
+              <th className={`${thClass} w-14 text-center`}>본선</th>
+              <th className={`${thClass} w-36`}>메모</th>
               <th className={`${thClass} w-24`}>등록일</th>
             </tr>
           </thead>
@@ -99,7 +127,7 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={11}
                   className="px-4 py-6 text-center text-muted-foreground typo-caption1"
                 >
                   {search
@@ -183,6 +211,46 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
+                  </td>
+                  <td className={`${tdClass} text-center`}>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={project.isFinals}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleFinals(project.id, !project.isFinals);
+                      }}
+                      className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors cursor-pointer ${
+                        project.isFinals
+                          ? "bg-accent"
+                          : "bg-muted-foreground/30"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-3 w-3 rounded-full bg-white transition-transform ${
+                          project.isFinals
+                            ? "translate-x-3.5"
+                            : "translate-x-0.5"
+                        }`}
+                      />
+                    </button>
+                  </td>
+                  <td className={tdClass} onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="text"
+                      defaultValue={project.adminMemo ?? ""}
+                      placeholder="메모"
+                      onBlur={(e) =>
+                        handleMemoSave(project.id, e.target.value)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          (e.target as HTMLInputElement).blur();
+                        }
+                      }}
+                      className="w-full rounded border border-transparent bg-transparent px-1 py-0.5 typo-caption2 text-muted-foreground outline-none hover:border-border focus:border-accent focus:bg-background transition-colors"
+                    />
                   </td>
                   <td
                     className={`${tdClass} text-muted-foreground whitespace-nowrap`}

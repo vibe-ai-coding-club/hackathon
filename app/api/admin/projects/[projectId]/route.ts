@@ -43,9 +43,15 @@ export async function PATCH(
   const { projectId } = await params;
   const body = await request.json();
 
-  const data: Record<string, string | null> = {};
+  const data: Record<string, string | boolean | null> = {};
   if (body.promptResult !== undefined) {
     data.promptResult = body.promptResult?.trim() || null;
+  }
+  if (body.isFinals !== undefined) {
+    data.isFinals = Boolean(body.isFinals);
+  }
+  if (body.adminMemo !== undefined) {
+    data.adminMemo = body.adminMemo?.trim() || null;
   }
 
   if (Object.keys(data).length === 0) {
