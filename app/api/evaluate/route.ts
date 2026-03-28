@@ -265,11 +265,11 @@ function parseCatScores(feedback: string): {
   let promptScore: number | null = null;
   let catScore: number | null = null;
 
-  // Part A 소계
+  // Part A 총점
   const partAPatterns = [
-    /Part\s*A[^\d]*소계[^\d]*(\d{1,3})\s*[/／]\s*85/,
-    /Part\s*A[^\d]*(\d{1,3})\s*[/／]\s*85/,
-    /기본 심사[^\d]*(\d{1,3})\s*[/／]\s*85/,
+    /Part\s*A[^\d]*총점[^\d]*(\d{1,3})\s*[/／]\s*100/,
+    /Part\s*A[^\d]*(\d{1,3})\s*[/／]\s*100/,
+    /기본 심사[^\d]*(\d{1,3})\s*[/／]\s*100/,
   ];
   for (const pattern of partAPatterns) {
     const match = feedback.match(pattern);
