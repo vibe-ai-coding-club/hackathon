@@ -122,17 +122,26 @@ export const ResultBoard = () => {
             합산 = 좋아요(50점) + 기본 심사(50점). 냥심사는 별도 표기됩니다.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setFinalsOnly((v) => !v)}
-          className={`shrink-0 rounded-full px-3 py-1 typo-caption1 font-medium cursor-pointer transition-colors ${
-            finalsOnly
-              ? "bg-accent text-white"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
-          }`}
-        >
-          {finalsOnly ? "🏆 본선 진출" : "전체 보기"}
-        </button>
+        <label className="flex items-center gap-2 cursor-pointer shrink-0">
+          <span className="typo-caption1 text-muted-foreground">
+            본선 진출만
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={finalsOnly}
+            onClick={() => setFinalsOnly((v) => !v)}
+            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${
+              finalsOnly ? "bg-accent" : "bg-muted-foreground/30"
+            }`}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                finalsOnly ? "translate-x-4.5" : "translate-x-0.5"
+              }`}
+            />
+          </button>
+        </label>
       </div>
 
       <ResultTable
