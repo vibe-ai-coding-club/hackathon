@@ -23,6 +23,7 @@ export async function GET() {
           catScore: true,
           promptFeedback: true,
           catFeedback: true,
+          isFinals: true,
           team: {
             select: {
               teamName: true,
@@ -50,6 +51,7 @@ export async function GET() {
       promptFeedback: p.promptFeedback,
       catFeedback: p.catFeedback,
       team: p.team,
+      isFinals: p.isFinals,
       likeCount: p._count.likes,
     }));
 

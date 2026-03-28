@@ -13,6 +13,7 @@ export type ProjectResult = {
   promptFeedback: string | null;
   catFeedback: string | null;
   likeCount: number;
+  isFinals: boolean;
   team: {
     teamName: string | null;
     participationType: string;
@@ -34,6 +35,7 @@ export const ResultBoard = () => {
   const [feedbackType, setFeedbackType] = useState<"prompt" | "cat">("prompt");
   // "projectId:prompt" 또는 "projectId:cat" 형태로 공개된 점수를 추적
   const [revealedScores, setRevealedScores] = useState<Set<string>>(new Set());
+  const [finalsOnly, setFinalsOnly] = useState(true);
 
   useEffect(() => {
     fetch("/api/evaluate/results")
@@ -71,7 +73,11 @@ export const ResultBoard = () => {
   const isRevealed = (p: ProjectResult) =>
     revealedScores.has(`${p.id}:prompt`);
 
-  const sorted = [...projects].sort((a, b) => {
+  const filtered = finalsOnly
+    ? projects.filter((p) => p.isFinals)
+    : projects;
+
+  const sorted = [...filtered].sort((a, b) => {
     const aRevealed = isRevealed(a);
     const bRevealed = isRevealed(b);
     // 비공개 팀은 하단 배치
@@ -109,11 +115,24 @@ export const ResultBoard = () => {
 
   return (
     <div className="mx-auto max-w-350 px-4 py-6">
-      <div className="mb-6">
-        <h2 className="typo-subtitle1">심사 결과</h2>
-        <p className="typo-caption1 text-muted-foreground mt-1">
-          합산 = 좋아요(50점) + 기본 심사(50점). 냥심사는 별도 표기됩니다.
-        </p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h2 className="typo-subtitle1">심사 결과</h2>
+          <p className="typo-caption1 text-muted-foreground mt-1">
+            합산 = 좋아요(50점) + 기본 심사(50점). 냥심사는 별도 표기됩니다.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setFinalsOnly((v) => !v)}
+          className={`shrink-0 rounded-full px-3 py-1 typo-caption1 font-medium cursor-pointer transition-colors ${
+            finalsOnly
+              ? "bg-accent text-white"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
+          }`}
+        >
+          {finalsOnly ? "🏆 본선 진출" : "전체 보기"}
+        </button>
       </div>
 
       <ResultTable
