@@ -332,8 +332,8 @@ export async function POST(request: NextRequest) {
 
     if (catFeedback) {
       data.catFeedback = catFeedback.trim();
-      const { promptScore, catScore } = parseCatScores(catFeedback);
-      if (promptScore !== null) data.promptScore = promptScore;
+      const { catScore } = parseCatScores(catFeedback);
+      // Part A(85점) 점수는 저장하지 않음 — 기본 심사(100점)의 promptScore를 보존
       if (catScore !== null) data.catScore = catScore;
     }
 
