@@ -13,6 +13,7 @@ type ProjectData = {
   teamId: string;
   voteCount: number;
   likeCount: number;
+  isFinals: boolean;
   githubUrl: string;
   demoUrl: string | null;
   imageUrl: string | null;
@@ -47,6 +48,7 @@ export const VotePage = ({ voter }: Props) => {
   const [likingProjectId, setLikingProjectId] = useState<string | null>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState("");
+  const [finalsOnly, setFinalsOnly] = useState(true);
 
   // 프로젝트 목록 + 설정 로드
   const fetchProjects = useCallback(async () => {
@@ -236,12 +238,15 @@ export const VotePage = ({ voter }: Props) => {
   };
 
   const remainingVotes = maxVotes - votedProjectIds.size;
+  const visibleProjects = finalsOnly
+    ? projects.filter((p) => p.isFinals)
+    : projects;
   const presentingProject = presentingProjectId
-    ? projects.find((p) => p.id === presentingProjectId)
+    ? visibleProjects.find((p) => p.id === presentingProjectId)
     : null;
   const otherProjects = presentingProjectId
-    ? projects.filter((p) => p.id !== presentingProjectId)
-    : projects;
+    ? visibleProjects.filter((p) => p.id !== presentingProjectId)
+    : visibleProjects;
 
   if (pageLoading) {
     return (
@@ -254,11 +259,33 @@ export const VotePage = ({ voter }: Props) => {
   return (
     <div className="mx-auto max-w-5xl px-4 pt-8 pb-20">
       {/* 헤더 */}
-      <div className="mb-8">
-        <h1 className="typo-h4 mb-2">프로젝트 좋아요</h1>
-        <p className="typo-body3 text-muted-foreground">
-          마음에 드는 프로젝트에 좋아요를 눌러주세요!
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="typo-h4 mb-2">프로젝트 좋아요</h1>
+          <p className="typo-body3 text-muted-foreground">
+            마음에 드는 프로젝트에 좋아요를 눌러주세요!
+          </p>
+        </div>
+        <label className="flex items-center gap-2 cursor-pointer shrink-0 mt-1">
+          <span className="typo-caption1 text-muted-foreground">
+            본선 진출만
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={finalsOnly}
+            onClick={() => setFinalsOnly((v) => !v)}
+            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${
+              finalsOnly ? "bg-accent" : "bg-muted-foreground/30"
+            }`}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                finalsOnly ? "translate-x-4.5" : "translate-x-0.5"
+              }`}
+            />
+          </button>
+        </label>
       </div>
 
       {/* 상태 바 */}
@@ -275,9 +302,9 @@ export const VotePage = ({ voter }: Props) => {
       )}
 
       {/* 실시간 현황 그래프 */}
-      {projects.length > 0 && (
+      {visibleProjects.length > 0 && (
         <VoteChart
-          projects={projects}
+          projects={visibleProjects}
           allVotesUsed={!isReadOnly && remainingVotes <= 0}
         />
       )}

@@ -19,6 +19,7 @@ export async function GET() {
         demoUrl: true,
         imageUrl: true,
         linkUrl: true,
+        isFinals: true,
         teamId: true,
         team: {
           select: {
@@ -48,6 +49,7 @@ export async function GET() {
           demoUrl: p.demoUrl,
           imageUrl: p.imageUrl,
           linkUrl: p.linkUrl,
+          isFinals: p.isFinals,
           teamId: p.teamId,
           teamName: p.team.teamName || p.team.members[0]?.name || "",
           voteCount: p._count.votes,
