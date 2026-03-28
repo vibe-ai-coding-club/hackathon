@@ -121,6 +121,9 @@ model Project {
   catFeedback    String? @map("cat_feedback") @db.Text
   catScore       Int?    @map("cat_score")
 
+  isFinals  Boolean @default(false) @map("is_finals")
+  adminMemo String? @map("admin_memo") @db.Text
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
