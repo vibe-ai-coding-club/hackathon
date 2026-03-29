@@ -6,6 +6,30 @@ type GalleryCardProps = {
   onDetailClick: () => void;
 };
 
+const GRADIENT_PAIRS = [
+  ["#FFB3B3", "#FFDAB3"],
+  ["#FFDAB3", "#FFF1B3"],
+  ["#B3E6CC", "#B3D9FF"],
+  ["#B3D9FF", "#D4B3FF"],
+  ["#D4B3FF", "#F2B3E6"],
+  ["#F2B3E6", "#FFB3B3"],
+  ["#B3F0E0", "#B3D4FF"],
+  ["#FFD6E8", "#FFE6B3"],
+  ["#D9B3FF", "#B3E0FF"],
+  ["#B3FFD9", "#B3E6FF"],
+  ["#FFE0B3", "#FFB3C4"],
+  ["#C4B3FF", "#B3FFE0"],
+];
+
+const getRandomGradient = (id: string) => {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const pair = GRADIENT_PAIRS[Math.abs(hash) % GRADIENT_PAIRS.length];
+  return `linear-gradient(135deg, ${pair[0]}, ${pair[1]})`;
+};
+
 export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
   const rankLabel =
     project.isFinals && project.finalsRank != null
@@ -16,10 +40,25 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
     ? `${project.title} - ${project.teamName}`
     : project.title;
 
+  const isFinals = project.isFinals;
+  const imageBorderStyle = isFinals
+    ? {
+        background:
+          "linear-gradient(white, white) padding-box, conic-gradient(#FF4444, #FF6B22, #FFAA00, #FFD700, #44DD44, #00CCAA, #2299FF, #4466FF, #7744FF, #AA44DD, #DD44AA, #FF4466, #FF4444) border-box",
+        border: "2px solid transparent",
+      }
+    : {
+        background: `linear-gradient(white, white) padding-box, ${getRandomGradient(project.id)} border-box`,
+        border: "2px solid transparent",
+      };
+
   return (
     <article className="overflow-hidden rounded-xl md:rounded-[14px]">
       {/* 이미지 영역 */}
-      <div className="relative aspect-3/2 overflow-hidden rounded-xl md:rounded-[14px] bg-gray-100">
+      <div
+        className="relative aspect-3/2 overflow-hidden rounded-xl md:rounded-[14px] bg-white"
+        style={imageBorderStyle}
+      >
         {project.imageUrl ? (
           <Image
             src={project.imageUrl}
@@ -29,11 +68,20 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <span className="typo-subtitle3 text-gray-400">
-              {project.title}
-            </span>
-          </div>
+          <>
+            <Image
+              src="/images/hero.webp"
+              alt={project.title}
+              fill
+              className="object-cover opacity-15"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+            <div className="absolute inset-0 flex items-center justify-center px-4">
+              <span className="typo-subtitle1 md:typo-h6 text-gray-700 text-center line-clamp-2 font-bold">
+                {project.title}
+              </span>
+            </div>
+          </>
         )}
         {rankLabel && (
           <div className="absolute top-3 left-3 rounded-lg bg-primary-400 px-2.5 py-1 typo-caption1 font-bold text-white shadow-sm">
@@ -43,7 +91,7 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
       </div>
 
       {/* 정보 영역 */}
-      <div className="mt-0 rounded-xl bg-gray-50 px-5 py-4 md:rounded-[14px] md:px-7 md:py-5">
+      <div className="bg-gray-50 px-5 py-4 md:px-7 md:py-5">
         {/* 제목 + 좋아요 */}
         <div className="flex items-center justify-between gap-2">
           <h3 className="typo-subtitle1 text-gray-850 md:typo-h6 line-clamp-1">
