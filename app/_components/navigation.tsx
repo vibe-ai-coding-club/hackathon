@@ -8,7 +8,7 @@ import { Logo } from "./logo";
 
 const navItems = [
   { label: "행사 소개", href: "/" },
-  { label: "갤러리", disabled: true },
+  { label: "갤러리", href: "/gallery" },
 ] as const;
 
 export const Navigation = () => {
