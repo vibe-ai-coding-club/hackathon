@@ -201,10 +201,16 @@ model ArchivedProject {
   linkUrl     String? @map("link_url")
 
   // 심사 결과
+  promptResult   String? @map("prompt_result") @db.Text
   promptFeedback String? @map("prompt_feedback") @db.Text
   promptScore    Int?    @map("prompt_score")
   catFeedback    String? @map("cat_feedback") @db.Text
   catScore       Int?    @map("cat_score")
+
+  // 본선 여부
+  isFinals   Boolean @default(false) @map("is_finals")
+  finalsRank Int?    @map("finals_rank")
+  adminMemo  String? @map("admin_memo") @db.Text
 
   // 카운트
   voteCount Int @default(0) @map("vote_count") // 0이면 미사용, 화면에서 미노출

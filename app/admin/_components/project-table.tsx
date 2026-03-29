@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ArchiveModal } from "./archive-modal";
 import { ProjectDetailModal } from "./project-detail-modal";
 
 export type SerializedProject = {
@@ -31,6 +32,7 @@ export type SerializedProject = {
 
 type ProjectTableProps = {
   projects: SerializedProject[];
+  archivedProjectIds?: string[];
 };
 
 const PAGE_SIZE = 20;
@@ -39,12 +41,17 @@ const thClass =
   "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
 const tdClass = "px-2.5 py-1.5 typo-caption1";
 
-export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) => {
+export const ProjectTable = ({ projects: initialProjects, archivedProjectIds = [] }: ProjectTableProps) => {
   const [projects, setProjects] = useState(initialProjects);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [selectedProject, setSelectedProject] =
     useState<SerializedProject | null>(null);
+  const [archiveTarget, setArchiveTarget] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const archivedSet = useMemo(() => new Set(archivedProjectIds), [archivedProjectIds]);
 
   const handleDelete = (projectId: string) => {
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
@@ -119,6 +126,7 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
               <th className={`${thClass} w-14`}>영상</th>
               <th className={`${thClass} w-14`}>기타</th>
               <th className={`${thClass} w-14 text-center`}>본선</th>
+              <th className={`${thClass} w-18 text-center`}>아카이빙</th>
               <th className={`${thClass} w-36`}>메모</th>
               <th className={`${thClass} w-24`}>등록일</th>
             </tr>
@@ -127,7 +135,7 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
             {paged.length === 0 ? (
               <tr>
                 <td
-                  colSpan={11}
+                  colSpan={12}
                   className="px-4 py-6 text-center text-muted-foreground typo-caption1"
                 >
                   {search
@@ -236,6 +244,27 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
                       />
                     </button>
                   </td>
+                  <td
+                    className={`${tdClass} text-center`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {archivedSet.has(project.id) ? (
+                      <span className="typo-caption2 text-accent">완료</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setArchiveTarget({
+                            id: project.id,
+                            title: project.title,
+                          })
+                        }
+                        className="rounded border border-border px-1.5 py-0.5 typo-caption2 text-muted-foreground cursor-pointer transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        저장
+                      </button>
+                    )}
+                  </td>
                   <td className={tdClass} onClick={(e) => e.stopPropagation()}>
                     <input
                       type="text"
@@ -293,6 +322,16 @@ export const ProjectTable = ({ projects: initialProjects }: ProjectTableProps) =
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
           onDelete={handleDelete}
+        />
+      )}
+
+      {/* 아카이빙 모달 */}
+      {archiveTarget && (
+        <ArchiveModal
+          projectId={archiveTarget.id}
+          projectTitle={archiveTarget.title}
+          onClose={() => setArchiveTarget(null)}
+          onArchived={() => setArchiveTarget(null)}
         />
       )}
     </div>
