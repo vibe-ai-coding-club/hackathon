@@ -185,3 +185,44 @@ model EventSetting {
 
   @@map("event_settings")
 }
+
+model ArchivedProject {
+  id String @id @default(cuid())
+
+  // 프로젝트 정보
+  title       String
+  description String?
+  features    String?
+  tools       String?
+  githubUrl   String? @map("github_url")
+  demoUrl     String? @map("demo_url")
+  videoUrl    String? @map("video_url")
+  imageUrl    String? @map("image_url")
+  linkUrl     String? @map("link_url")
+
+  // 심사 결과
+  promptFeedback String? @map("prompt_feedback") @db.Text
+  promptScore    Int?    @map("prompt_score")
+  catFeedback    String? @map("cat_feedback") @db.Text
+  catScore       Int?    @map("cat_score")
+
+  // 카운트
+  voteCount Int @default(0) @map("vote_count") // 0이면 미사용, 화면에서 미노출
+  likeCount Int @default(0) @map("like_count")
+
+  // 팀 정보 스냅샷
+  teamName        String? @map("team_name")
+  motivation      String?
+  recruitmentNote String? @map("recruitment_note")
+  experienceLevel String? @map("experience_level")
+
+  // 멤버 스냅샷
+  members Json? // 이메일과 이름만 유지, 전화번호, 계좌번호 제거
+
+  // 원본 참조
+  originalProjectId String? @unique @map("original_project_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("archived_projects")
+}
