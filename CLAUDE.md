@@ -123,7 +123,7 @@ ttalkkakthon/
 
 `@ttalkkakthon 냥심사 {순번}` 또는 `@ttalkkakthon 냥심사 {팀이름}` 또는 `@ttalkkakthon 냥심사 {팀이름} {프로젝트순번}`
 
-기본 심사(85점) + 고양이 나비의 예능 심사(15점) = 총 100점 통합 심사를 수행한다.
+기본 심사(100점) + 고양이 나비의 예능 보너스 심사(15점) = 통합 심사를 수행한다. 기본 심사 점수(promptScore)는 냥심사와 별개로 보존된다.
 
 1. `GET http://localhost:3000/api/evaluate?index={순번}` 또는 `?team={팀이름}` (프로젝트순번이 있으면 `&project={프로젝트순번}`)으로 프로젝트 데이터 조회
 2. 프로젝트가 여러 개면(`projectCount` 존재) 목록을 디스코드에 안내하고 선택 요청

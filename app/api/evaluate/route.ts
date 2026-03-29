@@ -256,7 +256,7 @@ function parseScore(feedback: string): number | null {
 }
 
 /**
- * 냥심사 피드백에서 Part A(85점)와 Part B(15점) 점수를 파싱
+ * 냥심사 피드백에서 Part A(100점)와 Part B(15점 보너스) 점수를 파싱
  */
 function parseCatScores(feedback: string): {
   promptScore: number | null;
@@ -300,7 +300,7 @@ function parseCatScores(feedback: string): {
  * POST /api/evaluate
  * 평가 결과 DB 저장
  * - promptFeedback + promptScore: 기본 심사 결과 (100점)
- * - catFeedback + promptScore + catScore: 냥심사 통합 결과 (85점 + 15점)
+ * - catFeedback + catScore: 냥심사 통합 결과 (Part A 100점 + Part B 15점 보너스, 기본 심사 promptScore는 보존)
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
