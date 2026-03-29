@@ -28,6 +28,9 @@
 - `info-tab.md`
 - `info-card.md`
 - `sponsor-section.md`
+- `staff-section.md`
+- `staff-card.md`
+- `staff-roller.md`
 - `footer-section.md`
 - `register/` — 참가 신청 관련 컴포넌트 (별도 디렉토리)
 - `admin-auth-guard.md`

@@ -21,6 +21,15 @@ export type InfoTabItem = {
   content: string[];
 };
 
+export type StaffItem = {
+  nickname: string;
+  role: string;
+  oneLiner: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  profileImage?: string;
+};
+
 export const POINT_CARDS: PointCard[] = [
   {
     title: "딱 8시간, 가볍게 즐기는 데이톤 ",
@@ -121,3 +130,69 @@ export const INFO_TABS: InfoTabItem[] = [
 ];
 
 export const SPONSOR_LOGOS = ["Vibe Coding Club", "Partner A", "Partner B"];
+
+export const STAFF_ITEMS: StaffItem[] = [
+  {
+    nickname: "체다",
+    role: "프론트엔드",
+    oneLiner: "오늘은 대충 합시다(는 어림없지)",
+    githubUrl: "https://github.com/da-in",
+    linkedinUrl: "https://www.linkedin.com/in/다인-최-09baa6311/",
+    profileImage: '/images/staffs/cheddar.jpg',
+  },
+  {
+    nickname: "운터",
+    role: "엔드",
+    oneLiner: "오늘의 쓸모를 다 하는 사람",
+    githubUrl: "https://github.com/anveloper/",
+    linkedinUrl: "https://linkedin.com/in/anveloper/",
+    profileImage: '/images/staffs/unteo.jpg',
+  },
+  {
+    nickname: "쿼카",
+    role: "프로덕트 디자이너",
+    oneLiner: "유대하강, 캥거루과에 속하는 소형 포유류 동물",
+    githubUrl: "https://github.com/a-quokka",
+    linkedinUrl: "https://www.linkedin.com/in/dahee-yoon-145852393/",
+    profileImage: '/images/staffs/quokka.png',
+  },
+  {
+    nickname: "쟌",
+    role: "프론트엔드",
+    oneLiner: "매일매일이 고점인 사람",
+    githubUrl: "https://github.com/bbbjihan",
+    linkedinUrl: "https://www.linkedin.com/in/bbbjihan/",
+    profileImage: '/images/staffs/jyan.jpg',
+  },
+  {
+    nickname: "게코",
+    role: "엔지니어",
+    oneLiner: "도마뱀 밥벌이 뛰는 사람",
+    githubUrl: "https://github.com/jonghunlee98",
+    linkedinUrl: "https://www.linkedin.com/in/%EC%A2%85%ED%9B%88-%EC%9D%B4-ba2a403a4",
+    profileImage: '/images/staffs/gaeko.jpg',
+  },
+  {
+    nickname: "데이빗",
+    role: "자루",
+    oneLiner: "잠 잘자(고 싶다)는 로봇",
+    githubUrl: "https://github.com/davidyang2149",
+    linkedinUrl: "https://www.linkedin.com/in/홍석-양-54786b241/",
+    profileImage: '/images/staffs/david.jpg',
+  },
+  {
+    nickname: "유자",
+    role: "프론트엔드",
+    oneLiner: "하고 싶은 거 짱 많은 개발자",
+    githubUrl: "https://github.com/song-chaeyoung",
+    linkedinUrl: "https://www.linkedin.com/in/chaeyoung-song-948995368",
+    profileImage: '/images/staffs/uza.png',
+  },
+  {
+    nickname: "몽키",
+    role: "잡부",
+    oneLiner: "팔 길어요",
+    githubUrl: "https://github.com/de-monkey-v",
+    profileImage: '/images/staffs/monkey.jpg',
+  },
+];

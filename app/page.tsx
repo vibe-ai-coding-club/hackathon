@@ -8,6 +8,7 @@ import { IntroSection } from "./sections/intro-section";
 import { PointSection } from "./sections/point-section";
 import { ScheduleSection } from "./sections/schedule-section";
 import { SponsorSection } from "./sections/sponsor-section";
+import { StaffSection } from "./sections/staff-section";
 import { StopwatchSection } from "./sections/stopwatch-section";
 
 const UnderConstruction = () => (
@@ -47,6 +48,9 @@ export default function Home() {
       </MotionSection>
       <MotionSection>
         <SponsorSection />
+      </MotionSection>
+      <MotionSection>
+        <StaffSection />
       </MotionSection>
       <FloatingStopwatch />
     </div>

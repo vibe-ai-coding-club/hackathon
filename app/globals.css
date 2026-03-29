@@ -111,6 +111,62 @@ html {
   }
 }
 
+.staff-roller-track {
+  display: flex;
+  width: max-content;
+  animation-name: staff-roller-scroll-left;
+  animation-duration: var(--staff-roll-duration, 24s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.staff-roller-track-reverse {
+  animation-name: staff-roller-scroll-right;
+}
+
+.staff-roller-track-paused {
+  animation-play-state: paused;
+}
+
+.staff-roller-row {
+  display: flex;
+  flex-shrink: 0;
+  gap: 16px;
+  padding-right: 16px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+@media (min-width: 768px) {
+  .staff-roller-row {
+    gap: 24px;
+    padding-right: 24px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+}
+
+@keyframes staff-roller-scroll-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(var(--staff-roll-distance, 25%) * -1), 0, 0);
+  }
+}
+
+@keyframes staff-roller-scroll-right {
+  from {
+    transform: translate3d(calc(var(--staff-roll-distance, 25%) * -1), 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 /* ===== Hero Glitch Effect ===== */
 /*
   8s 주기: 0~8% 버스트(~0.6s) → 8~100% 대기(~7.4s)

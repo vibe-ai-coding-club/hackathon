@@ -22,7 +22,8 @@
 5. Culture
 6. Info
 7. Sponsor
-8. Footer
+8. Staffs
+9. Footer
 
 ## 상세 동작 명세
 
@@ -88,7 +89,22 @@
 - 후원 카드 3개는 모바일/데스크탑 모두 한 줄 3열 고정 배치.
 - 각 카드는 텍스트 없이 회색 직사각형 목업으로 렌더링.
 
-### 8) Footer
+### 8) Staffs
+
+- 운영진 목록을 `StaffItem[]` 데이터로 관리한다.
+- 각 카드에는 프로필 이미지, 닉네임, 직무, 한줄평, GitHub/LinkedIn 링크를 포함한다.
+- `githubUrl`, `linkedinUrl`은 optional이며, 값이 없는 아이콘은 카드에서 노출하지 않는다.
+- 프로필 이미지는 큰 원형 썸네일로 노출하고, 이미지가 없으면 이니셜 플레이스홀더를 사용한다.
+- GitHub/LinkedIn 아이콘은 카드 우측 상단에 배치한다.
+- `StaffRoller`가 전체 목록을 반으로 나눠 2줄 마퀴로 렌더링한다. 홀수 개일 경우 윗줄이 1개 더 가진다.
+- 윗줄은 왼쪽, 아랫줄은 오른쪽 방향으로 무한 롤링한다.
+- 두 줄 모두 화면 전체 가로폭(`w-screen`)을 채우는 풀블리드 레이아웃으로 노출한다.
+- 핑크 영역 내부 하단에도 여백을 둬 마지막 롤링 줄이 섹션 끝선에 바로 붙지 않게 한다.
+- Footer 및 `FloatingStopwatch`와 겹치지 않도록 섹션 하단에 white 안전 여백을 둔다.
+- PC: hover 동안 전체 롤링 정지.
+- Mobile: press(touch hold) 동안 전체 롤링 정지.
+
+### 9) Footer
 
 - 소셜 링크(Instagram, LinkedIn), 운영 주체 텍스트, 문의 이메일 노출.
 - 소셜 링크는 각 텍스트 왼쪽에 브랜드 아이콘(Instagram/LinkedIn)을 포함한다.
