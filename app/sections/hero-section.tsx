@@ -601,9 +601,10 @@ export const HeroSection = () => {
           height={660}
           priority
           className={clsx(
-            "w-full h-auto object-contain",
+            "h-auto w-full object-contain",
             isGlitchBurst && "hero-glitch-base--active",
           )}
+          style={{ height: "auto" }}
         />
         <Image
           src="/images/hero.webp"
@@ -612,6 +613,7 @@ export const HeroSection = () => {
           height={660}
           aria-hidden
           className="hero-glitch-layer-1 pointer-events-none absolute h-auto object-contain"
+          style={{ height: "auto" }}
         />
         <Image
           src="/images/hero.webp"
@@ -620,6 +622,7 @@ export const HeroSection = () => {
           height={660}
           aria-hidden
           className="hero-glitch-layer-2 pointer-events-none absolute h-auto object-contain"
+          style={{ height: "auto" }}
         />
         <Image
           src="/images/hero.webp"
@@ -628,6 +631,7 @@ export const HeroSection = () => {
           height={660}
           aria-hidden
           className="hero-glitch-layer-3 pointer-events-none absolute h-auto object-contain"
+          style={{ height: "auto" }}
         />
         <Image
           src="/images/hero.webp"
@@ -636,6 +640,7 @@ export const HeroSection = () => {
           height={660}
           aria-hidden
           className="hero-glitch-layer-4 pointer-events-none absolute h-auto object-contain"
+          style={{ height: "auto" }}
         />
       </div>
 
