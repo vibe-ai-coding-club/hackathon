@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { AdminNav } from "../_components/admin-nav";
 import { LogoutButton } from "../_components/logout-button";
-import { ProjectTable } from "../_components/project-table";
+import { ProjectPageTabs } from "../_components/project-page-tabs";
 
 export const metadata: Metadata = {
   title: "프로젝트 관리",
 };
 
 const AdminProjectsPage = async () => {
-  const [projects, totalProjects] = await Promise.all([
+  const [projects, totalProjects, archivedProjects] = await Promise.all([
     prisma.project.findMany({
       orderBy: { createdAt: "desc" },
       include: {
@@ -28,6 +28,9 @@ const AdminProjectsPage = async () => {
       },
     }),
     prisma.project.count(),
+    prisma.archivedProject.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const serializedProjects = projects.map((project) => {
@@ -46,6 +49,17 @@ const AdminProjectsPage = async () => {
     };
   });
 
+  const archivedProjectIds = new Set(
+    archivedProjects
+      .map((a) => a.originalProjectId)
+      .filter(Boolean) as string[],
+  );
+
+  const serializedArchived = archivedProjects.map((a) => ({
+    ...a,
+    createdAt: a.createdAt.toISOString(),
+  }));
+
   return (
     <div className="w-full max-w-360 mx-auto px-4 py-4">
       <div className="flex items-center justify-between mb-3">
@@ -56,14 +70,12 @@ const AdminProjectsPage = async () => {
         <LogoutButton />
       </div>
 
-      <div className="space-y-3">
-        <div className="typo-caption1 text-muted-foreground">
-          총 <strong className="text-foreground">{totalProjects}</strong>개
-          프로젝트
-        </div>
-
-        <ProjectTable projects={serializedProjects} />
-      </div>
+      <ProjectPageTabs
+        projects={serializedProjects}
+        totalProjects={totalProjects}
+        archivedProjects={serializedArchived}
+        archivedProjectIds={[...archivedProjectIds]}
+      />
     </div>
   );
 };
