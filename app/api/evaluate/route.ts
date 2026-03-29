@@ -256,36 +256,20 @@ function parseScore(feedback: string): number | null {
 }
 
 /**
- * 냥심사 피드백에서 Part A(100점)와 Part B(15점 보너스) 점수를 파싱
+ * 냥심사 피드백에서 고양이 심사 점수(15점)를 파싱
  */
 function parseCatScores(feedback: string): {
-  promptScore: number | null;
   catScore: number | null;
 } {
-  let promptScore: number | null = null;
   let catScore: number | null = null;
 
-  // Part A 총점
-  const partAPatterns = [
-    /Part\s*A[^\d]*총점[^\d]*(\d{1,3})\s*[/／]\s*100/,
-    /Part\s*A[^\d]*(\d{1,3})\s*[/／]\s*100/,
-    /기본 심사[^\d]*(\d{1,3})\s*[/／]\s*100/,
-  ];
-  for (const pattern of partAPatterns) {
-    const match = feedback.match(pattern);
-    if (match) {
-      promptScore = parseInt(match[1], 10);
-      break;
-    }
-  }
-
-  // Part B 소계
-  const partBPatterns = [
+  const patterns = [
+    /소계[^\d]*(\d{1,3})\s*[/／]\s*15/,
     /Part\s*B[^\d]*소계[^\d]*(\d{1,3})\s*[/／]\s*15/,
     /Part\s*B[^\d]*(\d{1,3})\s*[/／]\s*15/,
     /고양이 심사[^\d]*(\d{1,3})\s*[/／]\s*15/,
   ];
-  for (const pattern of partBPatterns) {
+  for (const pattern of patterns) {
     const match = feedback.match(pattern);
     if (match) {
       catScore = parseInt(match[1], 10);
@@ -293,14 +277,14 @@ function parseCatScores(feedback: string): {
     }
   }
 
-  return { promptScore, catScore };
+  return { catScore };
 }
 
 /**
  * POST /api/evaluate
  * 평가 결과 DB 저장
  * - promptFeedback + promptScore: 기본 심사 결과 (100점)
- * - catFeedback + catScore: 냥심사 통합 결과 (Part A 100점 + Part B 15점 보너스, 기본 심사 promptScore는 보존)
+ * - catFeedback + catScore: 냥심사 결과 (고양이 나비 예능 심사 15점)
  */
 export async function POST(request: NextRequest) {
   const body = await request.json();
