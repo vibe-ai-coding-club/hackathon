@@ -1,11 +1,17 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import type { ReactElement } from "react";
 
 import { Icon } from "@/app/_components/icon";
 import type { StaffItem } from "@/app/sections/landing-data";
 
 type StaffCardProps = {
   item: StaffItem;
+};
+
+type SocialLink = {
+  href: string;
+  label: string;
+  icon: ReactElement;
 };
 
 const getInitials = (name: string) => {
@@ -35,9 +41,7 @@ export const StaffCard = ({ item }: StaffCardProps) => {
           icon: <Icon type="linkedin" width={20} height={20} />,
         }
       : null,
-  ].filter(
-    (link): link is { href: string; label: string; icon: ReactNode } => link !== null,
-  );
+  ].filter((link): link is SocialLink => link !== null);
 
   return (
     <article className="relative flex min-w-[272px] items-center gap-4 rounded-[32px] border border-white/15 bg-white/10 px-5 py-6 text-white backdrop-blur-sm md:min-w-[340px] md:gap-6 md:px-6 md:py-6">
