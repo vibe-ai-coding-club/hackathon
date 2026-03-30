@@ -135,17 +135,22 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
         {/* 제목 + 좋아요 */}
         <div className="flex items-center justify-between gap-2">
           {project.demoUrl ? (
-            <a
-              href={project.demoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="typo-subtitle1 md:typo-h6 line-clamp-1 text-blue-600 underline hover:text-blue-800"
-            >
-              {titleText}
+            <h3 className="typo-subtitle1 md:typo-h6 line-clamp-1">
+              <a
+                href={project.demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline"
+              >
+                {project.title}
+              </a>
+              {project.teamName && (
+                <span className="text-gray-850"> - {project.teamName}</span>
+              )}
               {rankLabel && (
                 <span className="ml-1.5 text-primary-400">{rankLabel}</span>
               )}
-            </a>
+            </h3>
           ) : (
             <h3 className="typo-subtitle1 text-gray-850 md:typo-h6 line-clamp-1">
               {titleText}
