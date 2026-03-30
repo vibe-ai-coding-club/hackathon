@@ -55,51 +55,105 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
   return (
     <article className="overflow-hidden rounded-xl md:rounded-[14px]">
       {/* 이미지 영역 */}
-      <div
-        className="relative aspect-3/2 overflow-hidden rounded-xl md:rounded-[14px] bg-white"
-        style={imageBorderStyle}
-      >
-        {project.imageUrl ? (
-          <Image
-            src={project.imageUrl}
-            alt={project.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-        ) : (
-          <>
+      {project.demoUrl ? (
+        <a
+          href={project.demoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block aspect-3/2 overflow-hidden rounded-xl md:rounded-[14px] bg-white cursor-pointer"
+          style={imageBorderStyle}
+        >
+          {project.imageUrl ? (
             <Image
-              src="/images/hero.webp"
+              src={project.imageUrl}
               alt={project.title}
               fill
-              className="object-cover opacity-15"
+              className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
-            <div className="absolute inset-0 flex items-center justify-center px-4">
-              <span className="typo-subtitle1 md:typo-h6 text-gray-700 text-center line-clamp-2 font-bold">
-                {project.title}
-              </span>
+          ) : (
+            <>
+              <Image
+                src="/images/hero.webp"
+                alt={project.title}
+                fill
+                className="object-cover opacity-15"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
+              <div className="absolute inset-0 flex items-center justify-center px-4">
+                <span className="typo-subtitle1 md:typo-h6 text-gray-700 text-center line-clamp-2 font-bold">
+                  {project.title}
+                </span>
+              </div>
+            </>
+          )}
+          {rankLabel && (
+            <div className="absolute top-3 left-3 rounded-lg bg-primary-400 px-2.5 py-1 typo-caption1 font-bold text-white shadow-sm">
+              {rankLabel}
             </div>
-          </>
-        )}
-        {rankLabel && (
-          <div className="absolute top-3 left-3 rounded-lg bg-primary-400 px-2.5 py-1 typo-caption1 font-bold text-white shadow-sm">
-            {rankLabel}
-          </div>
-        )}
-      </div>
+          )}
+        </a>
+      ) : (
+        <div
+          className="relative aspect-3/2 overflow-hidden rounded-xl md:rounded-[14px] bg-white"
+          style={imageBorderStyle}
+        >
+          {project.imageUrl ? (
+            <Image
+              src={project.imageUrl}
+              alt={project.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <>
+              <Image
+                src="/images/hero.webp"
+                alt={project.title}
+                fill
+                className="object-cover opacity-15"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
+              <div className="absolute inset-0 flex items-center justify-center px-4">
+                <span className="typo-subtitle1 md:typo-h6 text-gray-700 text-center line-clamp-2 font-bold">
+                  {project.title}
+                </span>
+              </div>
+            </>
+          )}
+          {rankLabel && (
+            <div className="absolute top-3 left-3 rounded-lg bg-primary-400 px-2.5 py-1 typo-caption1 font-bold text-white shadow-sm">
+              {rankLabel}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 정보 영역 */}
       <div className="bg-gray-50 px-5 py-4 md:px-7 md:py-5">
         {/* 제목 + 좋아요 */}
         <div className="flex items-center justify-between gap-2">
-          <h3 className="typo-subtitle1 text-gray-850 md:typo-h6 line-clamp-1">
-            {titleText}
-            {rankLabel && (
-              <span className="ml-1.5 text-primary-400">{rankLabel}</span>
-            )}
-          </h3>
+          {project.demoUrl ? (
+            <a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="typo-subtitle1 md:typo-h6 line-clamp-1 text-blue-600 underline hover:text-blue-800"
+            >
+              {titleText}
+              {rankLabel && (
+                <span className="ml-1.5 text-primary-400">{rankLabel}</span>
+              )}
+            </a>
+          ) : (
+            <h3 className="typo-subtitle1 text-gray-850 md:typo-h6 line-clamp-1">
+              {titleText}
+              {rankLabel && (
+                <span className="ml-1.5 text-primary-400">{rankLabel}</span>
+              )}
+            </h3>
+          )}
           {project.likeCount > 0 && (
             <span className="typo-caption1 text-gray-500 shrink-0 flex justify-center">
               ♥ {project.likeCount}
