@@ -145,7 +145,7 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
                 {project.title}
               </a>
               {project.teamName && (
-                <span className="text-gray-850"> - {project.teamName}</span>
+                <span className="text-gray-850 text-sm"> - {project.teamName}</span>
               )}
               {rankLabel && (
                 <span className="ml-1.5 text-primary-400">{rankLabel}</span>
