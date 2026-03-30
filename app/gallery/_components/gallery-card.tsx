@@ -153,17 +153,32 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
             </h3>
           ) : (
             <h3 className="typo-subtitle1 text-gray-850 md:typo-h6 line-clamp-1">
-              {titleText}
+              {project.title}
+              {project.teamName && (
+                <span className="text-sm"> - {project.teamName}</span>
+              )}
               {rankLabel && (
                 <span className="ml-1.5 text-primary-400">{rankLabel}</span>
               )}
             </h3>
           )}
-          {project.likeCount > 0 && (
-            <span className="typo-caption1 text-gray-500 shrink-0 flex justify-center">
-              ♥ {project.likeCount}
-            </span>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {project.likeCount > 0 && (
+              <span className="typo-caption1 text-gray-700 font-medium flex justify-center">
+                ♥ {project.likeCount}
+              </span>
+            )}
+            {project.promptScore != null && (
+              <span className="typo-caption1 text-gray-700 font-medium flex justify-center">
+                🤖 {project.promptScore}
+              </span>
+            )}
+            {project.catScore != null && (
+              <span className="typo-caption1 text-gray-400 flex justify-center">
+                🐱 {project.catScore}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* 서비스 한줄 소개 */}

@@ -64,11 +64,23 @@ export const GalleryDetailModal = ({
                   {rankLabel}
                 </span>
               )}
-              {project.likeCount > 0 && (
-                <span className="typo-caption1 text-gray-500">
-                  ♥ {project.likeCount}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5 typo-caption1">
+                {project.likeCount > 0 && (
+                  <span className="text-gray-700 font-medium">♥ {project.likeCount}</span>
+                )}
+                {project.promptScore != null && (
+                  <>
+                    {project.likeCount > 0 && <span className="text-gray-300">|</span>}
+                    <span className="text-gray-700 font-medium">🤖 {project.promptScore}</span>
+                  </>
+                )}
+                {project.catScore != null && (
+                  <>
+                    <span className="text-gray-300">|</span>
+                    <span className="text-gray-400">🐱 {project.catScore}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -162,6 +174,7 @@ export const GalleryDetailModal = ({
           {project.catFeedback && (
             <FeedbackBlock
               title="냥심사 결과"
+              subtitle="심사엔 반영되지 않는다냥"
               score={project.catScore}
               content={project.catFeedback}
             />
@@ -183,16 +196,23 @@ const InfoBlock = ({ title, content }: { title: string; content: string }) => (
 
 const FeedbackBlock = ({
   title,
+  subtitle,
   score,
   content,
 }: {
   title: string;
+  subtitle?: string;
   score: number | null;
   content: string;
 }) => (
   <div className="rounded-xl bg-gray-50 px-5 py-5 md:px-7 md:py-6">
     <div className="flex items-center justify-between">
-      <h3 className="typo-subtitle2 text-gray-900">{title}</h3>
+      <h3 className="typo-subtitle2 text-gray-900">
+        {title}
+        {subtitle && (
+          <span className="ml-2 text-xs text-gray-400 font-normal">{subtitle}</span>
+        )}
+      </h3>
       {score != null && (
         <span className="typo-h6 text-primary-400">{score}점</span>
       )}
