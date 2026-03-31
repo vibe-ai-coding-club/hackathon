@@ -72,7 +72,7 @@ export const FloatingStopwatch = () => {
     >
       <div className="flex items-center justify-center gap-2 overflow-hidden rounded-[32px] border border-primary-200 bg-transparent px-6 py-2.5 whitespace-nowrap backdrop-blur-[10px] md:gap-3.5 md:rounded-[44px] md:px-[34px] md:py-5">
         <p className="text-[14px] leading-[22px] font-medium tracking-[-0.2px] text-primary-900 md:typo-h6 md:font-bold">
-          해커톤 종료! 감사합니다 🎉
+          참여해주셔서 감사합니다 🎉
         </p>
       </div>
     </div>
