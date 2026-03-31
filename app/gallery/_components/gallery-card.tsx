@@ -64,12 +64,10 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
           style={imageBorderStyle}
         >
           {project.imageUrl ? (
-            <Image
+            <img
               src={project.imageUrl}
               alt={project.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
             <>
@@ -77,6 +75,7 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
                 src="/images/hero.webp"
                 alt={project.title}
                 fill
+                loading="eager"
                 className="object-cover opacity-15"
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
@@ -99,12 +98,10 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
           style={imageBorderStyle}
         >
           {project.imageUrl ? (
-            <Image
+            <img
               src={project.imageUrl}
               alt={project.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
             <>
@@ -112,6 +109,7 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
                 src="/images/hero.webp"
                 alt={project.title}
                 fill
+                loading="eager"
                 className="object-cover opacity-15"
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
