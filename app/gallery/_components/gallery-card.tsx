@@ -134,34 +134,33 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
       <div className="bg-gray-50 px-5 py-4 md:px-7 md:py-5">
         {/* 제목 + 좋아요 */}
         <div className="flex items-center justify-between gap-2">
-          {project.demoUrl ? (
-            <h3 className="typo-subtitle1 md:typo-h6 line-clamp-1">
-              <a
-                href={project.demoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
+          <div className="flex items-center gap-1.5 min-w-0">
+            {project.demoUrl ? (
+              <h3 className="typo-subtitle1 md:typo-h6 truncate min-w-0">
+                <a
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
+                  {project.title}
+                </a>
+                {project.teamName && (
+                  <span className="text-gray-850 text-sm"> - {project.teamName}</span>
+                )}
+              </h3>
+            ) : (
+              <h3 className="typo-subtitle1 text-gray-850 md:typo-h6 truncate min-w-0">
                 {project.title}
-              </a>
-              {project.teamName && (
-                <span className="text-gray-850 text-sm"> - {project.teamName}</span>
-              )}
-              {rankLabel && (
-                <span className="ml-1.5 text-primary-400">{rankLabel}</span>
-              )}
-            </h3>
-          ) : (
-            <h3 className="typo-subtitle1 text-gray-850 md:typo-h6 line-clamp-1">
-              {project.title}
-              {project.teamName && (
-                <span className="text-sm"> - {project.teamName}</span>
-              )}
-              {rankLabel && (
-                <span className="ml-1.5 text-primary-400">{rankLabel}</span>
-              )}
-            </h3>
-          )}
+                {project.teamName && (
+                  <span className="text-sm"> - {project.teamName}</span>
+                )}
+              </h3>
+            )}
+            {rankLabel && (
+              <span className="shrink-0 typo-subtitle1 md:typo-h6 text-primary-400 font-bold">{rankLabel}</span>
+            )}
+          </div>
           <div className="flex items-center gap-2 shrink-0">
             {project.likeCount > 0 && (
               <span className="typo-caption1 text-gray-700 font-medium flex justify-center">
