@@ -39,27 +39,27 @@ export const ConfirmModal = ({
         if (e.target === e.currentTarget) onCancel();
       }}
     >
-      <div className="w-full max-w-sm rounded-lg border border-border bg-background p-5 space-y-4">
-        <h3 className="typo-subtitle2">{title}</h3>
-        <p className="typo-caption1 text-muted-foreground whitespace-pre-line">
+      <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-6 shadow-lg space-y-4">
+        <h3 className="typo-subtitle1 text-gray-900">{title}</h3>
+        <p className="typo-body3 text-gray-500 whitespace-pre-line leading-relaxed">
           {message}
         </p>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-1">
           <button
             ref={cancelRef}
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-border px-3 py-1.5 typo-btn4 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-lg border border-gray-200 px-4 py-2 typo-btn4 cursor-pointer transition-colors hover:bg-gray-50"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`rounded-md px-3 py-1.5 typo-btn4 text-white cursor-pointer transition-colors ${
+            className={`rounded-lg px-4 py-2 typo-btn4 text-white cursor-pointer transition-colors ${
               variant === "danger"
-                ? "bg-error hover:opacity-90"
-                : "bg-accent hover:bg-accent-hover"
+                ? "bg-error hover:bg-red-600"
+                : "bg-gray-900 hover:bg-gray-800"
             }`}
           >
             {confirmLabel}

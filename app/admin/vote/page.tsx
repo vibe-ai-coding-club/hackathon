@@ -77,9 +77,9 @@ const AdminVotesPage = () => {
 
   return (
     <div className="w-full max-w-360 mx-auto px-4 py-4">
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-4 flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3">
         <div className="flex items-center gap-4">
-          <h1 className="typo-h6">딸깍톤 Admin</h1>
+          <h1 className="typo-h6 text-gray-900">딸깍톤 Admin</h1>
           <AdminNav />
         </div>
         <LogoutButton />
@@ -88,7 +88,7 @@ const AdminVotesPage = () => {
       <div className="space-y-3">
         {loading ? (
           <div className="py-8 text-center">
-            <p className="typo-caption1 text-muted-foreground">로딩 중...</p>
+            <p className="typo-caption1 text-gray-400">로딩 중...</p>
           </div>
         ) : (
           <>
