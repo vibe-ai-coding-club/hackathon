@@ -22,8 +22,8 @@ export const GalleryContent = ({ projects }: GalleryContentProps) => {
     <section className="px-4 pt-30 pb-22.5 md:px-8 md:pt-40 md:pb-45">
       <div className="mx-auto max-w-7xl">
         <MotionItem>
-          <div className="flex items-center justify-between">
-            <SectionTitle chipLabel="Gallery" title="프로젝트 갤러리" />
+          <SectionTitle chipLabel="Gallery" title="프로젝트 갤러리" />
+          <div className="flex justify-end mt-3">
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); setShowEdit(true); }}
