@@ -53,6 +53,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+  const editLog = `${dateStr} - 참가자 수정 (${email.trim()})`;
+  const newMemo = project.adminMemo
+    ? `${editLog}\n${project.adminMemo}`
+    : editLog;
+
   await prisma.project.update({
     where: { id: projectId },
     data: {
@@ -62,6 +69,7 @@ export async function POST(request: NextRequest) {
       demoUrl: demoUrl?.trim() || null,
       videoUrl: videoUrl?.trim() || null,
       linkUrl: linkUrl?.trim() || null,
+      adminMemo: newMemo,
     },
   });
 
