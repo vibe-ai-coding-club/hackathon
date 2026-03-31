@@ -356,7 +356,12 @@ const EditForm = ({
                     <input
                       type="checkbox"
                       checked={fetchImage}
-                      onChange={(e) => setFetchImage(e.target.checked)}
+                      onChange={(e) => {
+                      setFetchImage(e.target.checked);
+                      if (e.target.checked && readmeResult.imageUrl) {
+                        setImageUrl(readmeResult.imageUrl);
+                      }
+                    }}
                       className="accent-primary-400"
                     />
                     <span className="text-gray-600 truncate max-w-60">{readmeResult.imageUrl}</span>
