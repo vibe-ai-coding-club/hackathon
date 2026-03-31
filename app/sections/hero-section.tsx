@@ -303,7 +303,7 @@ export const HeroSection = () => {
     successTimerRef.current = window.setTimeout(() => {
       setPhase("success");
       navigateTimerRef.current = window.setTimeout(() => {
-        router.push("/teams");
+        router.push("/gallery");
       }, 2000);
     }, 520);
   }, [clearDesktopEscapeTimer, clearMobileTimers, clearSuccessTimers, router]);
@@ -656,7 +656,7 @@ export const HeroSection = () => {
             onMouseEnter={onIdleButtonMouseEnter}
             onPointerDown={onIdleButtonPointerDown}
           >
-            참가자 대시보드
+            갤러리 보러가기
           </button>
 
           <div
@@ -715,7 +715,7 @@ export const HeroSection = () => {
                 <span>미션 성공!</span>
               </span>
             ) : (
-              "참가자 대시보드"
+              "갤러리 보러가기"
             )}
           </span>
         </button>

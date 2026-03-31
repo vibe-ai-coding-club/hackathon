@@ -15,7 +15,7 @@ export const StopwatchSection = () => {
             className="text-white md:size-6"
           />
           <p className="text-[20px] leading-[30px] font-bold tracking-[-0.4px] text-white md:text-[34px] md:leading-[52px]">
-            D-Day!
+            해커톤 종료! 참여해주셔서 감사합니다 🎉
           </p>
           <Icon
             type="twinkle"
