@@ -38,7 +38,7 @@ type ProjectTableProps = {
 const PAGE_SIZE = 20;
 
 const thClass =
-  "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
+  "px-2.5 py-2 text-left typo-caption2 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap";
 const tdClass = "px-2.5 py-1.5 typo-caption1";
 
 export const ProjectTable = ({ projects: initialProjects, archivedProjectIds = [] }: ProjectTableProps) => {
@@ -101,22 +101,22 @@ export const ProjectTable = ({ projects: initialProjects, archivedProjectIds = [
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="typo-subtitle2 shrink-0">프로젝트 목록</h2>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
+        <h2 className="typo-subtitle2 shrink-0 text-gray-900">프로젝트 목록</h2>
         <input
           type="text"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="프로젝트명, 이름 또는 이메일 검색"
-          className="max-w-xs w-full rounded-md border border-border bg-background px-2.5 py-1 typo-caption1 outline-none focus:border-accent transition-colors"
+          className="max-w-xs w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 typo-caption1 outline-none focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-400/10 transition-all"
         />
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
         <table className="w-full table-fixed">
           <thead>
-            <tr className="border-b border-border bg-muted">
+            <tr className="border-b border-gray-200 bg-gray-50/80">
               <th className={`${thClass} w-10`}>#</th>
               <th className={thClass}>프로젝트명</th>
               <th className={`${thClass} w-20`}>대표자</th>
@@ -148,7 +148,7 @@ export const ProjectTable = ({ projects: initialProjects, archivedProjectIds = [
                 <tr
                   key={project.id}
                   onClick={() => setSelectedProject(project)}
-                  className="border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors"
+                  className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 cursor-pointer transition-colors"
                 >
                   <td className={`${tdClass} text-muted-foreground`}>
                     {page * PAGE_SIZE + i + 1}
@@ -295,21 +295,21 @@ export const ProjectTable = ({ projects: initialProjects, archivedProjectIds = [
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1.5">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-gray-50"
           >
             이전
           </button>
-          <span className="typo-caption1 text-muted-foreground">
+          <span className="px-3 typo-caption1 tabular-nums text-gray-500">
             {page + 1} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-gray-50"
           >
             다음
           </button>

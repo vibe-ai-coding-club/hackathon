@@ -35,7 +35,7 @@ type ArchivedProjectTableProps = {
 };
 
 const thClass =
-  "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
+  "px-2.5 py-2 text-left typo-caption2 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap";
 const tdClass = "px-2.5 py-1.5 typo-caption1 whitespace-nowrap";
 
 type MemberInfo = { name: string; email: string; isLeader: boolean };
@@ -96,22 +96,22 @@ export const ArchivedProjectTable = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="typo-subtitle2 shrink-0">아카이빙 목록</h2>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
+        <h2 className="typo-subtitle2 shrink-0 text-gray-900">아카이빙 목록</h2>
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="프로젝트명 또는 팀명 검색"
-          className="max-w-xs w-full rounded-md border border-border bg-background px-2.5 py-1 typo-caption1 outline-none focus:border-accent transition-colors"
+          className="max-w-xs w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 typo-caption1 outline-none focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-400/10 transition-all"
         />
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border bg-muted">
+            <tr className="border-b border-gray-200 bg-gray-50/80">
               <th className={`${thClass} w-10`}>#</th>
               <th className={thClass}>프로젝트명</th>
               <th className={`${thClass} w-28`}>팀명</th>
@@ -158,7 +158,7 @@ export const ArchivedProjectTable = ({
                 <tr
                   key={project.id}
                   onClick={() => setSelected(project)}
-                  className="border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors"
+                  className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 cursor-pointer transition-colors"
                 >
                   <td className={`${tdClass} text-muted-foreground`}>
                     {i + 1}

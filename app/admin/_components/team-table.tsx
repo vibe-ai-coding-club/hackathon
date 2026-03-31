@@ -580,19 +580,19 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
   };
 
   const thClass =
-    "px-2.5 py-1.5 text-left typo-caption2 font-medium text-muted-foreground whitespace-nowrap";
+    "px-2.5 py-2 text-left typo-caption2 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap";
   const tdClass = "px-2.5 py-1.5 typo-caption1";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* 필터 바 */}
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="typo-subtitle2 shrink-0 mr-2">신청 목록</h2>
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3">
+        <h2 className="typo-subtitle2 shrink-0 mr-2 text-gray-900">신청 목록</h2>
 
         <select
           value={filters.status}
           onChange={(e) => updateFilter("status", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
+          className="rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 typo-caption1 cursor-pointer transition-colors hover:border-gray-300"
         >
           <option value="ALL">상태: 전체</option>
           {Object.entries(statusLabel).map(([k, v]) => (
@@ -605,7 +605,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         <select
           value={filters.experienceLevel}
           onChange={(e) => updateFilter("experienceLevel", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
+          className="rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 typo-caption1 cursor-pointer transition-colors hover:border-gray-300"
         >
           <option value="ALL">경험: 전체</option>
           {Object.entries(experienceLevelLabel).map(([k, v]) => (
@@ -618,7 +618,7 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
         <select
           value={filters.participationType}
           onChange={(e) => updateFilter("participationType", e.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1 typo-caption1 cursor-pointer"
+          className="rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 typo-caption1 cursor-pointer transition-colors hover:border-gray-300"
         >
           <option value="ALL">유형: 전체</option>
           {Object.entries(participationTypeLabel).map(([k, v]) => (
@@ -641,16 +641,16 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
             placeholder="이름/이메일/팀명 검색"
-            className="w-44 rounded-md border border-border bg-background px-2.5 py-1 typo-caption1 outline-none focus:border-accent transition-colors ml-1"
+            className="w-44 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 typo-caption1 outline-none focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-400/10 transition-all ml-1"
           />
         </div>
       </div>
 
       {/* 스프레드시트형 테이블 */}
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border bg-muted">
+            <tr className="border-b border-gray-200 bg-gray-50/80">
               <th className={thClass}>#</th>
               <th className={thClass}>상태</th>
               <th className={thClass}>유형</th>
@@ -998,21 +998,21 @@ export const TeamTable = ({ teams: initialTeams }: TeamTableProps) => {
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1.5">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-gray-50"
           >
             이전
           </button>
-          <span className="typo-caption1 text-muted-foreground">
+          <span className="px-3 typo-caption1 tabular-nums text-gray-500">
             {page + 1} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="rounded-md border border-border px-2.5 py-1 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-muted"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 typo-caption1 disabled:opacity-30 cursor-pointer transition-colors hover:bg-gray-50"
           >
             다음
           </button>

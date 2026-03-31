@@ -59,20 +59,20 @@ export const EventSettingControl = ({
   };
 
   return (
-    <div className="rounded-lg border border-border p-4">
-      <h2 className="typo-subtitle2 mb-3">이벤트 설정</h2>
+    <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <h2 className="typo-subtitle2 mb-3 text-gray-900">이벤트 설정</h2>
 
       <div className="space-y-4">
         {/* 발표 중 프로젝트 선택 */}
         <div className="flex items-center gap-2">
-          <label className="typo-caption1 text-muted-foreground">
+          <label className="typo-caption1 text-gray-500">
             발표 중 프로젝트:
           </label>
           <select
             value={presentingProjectId}
             onChange={(e) => handlePresentingChange(e.target.value)}
             disabled={loading}
-            className="flex-1 max-w-sm rounded-md border border-border bg-background px-2 py-1 typo-caption1 disabled:opacity-50"
+            className="flex-1 max-w-sm rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 typo-caption1 disabled:opacity-50 transition-colors hover:border-gray-300"
           >
             <option value="">없음 (선택 해제)</option>
             {projects.map((p) => (
@@ -82,8 +82,8 @@ export const EventSettingControl = ({
             ))}
           </select>
           {presentingProjectId && (
-            <span className="flex items-center gap-1 typo-caption2 text-success">
-              <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+            <span className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 typo-caption2 text-success">
+              <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
               발표 중
             </span>
           )}

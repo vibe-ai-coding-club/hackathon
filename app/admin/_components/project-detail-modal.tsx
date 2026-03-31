@@ -112,12 +112,12 @@ export const ProjectDetailModal = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-lg border border-border bg-background">
+      <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-2xl border border-gray-200 bg-white shadow-lg">
         <div className="flex items-center justify-between p-5 pb-0">
-          <h2 className="typo-subtitle2">프로젝트 상세</h2>
+          <h2 className="typo-subtitle1 text-gray-900">프로젝트 상세</h2>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors text-base leading-none"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors text-lg leading-none"
             aria-label="닫기"
           >
             &times;
