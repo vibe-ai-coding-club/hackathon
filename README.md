@@ -1,3 +1,7 @@
+<a href="https://www.youtube.com/watch?v=JDYy4JY3VFs">
+  <img src="https://img.youtube.com/vi/JDYy4JY3VFs/0.jpg" alt="딸깍톤 웹페이지">
+</a>
+
 # ttalkkakthon
 
 해커톤 프로젝트
