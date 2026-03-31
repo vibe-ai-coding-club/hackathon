@@ -73,5 +73,18 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  // 아카이빙 프로젝트에도 수정 내용 반영
+  await prisma.archivedProject.updateMany({
+    where: { originalProjectId: projectId },
+    data: {
+      description: description?.trim() || null,
+      imageUrl: imageUrl?.trim() || null,
+      githubUrl: githubUrl?.trim() || null,
+      demoUrl: demoUrl?.trim() || null,
+      videoUrl: videoUrl?.trim() || null,
+      linkUrl: linkUrl?.trim() || null,
+    },
+  });
+
   return NextResponse.json({ success: true });
 }
