@@ -57,12 +57,7 @@ export const Navigation = () => {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/teams"
-              className="rounded-xl bg-primary-400 px-5 py-3 text-[18px] leading-6.5 font-semibold tracking-[-0.4px] text-white transition-colors hover:bg-primary-500"
-            >
-              참가자 대시보드
-            </Link>
+            {/* 참가자 대시보드 임시 비활성화 */}
           </div>
         </nav>
 
