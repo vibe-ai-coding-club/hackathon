@@ -389,6 +389,10 @@ const EditForm = ({
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
+      <p className="text-xs text-gray-400 leading-relaxed">
+        수정 내용은 바로 반영되지 않으며, 관리자가 확인 후 직접 반영할 예정입니다.
+      </p>
+
       <div className="flex justify-between items-center pt-1">
         <div>
           {onBack && (
