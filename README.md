@@ -1,3 +1,5 @@
+<img width="1424" height="830" alt="스크린샷 2026-04-01 오전 10 17 39" src="https://github.com/user-attachments/assets/4bcbb52e-00a8-4ac9-a1c5-3d157334591c" />
+
 <a href="https://www.youtube.com/watch?v=JDYy4JY3VFs">
   <img src="https://img.youtube.com/vi/JDYy4JY3VFs/0.jpg" alt="딸깍톤 웹페이지">
 </a>
