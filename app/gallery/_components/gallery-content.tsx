@@ -36,7 +36,7 @@ export const GalleryContent = ({ projects }: GalleryContentProps) => {
 
         <div className="mt-9 grid gap-6 md:mt-13 md:grid-cols-2 md:gap-7 lg:grid-cols-3">
           {projects.map((project, index) => (
-            <MotionItem key={project.id} delay={0.08 * (index % 6)}>
+            <MotionItem key={project.id} delay={0.08 * (index % 6)} className="min-w-0">
               <GalleryCard
                 project={project}
                 onDetailClick={() => setSelected(project)}
