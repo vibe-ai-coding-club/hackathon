@@ -165,7 +165,7 @@ export const GalleryCard = ({ project, onDetailClick }: GalleryCardProps) => {
                 ♥ {project.likeCount}
               </span>
             )}
-            {project.promptScore != null && (
+            {project.promptScore != null && project.promptScore >= 70 && (
               <span className="typo-caption1 text-gray-700 font-medium flex justify-center">
                 🤖 {project.promptScore}
               </span>
